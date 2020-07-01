@@ -3,6 +3,7 @@
  */
 
 import { call, put, takeLatest } from 'redux-saga/effects';
+import { push } from 'connected-react-router';
 import { FETCH_USER } from './constants';
 import { userFetched, userFetchError } from './actions';
 import { getPrivateRoute } from '../../utils/api';
@@ -19,6 +20,7 @@ function* fetchUser() {
     }
   } catch (err) {
     yield put(userFetchError(err));
+    yield put(push('/create'));
   }
 }
 

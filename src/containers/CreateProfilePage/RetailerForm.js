@@ -50,13 +50,14 @@ const RetailerForm = ({
     setFormValues({ ...formValues, terms: !formValues.terms });
   };
 
-  const handleSuggestSelect = suggestion => {
+  const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
-      const { location } = suggestion;
+      console.log(suggestion);
+      const { location, gmaps } = suggestion;
       const newErrors = { ...formErrors };
       delete newErrors.location;
       setFormErrors({ ...newErrors });
-      setFormValues({ ...formValues, location });
+      setFormValues({ ...formValues, location, address: gmaps.formatted_address });
     }
   };
 

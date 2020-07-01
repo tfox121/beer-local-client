@@ -40,6 +40,7 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
   const formTemplate = {
     type: '',
     location: {},
+    address: '',
     avatar: false,
     terms: false,
     pictureFile: undefined,

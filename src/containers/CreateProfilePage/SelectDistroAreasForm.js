@@ -16,8 +16,6 @@ const SelectDistroAreasForm = ({
 }) => {
   const [visible, setVisible] = useState(false);
 
-  console.log(mapCentre);
-
   useEffect(() => {
     if (profileStage === 2 && formValues.type === 'producer') {
       setVisible(true);
@@ -28,7 +26,7 @@ const SelectDistroAreasForm = ({
 
   let editableFG = null;
 
-  const onFeatureGroupReady = reactFGref => {
+  const onFeatureGroupReady = (reactFGref) => {
     if (reactFGref) {
       editableFG = reactFGref;
     }
@@ -48,7 +46,7 @@ const SelectDistroAreasForm = ({
     onChange();
   };
 
-  const onCreated = e => {
+  const onCreated = (e) => {
     const type = e.layerType;
     console.log('onCreated: something else created:', type, e);
 
@@ -80,7 +78,7 @@ const SelectDistroAreasForm = ({
               />
               <MapMarker location={formValues.location} />
               <FeatureGroup
-                ref={reactFGref => {
+                ref={(reactFGref) => {
                   onFeatureGroupReady(reactFGref);
                 }}
               >

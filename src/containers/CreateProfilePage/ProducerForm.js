@@ -1,6 +1,6 @@
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Geosuggest from 'react-geosuggest';
 
 import ImageUpload from '../../components/ImageUpload';
@@ -19,6 +19,7 @@ const ProducerForm = ({
 }) => {
   const [zoomLevel, setZoomLevel] = useState(5);
   const [visible, setVisible] = useState(false);
+  const geosuggestEl = useRef(null);
 
   useEffect(() => {
     if (profileStage === 1 && formValues.type === 'producer') {
@@ -49,13 +50,14 @@ const ProducerForm = ({
     setFormValues({ ...formValues, terms: !formValues.terms });
   };
 
-  const handleSuggestSelect = suggestion => {
+  const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
-      const { location } = suggestion;
+      console.log(suggestion);
+      const { location, gmaps } = suggestion;
       const newErrors = { ...formErrors };
       delete newErrors.location;
       setFormErrors({ ...newErrors });
-      setFormValues({ ...formValues, location });
+      setFormValues({ ...formValues, location, address: gmaps.formatted_address });
     }
   };
 
@@ -111,6 +113,7 @@ const ProducerForm = ({
               >
                 <SuggestBlockStyle>
                   <Geosuggest
+                    ref={geosuggestEl}
                     label="Location"
                     id="breweryLocation"
                     // eslint-disable-next-line no-undef
@@ -122,7 +125,9 @@ const ProducerForm = ({
                     minlegnth="3"
                     country="gb"
                     onSuggestSelect={handleSuggestSelect}
+                    onBlur={() => geosuggestEl.current.selectSuggest()}
                     required
+                    autoActivateFirstSuggest
                   />
                 </SuggestBlockStyle>
                 {formErrors.location && (

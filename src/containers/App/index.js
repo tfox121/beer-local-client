@@ -46,18 +46,24 @@ const AppWrapper = styled.div`
   flex-direction: column;
 `;
 
-const App = ({ userFetch, userClear }) => {
+const App = ({ userProfile, userFetch, userClear }) => {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
-  const { isAuthenticated } = useAuth0();
+  const { user, isAuthenticated } = useAuth0();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      userFetch();
-      return;
+    // if (isAuthenticated) {
+    //   userFetch();
+    //   return;
+    // }
+    if (!isAuthenticated) {
+      userClear();
     }
-    userClear();
   }, [isAuthenticated]);
+
+  if (isAuthenticated && user && user['https://beerlocal/apiroles'][0] !== 'Visitor' && !userProfile) {
+    userFetch();
+  }
 
   return (
     <AppWrapper>

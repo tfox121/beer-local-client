@@ -26,6 +26,7 @@ import { Map, TileLayer } from 'react-leaflet';
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { STOCK_HEADERS, PACK_SIZES } from '../../utils/constants';
+import { baseURL } from '../../utils/api';
 import makeSelectProducerProfilePage, { makeSelectUser } from './selectors';
 import { fetchProfile, clearProfile } from './actions';
 import reducer from './reducer';
@@ -38,6 +39,8 @@ import MapMarker from '../../components/MapMarker';
 import StockModal from './StockModal';
 
 import MapStyle from './MapStyle';
+import AvailabilityBasic from './AvailabilityBasic';
+import AvailabilityDynamic from './AvailabilityDynamic';
 
 export function ProducerProfilePage({
   profileFetch,
@@ -81,22 +84,31 @@ export function ProducerProfilePage({
       <PageWrapper>
         <Container>
           <Segment basic textAlign="center">
-            <Image src={avatarSource} size="small" bordered centered circular />
-            <a href={website} target="_blank" rel="noreferrer">
-              {website}
-            </a>
-            <Grid columns={2} padded="vertically">
+
+            <Grid columns={3} padded="vertically">
               <Grid.Row>
+                <Grid.Column width={4} verticalAlign="middle">
+                  <Image src={`${baseURL}${avatarSource}`} size="small" bordered centered circular />
+
+                </Grid.Column>
                 <Grid.Column width={8} textAlign="left">
                   <Header as="h1">{businessName}</Header>
+                  <a href={website} target="_blank" rel="noreferrer">
+                    {website}
+                  </a>
                   <p>{intro}</p>
-                  <Header as="h3">Sales email</Header>
-                  <p>{salesEmail}</p>
-                  <Header as="h3">Sales telephone</Header>
-                  <p>{salesContactNumber}</p>
+                  <Header as="h4">Contact</Header>
+                  <p>
+                    Email:
+                    {' '}
+                    {salesEmail}
+                    {' '}
+                    / Tel:
+                    {' '}
+                    {salesContactNumber}
+                  </p>
                 </Grid.Column>
-                <Grid.Column width={8}>
-                  <Header as="h3">Distribution area</Header>
+                <Grid.Column width={4}>
                   <MapStyle>
                     <Map
                       className="profileViewMap"
@@ -119,7 +131,7 @@ export function ProducerProfilePage({
             </Grid>
           </Segment>
           <Segment basic>
-            <Grid columns={2}>
+            <Grid columns={2} style={{ marginBottom: '0.05em' }}>
               <Grid.Column textAlign="left">
                 <Header as="h2">Available Items</Header>
               </Grid.Column>
@@ -128,51 +140,8 @@ export function ProducerProfilePage({
                   && <StockModal />}
               </Grid.Column>
             </Grid>
-            <Table>
-              <Table.Header>
-                <Table.Row>
-                  {STOCK_HEADERS.map((header) => (
-                    <Table.HeaderCell key={header}>{header}</Table.HeaderCell>
-                  ))}
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {stock.map((stockItem) => {
-                  if (stockItem.display && stockItem.display === 'Show') {
-                    return (
-                      <Table.Row key={stockItem.id}>
-                        <Table.Cell width={4}>{stockItem.name}</Table.Cell>
-                        <Table.Cell>{stockItem.style}</Table.Cell>
-                        <Table.Cell>
-                          <NumberFormat
-                            displayType="text"
-                            decimalScale={1}
-                            fixedDecimalScale
-                            suffix="%"
-                            value={stockItem.abv}
-                          />
-                        </Table.Cell>
-                        <Table.Cell>
-                          {PACK_SIZES[stockItem.packSize]}
-                        </Table.Cell>
-                        <Table.Cell>
-                          <NumberFormat
-                            displayType="text"
-                            thousandSeparator
-                            decimalScale={2}
-                            fixedDecimalScale
-                            prefix="£"
-                            value={stockItem.price}
-                          />
-                        </Table.Cell>
-                        <Table.Cell>{stockItem.availability}</Table.Cell>
-                      </Table.Row>
-                    );
-                  }
-                  return null;
-                })}
-              </Table.Body>
-            </Table>
+            {/* <AvailabilityBasic stock={stock} /> */}
+            <AvailabilityDynamic data={stock} />
           </Segment>
         </Container>
       </PageWrapper>

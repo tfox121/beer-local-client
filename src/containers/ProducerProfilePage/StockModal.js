@@ -21,6 +21,7 @@ import { withRouter } from 'react-router';
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { getPrivateRoute } from '../../utils/api';
+import arrayMove from '../../utils/arrayMove';
 import StockModalStyle from './StockModalStyle';
 
 import StockModalMenu from './StockModalMenu';
@@ -80,6 +81,32 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
       setStockData(stock);
     }
   }, [stock]);
+
+  const moveStockLineUp = () => {
+    const rows = Object.keys(selected);
+    if (rows.includes('0')) {
+      return;
+    }
+    let tempArr = [...stockData];
+    rows.forEach((row) => {
+      tempArr = arrayMove(tempArr, Number(row), Number(row) - 1);
+    });
+    // const newSelected = rows.reduce((obj, val) => { obj[Number(val) - 1] = true; return obj; }, {});
+    setStockData(tempArr);
+  };
+
+  const moveStockLineDown = () => {
+    console.log(selected);
+    const rows = Object.keys(selected);
+    if (rows.includes(rows.length.toString())) {
+      return;
+    }
+    let tempArr = [...stockData];
+    rows.reverse().forEach((row) => {
+      tempArr = arrayMove(tempArr, Number(row), Number(row) + 1);
+    });
+    setStockData(tempArr);
+  };
 
   const addNewStockLine = async () => {
     setStockData([stockDataTemplate, ...stockData]);
@@ -151,6 +178,8 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
             addNewStockLine={addNewStockLine}
             deleteStockItems={deleteStockItems}
             copyStockItems={copyStockItems}
+            moveStockLineUp={moveStockLineUp}
+            moveStockLineDown={moveStockLineDown}
           />
         </Modal.Header>
         <StockModalStyle>

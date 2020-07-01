@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-
 import { Dropdown, Menu, Image } from 'semantic-ui-react';
 import { useAuth0 } from '@auth0/auth0-react';
+
 import messages from './messages';
+import { baseURL } from '../../utils/api';
 
 export default function UserMenuItems({ avatarSource }) {
   const [avatar, setAvatar] = useState('./images/avatars/blank-profile.webp');
@@ -15,7 +16,7 @@ export default function UserMenuItems({ avatarSource }) {
 
   useEffect(() => {
     if (avatarSource && !avatarUpdated) {
-      setAvatar(avatarSource);
+      setAvatar(`${baseURL}${avatarSource}`);
       setAvatarUpdated(true);
     }
   }, [avatarSource]);
