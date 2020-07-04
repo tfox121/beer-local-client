@@ -9,7 +9,9 @@
  */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import NumberFormat from 'react-number-format';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Select from 'react-select';
 
 import {
@@ -22,13 +24,42 @@ import {
   useRowSelect,
 } from 'react-table';
 import matchSorter from 'match-sorter';
-import { Table, Button, Icon } from 'semantic-ui-react';
+import { Button, Icon } from 'semantic-ui-react';
 // import PropTypes from 'prop-types';
 
 // import { FormattedMessage } from 'react-intl';
-import { PACK_SIZES } from '../../utils/constants';
-
 import StockTableStyle from './StockTableStyle';
+
+const portal = document.createElement('div');
+portal.classList.add('my-super-cool-portal');
+
+if (!document.body) {
+  throw new Error('body not ready for portal creation!');
+}
+
+document.body.appendChild(portal);
+
+const PortalAwareItem = ({ provided, snapshot, children }) => {
+  const usePortal = snapshot.isDragging;
+
+  const child = (
+    <div
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      inPortal={usePortal}
+    >
+      {children}
+    </div>
+  );
+
+  if (!usePortal) {
+    return child;
+  }
+
+  // if dragging - put the item in a portal
+  return ReactDOM.createPortal(child, portal);
+};
 
 // Create an editable cell renderer
 const EditableCell = ({
@@ -62,7 +93,7 @@ const EditableCell = ({
 
   // We'll only update the external data when the input is blurred
   const onBlur = () => {
-    updateMyData(index, id, value);
+    updateMyData(index, id, value || 0);
   };
 
   // If the initialValue is changed externall, sync it up with our state
@@ -94,7 +125,6 @@ const EditableCell = ({
         value={value}
         onValueChange={onValueChange}
         onBlur={onBlur}
-        allowNegative={false}
       />
     );
   }
@@ -109,7 +139,6 @@ const EditableCell = ({
         value={value}
         onValueChange={onValueChange}
         onBlur={onBlur}
-        allowNegative={false}
       />
     );
   }
@@ -125,12 +154,20 @@ const EditableCell = ({
       singleValue: (base) => ({ ...base, padding: '3px' }),
     };
 
-    const packSizeArr = Object.keys(PACK_SIZES).map((key) => ({ value: key, label: PACK_SIZES[key] }));
+    const options = [
+      { value: '30l', label: '30L' },
+      { value: '50l', label: '50L' },
+      { value: '9g', label: '9g' },
+      { value: '12x330', label: '12x330ml' },
+      { value: '24x330', label: '24x330ml' },
+      { value: '24x440', label: '24x440ml' },
+    ];
+
     element = (
       <Select
-        options={packSizeArr}
+        options={options}
         onChange={onSelectChange}
-        value={packSizeArr.filter((option) => option.value === value)[0]}
+        value={options.filter((option) => option.value === value)[0]}
         placeholder="Select size"
         menuPortalTarget={document.body}
         styles={customStyles}
@@ -147,7 +184,7 @@ const EditableCell = ({
         value="Show"
         checked={value === 'Show'}
         onClick={onCheckboxChange}
-        onChange={() => { }}
+        onChange={() => {}}
       />
     );
   }
@@ -268,7 +305,7 @@ fuzzyTextFilterFn.autoRemove = (val) => !val;
 
 // Be sure to pass our updateMyData and the skipReset option
 const MyTable = ({
-  columns, data, updateMyData, skipReset, setSelected,
+  columns, data, updateMyData, skipReset, setSelected, setData,
 }) => {
   const filterTypes = React.useMemo(
     () => ({
@@ -297,6 +334,29 @@ const MyTable = ({
     }),
     [],
   );
+
+  const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  };
+
+  const onDragEnd = (result) => {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const newData = reorder(
+      data,
+      result.source.index,
+      result.destination.index,
+    );
+
+    setData(newData);
+  };
 
   // Use the state and functions returned from useTable to build your UI
   const {
@@ -332,7 +392,7 @@ const MyTable = ({
       // We also need to pass this so the page doesn't change
       // when we edit the data.
       autoResetPage: !skipReset,
-      // autoResetSelectedRows: !skipReset,
+      autoResetSelectedRows: !skipReset,
       disableMultiSort: true,
     },
     useFilters,
@@ -389,76 +449,103 @@ const MyTable = ({
   return (
     <>
       <StockTableStyle>
-        <Table {...getTableProps()} className="stock-table" compact>
-          <Table.Header className="table-header">
-            {headerGroups.map((headerGroup, index) => (
-              <Table.Row key={index} {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column, i) => (
-                  <th
-                    key={i}
-                    className="header-cell"
-                    width={column.width}
-                    {...column.getHeaderProps()}
-                  >
-                    <div className="column-header">
-                      <span {...column.getSortByToggleProps()}>
-                        {column.render('Header')}
-                        {/* Add a sort direction indicator */}
-                        {column.isSorted
-                          ? column.isSortedDesc
-                            ? ' ↑'
-                            : ' ↓'
-                          : ''}
-                      </span>
-                    </div>
-                    {/* Render the columns filter UI */}
-                    <div className="filter-container">
-                      {column.canFilter ? column.render('Filter') : null}
-                    </div>
-                  </th>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Header>
-          <Table.Body className="table-body" {...getTableBodyProps()}>
-            {page.map((row, index) => {
-              prepareRow(row);
-              return (
-                <Table.Row key={index} {...row.getRowProps()}>
-                  {row.cells.map((cell, i) => (
-                    <Table.Cell
-                      key={i}
-                      className="table-cell"
-                      {...cell.getCellProps()}
-                    >
-                      {cell.isGrouped ? (
-                        // If it's a grouped cell, add an expander and row count
-                        <>
-                          <span {...row.getToggleRowExpandedProps()}>
-                            {row.isExpanded ? 'ðŸ‘‡' : 'ðŸ‘‰'}
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="ReactTable -striped -highlight">
+            <div {...getTableProps()} className="rt-table stock-table" role="grid">
+              <div className="rt-thead -header" style={{ minWidth: '500px' }}>
+                {headerGroups.map((headerGroup, index) => (
+                  <div className="rt-tr" role="row" key={index} {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column, i) => (
+                      <div
+                        key={i}
+                        className="rt-th rt-resizable-header header-cell"
+                        role="columnheader"
+                        style={{ flex: '100 0 auto', width: '100px' }}
+                        width={column.width}
+                        tabIndex="-1"
+                        {...column.getHeaderProps()}
+                      >
+                        <div className="rt-resizable-header-content column-header">
+                          <span {...column.getSortByToggleProps()}>
+                            {column.render('Header')}
+                            {/* Add a sort direction indicator */}
+                            {column.isSorted
+                              ? column.isSortedDesc
+                                ? ' ↑'
+                                : ' ↓'
+                              : ''}
                           </span>
-                          {' '}
-                          {cell.render('Cell', { editable: false })}
-                          {' '}
-                          (
-                          {row.subRows.length}
-                          )
-                        </>
-                      ) : cell.isAggregated ? (
-                        // If the cell is aggregated, use the Aggregated
-                        // renderer for cell
-                        cell.render('Aggregated')
-                      ) : cell.isPlaceholder ? null : ( // For cells with repeated values, render null
-                        // Otherwise, just render the regular cell
-                        cell.render('Cell', { editable: true })
-                      )}
-                    </Table.Cell>
-                  ))}
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
-        </Table>
+                        </div>
+                        {/* Render the columns filter UI */}
+                        <div className="filter-container">
+                          {column.canFilter ? column.render('Filter') : null}
+                        </div>
+                        <div className="rt-resizer" />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <Droppable droppableId="droppable">
+                {(droppableProvided, droppableSnapshot) => (
+                  <div ref={droppableProvided.innerRef}>
+                    <div className="rt-tbody table-body" {...getTableBodyProps()} ref={droppableProvided.innerRef}>
+                      {page.map((row, index) => {
+                        prepareRow(row);
+                        return (
+                          // <div className="rt-tr-group" role="rowgroup">
+                          <Draggable key={row.original.id} index={index} draggableId={row.original.id}>
+                            {(draggableProvided, draggableSnapshot) => (
+                              <PortalAwareItem
+                                provided={draggableProvided}
+                                snapshot={draggableSnapshot}
+                              >
+                                <div className="rt-tr" role="row" key={index}>
+                                  {row.cells.map((cell, i) => (
+                                    <div
+                                      key={i}
+                                      className="rt-td table-cell"
+                                      role="gridcell"
+                                      style={{ flex: '100 0 auto', width: '100px' }}
+                                      {...cell.getCellProps()}
+                                    >
+                                      {cell.isGrouped ? (
+                                        // If it's a grouped cell, add an expander and row count
+                                        <>
+                                          <span {...row.getToggleRowExpandedProps()}>
+                                            {row.isExpanded ? 'ðŸ‘‡' : 'ðŸ‘‰'}
+                                          </span>
+                                          {' '}
+                                          {cell.render('Cell', { editable: false })}
+                                          {' '}
+                                          (
+                                          {row.subRows.length}
+                                          )
+                                        </>
+                                      ) : cell.isAggregated ? (
+                                        // If the cell is aggregated, use the Aggregated
+                                        // renderer for cell
+                                        cell.render('Aggregated')
+                                      ) : cell.isPlaceholder ? null : ( // For cells with repeated values, render null
+                                        // Otherwise, just render the regular cell
+                                        cell.render('Cell', { editable: true })
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </PortalAwareItem>
+                            )}
+                          </Draggable>
+                          // </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </Droppable>
+            </div>
+          </div>
+        </DragDropContext>
         {/*
         Pagination can be built however you'd like.
         This is just a very basic UI implementation:
@@ -589,7 +676,7 @@ const IndeterminateCheckbox = React.forwardRef(
   },
 );
 
-const StockManager = ({
+const StockManagerDraggable = ({
   data, setData, setSelected, setStockEditPending,
 }) => {
   const columns = React.useMemo(
@@ -660,6 +747,20 @@ const StockManager = ({
   // Update data. So we can keep track of that flag with a ref.
   const skipResetRef = React.useRef(false);
 
+  // // Update DB with new data
+  // const updateSourceData = async newData => {
+  //   if (newData.id) {
+  //     const response = await fetch(
+  //       'http://localhost:8000/api/user/brewery/stock',
+  //       {
+  //         method: 'PATCH',
+  //         body: JSON.stringify(newData),
+  //       },
+  //     );
+  //     console.log(response);
+  //   }
+  // };
+
   // When our cell renderer calls updateMyData, we'll use
   // the rowIndex, columnId and new value to update the
   // original data
@@ -686,6 +787,23 @@ const StockManager = ({
     skipResetRef.current = false;
   }, [data]);
 
+  // const isInitialMount = React.useRef(true);
+
+  // React.useEffect(() => {
+  //   if (isInitialMount.current) {
+  //     isInitialMount.current = false;
+  //   } else {
+  //     const updateSourceData = async (newData) => {
+  //       const response = await fetch('http://localhost:8000/api/user/brewery/stock', {
+  //         method: 'PATCH',
+  //         body: JSON.stringify(newData),
+  //       });
+  //       console.log(response);
+  //     };
+  //     updateSourceData(data);
+  //   }
+  // }, [data]);
+
   return (
     <MyTable
       columns={columns}
@@ -693,8 +811,9 @@ const StockManager = ({
       updateMyData={updateMyData}
       skipReset={skipResetRef.current}
       setSelected={setSelected}
+      setData={setData}
     />
   );
 };
 
-export default StockManager;
+export default StockManagerDraggable;

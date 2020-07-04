@@ -11,8 +11,6 @@ import { connect } from 'react-redux';
 import shortid from 'shortid';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
-import { useAuth0 } from '@auth0/auth0-react';
-import axios from 'axios';
 import {
   Modal, Button, Confirm, Loader, Icon,
 } from 'semantic-ui-react';
@@ -45,13 +43,12 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
     sku: '',
     style: '',
     abv: 0.0,
-    packSize: null,
+    packSize: '',
     price: 0.0,
     availability: '',
     display: 'Hide',
   };
 
-  const { getAccessTokenSilently } = useAuth0();
   const [stockData, setStockData] = React.useState([stockDataTemplate]);
   const [selected, setSelected] = useState({});
   const [modalOpen, setModalOpen] = useState(false);

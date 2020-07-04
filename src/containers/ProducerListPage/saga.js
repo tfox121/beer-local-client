@@ -1,30 +1,26 @@
-/**
- * Gets the repositories of the user from Github
- */
-
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { FETCH_USER } from './constants';
-import { userFetched, userFetchError } from './actions';
-import { getPrivateRoute } from '../../utils/api';
+import { FETCH_PRODUCERS } from './constants';
+import { producersFetched, producersFetchError } from './actions';
+import { publicRoute } from '../../utils/api';
 
-function* fetchUser() {
+function* fetchProducers() {
   try {
-    const privateRoute = yield call(getPrivateRoute);
-    const fetchUserData = () => privateRoute.get('/user');
-    const response = yield call(fetchUserData);
+    const fetchProducersData = () => publicRoute.get('/producers');
+    const response = yield call(fetchProducersData);
 
-    console.log('USER RETRIEVED', response.data);
+    console.log(response);
+
     if (response.data) {
-      yield put(userFetched(response.data));
+      yield put(producersFetched(response.data));
     }
   } catch (err) {
-    yield put(userFetchError(err));
+    yield put(producersFetchError(err));
   }
 }
 
 /**
  * Root saga manages watcher lifecycle
  */
-export default function* userData() {
-  yield takeLatest(FETCH_USER, fetchUser);
+export default function* producersData() {
+  yield takeLatest(FETCH_PRODUCERS, fetchProducers);
 }

@@ -48,6 +48,17 @@ const GlobalStyle = createGlobalStyle`
   button.stock-save > i.check.icon {
     margin: 0 !important;
   }
+
+  .blog-editor {
+    min-height: 300px;
+    cursor: text;
+    border: 1px solid #F1F1F1;
+    padding: 0 1em;
+
+  }
+
+  .blog-editor-wrapper {
+  }
 `;
 
 export default GlobalStyle;

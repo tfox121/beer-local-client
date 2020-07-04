@@ -46,10 +46,10 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
     pictureFile: undefined,
     pictureFileExt: undefined,
     fileValid: true,
+    businessName: '',
   };
 
   const producerFormTemplate = {
-    businessName: 'Buxton',
     salesEmail: 'tfox121@gmail.com',
     salesContactNumber: '07540889637',
     website: 'buxtonbrewery.co.uk',
@@ -59,7 +59,6 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
   };
 
   const retailerFormTemplate = {
-    premisesName: '',
     purchasingEmail: '',
     purchasingContactNumber: '',
     contactOptions: {},
@@ -111,19 +110,16 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
     const errors = {};
 
     if (formValues.type === 'retailer') {
-      if (!formValues.premisesName) {
-        errors.premisesName = 'This field is required';
-      }
       if (!formValues.purchasingEmail) {
         errors.purchasingEmail = 'This field is required';
       }
     } else if (formValues.type === 'producer') {
-      if (!formValues.businessName) {
-        errors.businessName = 'This field is required';
-      }
       if (!formValues.salesEmail) {
         errors.salesEmail = 'This field is required';
       }
+    }
+    if (!formValues.businessName) {
+      errors.businessName = 'This field is required';
     }
     if (!formValues.terms) {
       errors.terms = 'This field is required';

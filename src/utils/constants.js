@@ -25,3 +25,5 @@ export const PACK_SIZES = {
   '24x330': '24x330ml',
   '24x440': '24x440ml',
 };
+
+export const BLOG_ITEMS_PER_PAGE = 2;

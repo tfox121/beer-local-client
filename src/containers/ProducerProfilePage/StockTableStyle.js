@@ -81,6 +81,7 @@ const StockTableStyle = styled.div`
 
   th:first-child {
     width: 15px;
+    padding-left: 1em !important;
   }
 
   th:nth-child(2) {
@@ -98,9 +99,8 @@ const StockTableStyle = styled.div`
 
   td:first-child {
     text-align: center !important;
+    padding-left: 1em !important;
   }
-
-
 
   th:last-child > .filter-container {
     max-width: 100px;

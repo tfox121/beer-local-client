@@ -24,5 +24,10 @@ const makeSelectProducerProfilePage = () => createSelector(
   (substate) => substate,
 );
 
+const makeSelectProducerProfile = () => createSelector(
+  selectProducerProfilePageDomain,
+  (substate) => substate.profile,
+);
+
 export default makeSelectProducerProfilePage;
-export { selectProducerProfilePageDomain, makeSelectUser };
+export { selectProducerProfilePageDomain, makeSelectUser, makeSelectProducerProfile };

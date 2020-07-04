@@ -12,7 +12,6 @@ import { Menu } from 'semantic-ui-react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { useAuth0 } from '@auth0/auth0-react';
 import { push } from 'connected-react-router';
 
 import ProducerMenuItems from './ProducerMenuItems';
@@ -24,30 +23,24 @@ import messages from './messages';
 import { makeSelectUser } from './selectors';
 
 function NavBar({ userProfile, pushRoute }) {
-  const [activeItem, setActiveItem] = useState('home');
-  const { user } = useAuth0();
+  const [activeItem, setActiveItem] = useState('');
 
   const handleItemClick = (e, { name }) => {
     setActiveItem(name);
     switch (name) {
       case '/':
+        setActiveItem('');
         pushRoute('/');
         break;
       case '/brewery/profile':
         pushRoute(`/brewery/${userProfile.producerId}`);
         break;
-      // case '/brewery/profile/stock':
-      //   pushRoute(`/brewery/profile/stock`);
-      //   break;
-      // case '/breweries':
-      //   pushRoute({
-      //     pathname: '/breweries',
-      //     query: {
-      //       lat: accountInfo.location.lat,
-      //       lng: accountInfo.location.lng,
-      //     },
-      //   });
-      //   break;
+      case '/sales/orders':
+        pushRoute('/sales/orders');
+        break;
+      case '/breweries':
+        pushRoute('/breweries');
+        break;
       default:
         break;
     }
@@ -63,10 +56,10 @@ function NavBar({ userProfile, pushRoute }) {
           >
             <FormattedMessage {...messages.home} />
           </Menu.Item>
-          {user && (
+          {userProfile && (
             <>
               <Can
-                role={user['https://beerlocal/apiroles'][0]}
+                role={userProfile.role}
                 perform="producer-menu:visit"
                 yes={() => (
                   <ProducerMenuItems
@@ -76,11 +69,10 @@ function NavBar({ userProfile, pushRoute }) {
                 )}
               />
               <Can
-                role={user['https://beerlocal/apiroles'][0]}
+                role={userProfile.role}
                 perform="retailer-menu:visit"
                 yes={() => (
                   <RetailerMenuItems
-                    accountInfo={userProfile}
                     activeItem={activeItem}
                     handleItemClick={handleItemClick}
                   />
@@ -108,7 +100,7 @@ const mapStateToProps = createStructuredSelector({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    pushRoute: path => dispatch(push(path)),
+    pushRoute: (path) => dispatch(push(path)),
   };
 }
 

@@ -1,4 +1,5 @@
 module.exports = {
+  parser: 'babel-eslint',
   "env": {
       "browser": true,
       "es2020": true
@@ -71,5 +72,6 @@ module.exports = {
     'redux-saga/yield-effects': 2,
     'require-yield': 0,
     'react/jsx-props-no-spreading': 0,
+    'react/static-property-placement': 0,
   },
 };

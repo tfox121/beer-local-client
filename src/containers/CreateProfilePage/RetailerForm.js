@@ -69,13 +69,13 @@ const RetailerForm = ({
             <Form>
               <Form.Input
                 label="Premises name"
-                name="premisesName"
-                value={formValues.premisesName}
+                name="businessName"
+                value={formValues.businessName}
                 required
                 onChange={handleChange}
                 error={
-                  formErrors.premisesName && {
-                    content: formErrors.premisesName,
+                  formErrors.businessName && {
+                    content: formErrors.businessName,
                     pointing: 'above',
                   }
                 }

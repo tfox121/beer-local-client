@@ -1,51 +1,50 @@
 /*
  *
- * App reducer
+ * ProducerListPage reducer
  *
  */
 import produce from 'immer';
 import {
-  FETCH_USER,
-  FETCH_USER_SUCCESS,
-  FETCH_USER_ERROR,
-  CLEAR_USER,
+  FETCH_PRODUCERS,
+  FETCH_PRODUCERS_SUCCESS,
+  FETCH_PRODUCERS_ERROR,
+  CLEAR_PRODUCERS,
 } from './constants';
 
 export const initialState = {
-  fetchingUser: false,
-  fetchUserError: false,
-  user: false,
+  fetchingProducers: false,
+  fetchProducersError: false,
+  producers: false,
 };
 
 /* eslint-disable default-case, no-param-reassign */
-const appReducer = (state = initialState, action) =>
-  produce(state, draftState => {
-    switch (action.type) {
-      default:
-        break;
-      case FETCH_USER:
-        draftState.fetchUserError = false;
-        draftState.fetchingUser = true;
-        break;
-      case FETCH_USER_SUCCESS:
-        if (action.user) {
-          draftState.user = action.user;
-          draftState.fetchUserError = false;
-        }
-        draftState.fetchingUser = false;
-        break;
-      case FETCH_USER_ERROR:
-        draftState.fetchUserError = true;
-        draftState.fetchingUser = false;
-        break;
-      case CLEAR_USER:
-        draftState.user = false;
-        break;
+const producerListPageReducer = (state = initialState, action) => produce(state, (draftState) => {
+  switch (action.type) {
+    default:
+      break;
+    case FETCH_PRODUCERS:
+      draftState.fetchProducersError = false;
+      draftState.fetchingProducers = true;
+      break;
+    case FETCH_PRODUCERS_SUCCESS:
+      if (action.producers) {
+        draftState.producers = action.producers;
+        draftState.fetchProducersError = false;
+      }
+      draftState.fetchingProducers = false;
+      break;
+    case FETCH_PRODUCERS_ERROR:
+      draftState.fetchProducersError = true;
+      draftState.fetchingProducers = false;
+      break;
+    case CLEAR_PRODUCERS:
+      draftState.producers = false;
+      break;
       // case CLOSE_SESSION_SUCCESS:
       //   draftState.session = false;
       //   draftState.closingSession = false;
       //   break;
-    }
-  });
+  }
+});
 
-export default appReducer;
+export default producerListPageReducer;

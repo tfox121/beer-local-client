@@ -2,9 +2,11 @@ const rbacRules = {
   visitor: {
     static: ['posts:list', 'home-page:visit'],
   },
-  Producer: {
+  producer: {
     static: [
       'producer-menu:visit',
+      'orders:reject',
+      'orders:confirm',
       'posts:list',
       'posts:create',
       'users:getSelf',
@@ -18,9 +20,10 @@ const rbacRules = {
       },
     },
   },
-  Retailer: {
+  retailer: {
     static: [
       'retailer-menu:visit',
+      'orders:cancel',
       'posts:list',
       'posts:create',
       'users:getSelf',

@@ -13,10 +13,11 @@ function* fetchUser() {
     const privateRoute = yield call(getPrivateRoute);
     const fetchUserData = () => privateRoute.get('/user');
     const response = yield call(fetchUserData);
-
     console.log('USER RETRIEVED', response.data);
-    if (response.data) {
-      yield put(userFetched(response.data));
+    if (Object.keys(response.data.user).length && Object.keys(response.data.business).length) {
+      yield put(userFetched({ ...response.data.user, ...response.data.business }));
+    } else {
+      yield put(push('/create'));
     }
   } catch (err) {
     yield put(userFetchError(err));

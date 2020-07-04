@@ -29,9 +29,14 @@ function* saveProfile() {
       yield call(uploadAvatar, newProfileData.pictureFile);
     }
 
-    if (response.data) {
-      yield put(profileSaved(response.data));
-      yield put(push(`/brewery/${response.data.producerId}`));
+    if (response.data.user && response.data.business) {
+      console.log(response.data);
+      yield put(profileSaved({ ...response.data.user, ...response.data.business }));
+      if (newProfileData.type === 'producer') {
+        yield put(push(`/brewery/${response.data.business.producerId}`));
+      } else {
+        yield put(push('/'));
+      }
     }
   } catch (err) {
     yield put(profileSaveError(err));

@@ -3,25 +3,28 @@ import { Menu } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 export default function RetailerMenuItems({
-  accountInfo,
   activeItem,
   handleItemClick,
 }) {
-  if (accountInfo && accountInfo.type === 'retailer') {
-    return (
+  return (
+    <>
       <Menu.Item
         name="/breweries"
         content="Breweries"
         active={activeItem === '/breweries'}
         onClick={handleItemClick}
       />
-    );
-  }
-  return null;
+      <Menu.Item
+        content="Orders"
+        active={activeItem === '/sales/orders'}
+        onClick={handleItemClick}
+        name="/sales/orders"
+      />
+    </>
+  );
 }
 
 RetailerMenuItems.propTypes = {
-  accountInfo: PropTypes.object,
   activeItem: PropTypes.string,
   handleItemClick: PropTypes.func,
 };

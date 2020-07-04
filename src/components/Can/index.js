@@ -36,7 +36,9 @@ const check = (rules, role, action, data) => {
   return false;
 };
 
-const Can = ({ role, perform, data, yes, no }) =>
+const Can = ({
+  role, perform, data, yes, no,
+}) =>
   // console.log('NAV', role, perform, data);
   check(rbacRules, role, perform, data) ? yes() : no();
 

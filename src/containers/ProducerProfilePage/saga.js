@@ -15,9 +15,10 @@ function* fetchProfile({ pathName }) {
 
     console.log('PROFILE RETRIEVED', response.data);
     if (response.data) {
-      yield put(profileFetched(response.data));
+      yield put(profileFetched({ ...response.data.producer, ...response.data.user }));
     }
   } catch (err) {
+    console.log('ERROR', err);
     yield put(profileFetchError(err));
   }
 }

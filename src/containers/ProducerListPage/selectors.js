@@ -1,33 +1,28 @@
 import { createSelector } from 'reselect';
 import { initialState } from './reducer';
 
-const selectGlobal = (state) => state.global || initialState;
+/**
+ * Direct selector to the ProducerListPage state domain
+ */
 
-const selectRouter = (state) => state.router;
+const selectProducerListPageDomain = (state) => state.ProducerListPage || initialState;
 
-const makeSelectUser = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.user,
+/**
+ * Other specific selectors
+ */
+const makeSelectProducerList = () => createSelector(
+  selectProducerListPageDomain,
+  (substate) => substate.producers,
 );
 
-const makeSelectFetchingUser = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.fetchingUser,
+/**
+ * Default selector used by ProducerListPage
+ */
+
+const makeSelectProducerListPage = () => createSelector(
+  selectProducerListPageDomain,
+  (substate) => substate,
 );
 
-const makeSelectUserFetchError = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.sessionError,
-);
-
-const makeSelectLocation = () => createSelector(
-  selectRouter,
-  (routerState) => routerState.location,
-);
-
-export {
-  makeSelectUser,
-  makeSelectFetchingUser,
-  makeSelectUserFetchError,
-  makeSelectLocation,
-};
+export default makeSelectProducerListPage;
+export { selectProducerListPageDomain, makeSelectProducerList };

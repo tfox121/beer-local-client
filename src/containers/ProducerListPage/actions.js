@@ -1,36 +1,36 @@
 /*
  *
- * App actions
+ * ProducerListPage actions
  *
  */
 
 import {
-  FETCH_USER,
-  FETCH_USER_SUCCESS,
-  FETCH_USER_ERROR,
-  CLEAR_USER,
+  FETCH_PRODUCERS,
+  FETCH_PRODUCERS_SUCCESS,
+  FETCH_PRODUCERS_ERROR,
+  CLEAR_PRODUCERS,
 } from './constants';
 
-export const fetchUser = () => ({
-  type: FETCH_USER,
+export const fetchProducers = () => ({
+  type: FETCH_PRODUCERS,
 });
 
-export function userFetched(user) {
+export function producersFetched(producers) {
   return {
-    type: FETCH_USER_SUCCESS,
-    user,
+    type: FETCH_PRODUCERS_SUCCESS,
+    producers,
   };
 }
 
-export function userFetchError(error) {
+export function producersFetchError(error) {
   return {
-    type: FETCH_USER_ERROR,
+    type: FETCH_PRODUCERS_ERROR,
     error,
   };
 }
 
-export function clearUser() {
+export function clearProducers() {
   return {
-    type: CLEAR_USER,
+    type: CLEAR_PRODUCERS,
   };
 }

@@ -7,7 +7,7 @@
  *
  */
 
-import React, { useEffect, memo } from 'react';
+import React, { useEffect } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -26,6 +26,7 @@ import { useInjectSaga } from '../../utils/injectSaga';
 import HomePage from '../HomePage/Loadable';
 import CreateProfilePage from '../CreateProfilePage/Loadable';
 import ProducerProfilePage from '../ProducerProfilePage/Loadable';
+import ProducerOrdersPage from '../ProducerOrdersPage/Loadable';
 import NotFoundPage from '../NotFoundPage/Loadable';
 import NavBar from '../../components/NavBar/index';
 // import { loadSession, closeSession } from './actions';
@@ -34,6 +35,7 @@ import saga from './saga';
 
 import GlobalStyle from '../../global-styles';
 import { fetchUser, clearUser } from './actions';
+import ProducerListPage from '../ProducerListPage';
 
 const key = 'global';
 const AppWrapper = styled.div`
@@ -52,18 +54,14 @@ const App = ({ userProfile, userFetch, userClear }) => {
   const { user, isAuthenticated } = useAuth0();
 
   useEffect(() => {
-    // if (isAuthenticated) {
-    //   userFetch();
-    //   return;
-    // }
+    if (isAuthenticated) {
+      userFetch();
+      return;
+    }
     if (!isAuthenticated) {
       userClear();
     }
   }, [isAuthenticated]);
-
-  if (isAuthenticated && user && user['https://beerlocal/apiroles'][0] !== 'Visitor' && !userProfile) {
-    userFetch();
-  }
 
   return (
     <AppWrapper>
@@ -72,6 +70,8 @@ const App = ({ userProfile, userFetch, userClear }) => {
         <Route exact path="/" component={HomePage} />
         <Route exact path="/create" component={CreateProfilePage} />
         <Route exact path="/brewery/:id" component={ProducerProfilePage} />
+        <Route exact path="/sales/orders" component={ProducerOrdersPage} />
+        <Route exact path="/breweries" component={ProducerListPage} />
         <Route component={NotFoundPage} />
       </Switch>
       <GlobalStyle />
@@ -83,6 +83,7 @@ App.propTypes = {
   // userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   userFetch: PropTypes.func,
   userClear: PropTypes.func,
+  userProfile: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -105,5 +106,4 @@ const withConnect = connect(
 
 export default compose(
   withConnect,
-  memo,
 )(App);
