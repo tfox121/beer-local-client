@@ -10,19 +10,24 @@ import { FormattedMessage } from 'react-intl';
 import { Header, Segment, Message } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+import PropTypes from 'prop-types';
+import { createStructuredSelector } from 'reselect';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import messages from './messages';
 import PageWrapper from '../../components/PageWrapper';
+import { makeSelectUser } from '../App/selectors';
 
-export default function HomePage() {
-  const { user, isAuthenticated } = useAuth0();
+const HomePage = ({ userProfile }) => {
+  const { isAuthenticated } = useAuth0();
   return (
     <PageWrapper>
       <Segment basic>
         <Header as="h1">
           <FormattedMessage {...messages.header} />
         </Header>
-        {isAuthenticated && (
+        {isAuthenticated && !userProfile && (
           <Message>
             <Message.Header>Create your profile</Message.Header>
             <p>
@@ -39,4 +44,20 @@ export default function HomePage() {
       </Segment>
     </PageWrapper>
   );
-}
+};
+
+HomePage.propTypes = {
+  userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+};
+
+const mapStateToProps = createStructuredSelector({
+  userProfile: makeSelectUser(),
+});
+
+const withConnect = connect(
+  mapStateToProps,
+);
+
+export default compose(
+  withConnect,
+)(HomePage);

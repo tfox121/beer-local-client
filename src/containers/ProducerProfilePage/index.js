@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /**
  *
  * ProducerProfilePage
@@ -13,26 +14,23 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
-import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
-import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import {
   Segment,
   Image,
   Grid,
   Header,
-  Button,
   Item,
-  Modal,
   Pagination,
-  Form,
+  Button,
+  Icon,
+  Input,
 } from 'semantic-ui-react';
 import { Map, TileLayer } from 'react-leaflet';
-import { stateToHTML } from 'draft-js-export-html';
 
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
-import { baseURL, getPrivateRoute } from '../../utils/api';
+import { baseURL } from '../../utils/api';
 import makeSelectProducerProfilePage, { makeSelectUser } from './selectors';
 import { fetchProfile, clearProfile } from './actions';
 import reducer from './reducer';
@@ -42,13 +40,16 @@ import saga from './saga';
 import PageWrapper from '../../components/PageWrapper';
 import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
-import StockModal from './StockModal';
-import AvailabilityDynamic from './AvailabilityDynamic';
+import StockModal from '../Stockmodal/StockModal';
 // import AvailabilityBasic from './AvailabilityBasic';
+import AvailabilityDynamic from './AvailabilityDynamic';
+import AvailabilityCategories from './AvailabilityCategories';
+import ProducerBlogEditor from './ProducerBlogEditor';
 
 import MapStyle from './MapStyle';
 import BlogStyle from './BlogStyle';
 import { BLOG_ITEMS_PER_PAGE } from '../../utils/constants';
+import BlogPost from './BlogPost';
 
 export function ProducerProfilePage({
   profileFetch,
@@ -71,103 +72,35 @@ export function ProducerProfilePage({
     distributionAreas,
     stock,
     blog,
+    profileOptions,
   } = producerProfilePage.profile;
 
-  TimeAgo.addLocale(en);
-  const timeAgo = new TimeAgo('en-UK');
-
-  const [modalOpen, setModalOpen] = useState(false);
-  const [blogEditor, setBlogEditor] = useState(EditorState.createEmpty());
-  const [blogMeta, setBlogMeta] = useState({ title: '', author: '' });
   const [blogPage, setBlogPage] = useState(1);
+  const [stockCategoryNum, setStockCategoryNum] = useState('1');
+
+  TimeAgo.addLocale(en);
 
   useEffect(() => {
     profileClear();
     profileFetch();
   }, []);
 
-  // useEffect(() => {
-  //   if (blog && blog.length) {
-  //     const parsedBlog = JSON.parse(blog[0].blogData);
-  //     const contentState = convertFromRaw(parsedBlog);
-  //     const html = stateToHTML(contentState);
-  //     setBlogHTML(html);
-  //     // setBlogEditor(EditorState.createWithContent(contentState));
-  //   }
-  // }, [blog]);
+  useEffect(() => {
+    if (profileOptions && profileOptions.stockCategories) {
+      setStockCategoryNum(profileOptions.stockCategories.length);
+    }
+  }, [profileOptions]);
 
-  const blogRender = (blogArray, page) => blogArray.map((blogPost, index) => {
-    const parsedBlog = JSON.parse(blogPost.blogData);
-    const contentState = convertFromRaw(parsedBlog);
-    const htmlString = stateToHTML(contentState);
-    const itemsPerPage = 2;
-    if (index < (page * itemsPerPage) - itemsPerPage || index >= page * itemsPerPage) {
+  const blogRender = (blogArray, page) => blogArray.filter((blogPost) => blogPost.display === true || (user && user.producerId === producerId)).map((blogPost, index) => {
+    if (index < (page * BLOG_ITEMS_PER_PAGE) - BLOG_ITEMS_PER_PAGE || index >= page * BLOG_ITEMS_PER_PAGE) {
       return null;
     }
     return (
-      <Item key={blogPost._id}>
-        <Item.Content>
-          <Item.Header as="a">{blogPost.title}</Item.Header>
-          <Item.Meta>
-            by
-            {' '}
-            {blogPost.author}
-            {' '}
-            -
-            {' '}
-            {timeAgo.format(Date.parse(blogPost.created))}
-          </Item.Meta>
-          <Item.Description>
-            <div className="blog-description" dangerouslySetInnerHTML={{ __html: htmlString }} />
-          </Item.Description>
-          <Item.Extra>
-            <Modal closeIcon trigger={<Button basic floated="right">Continue reading...</Button>}>
-              <Modal.Header>{blogPost.title}</Modal.Header>
-              <Modal.Content>
-                <Modal.Description>
-                  <Editor
-                    editorState={EditorState.createWithContent(contentState)}
-                    toolbarClassName="toolbarClassName"
-                    wrapperClassName="wrapperClassName"
-                    editorClassName="editorClassName"
-                    readOnly
-                    toolbarHidden
-                  />
-                </Modal.Description>
-              </Modal.Content>
-              <Modal.Actions>
-                <p>
-                  by
-                  {' '}
-                  {blogPost.author}
-                  {' '}
-                  -
-                  {' '}
-                  {timeAgo.format(Date.parse(blogPost.created))}
-                  {' '}
-                </p>
-              </Modal.Actions>
-            </Modal>
-          </Item.Extra>
-        </Item.Content>
-      </Item>
+      <React.Fragment key={blogPost._id}>
+        <BlogPost blogPost={blogPost} blogPage={blogPage} index={index} />
+      </React.Fragment>
     );
   });
-
-  const handleBlogEditorChange = (editorState) => {
-    setBlogEditor(editorState);
-  };
-
-  const handleBlogEditorSave = async () => {
-    const contentState = blogEditor.getCurrentContent();
-    const rawBlogData = convertToRaw(contentState);
-    const privateRoute = await getPrivateRoute();
-    const response = await privateRoute.post('/producer/blog', { rawBlogData: JSON.stringify(rawBlogData), blogMeta });
-    console.log(response.data);
-    setBlogEditor(EditorState.createEmpty());
-    setBlogMeta({ title: '', author: '' });
-    setModalOpen(false);
-  };
 
   if (!producerProfilePage.profile) {
     return null;
@@ -232,37 +165,10 @@ export function ProducerProfilePage({
                 <Header as="h2">Updates</Header>
               </Grid.Column>
               <Grid.Column textAlign="right">
-                <Modal open={modalOpen} trigger={<Button onClick={() => setModalOpen(true)} primary>Write new post</Button>}>
-                  <Modal.Header>New post</Modal.Header>
-                  <Modal.Content>
-                    <Modal.Description>
-                      <Form>
-                        <Form.Group>
-                          <Form.Input label="Title" fluid width={7} value={blogMeta.title} onChange={(e) => setBlogMeta({ ...blogMeta, title: e.target.value })} placeholder="Post title..." />
-                          <Form.Input label="Author" fluid width={5} value={blogMeta.author} onChange={(e) => setBlogMeta({ ...blogMeta, author: e.target.value })} placeholder="Author" />
-                        </Form.Group>
-                      </Form>
-                      <Editor
-                        editorState={blogEditor}
-                        toolbarClassName="blog-editor-toolbar"
-                        wrapperClassName="blog-editor-wrapper"
-                        editorClassName="blog-editor"
-                        onEditorStateChange={handleBlogEditorChange}
-                        toolbar={{
-                          options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'colorPicker', 'link', 'emoji', 'image', 'remove', 'history'],
-                          inline: { options: ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript'] },
-                          list: { inDropdown: true },
-                          textAlign: { inDropdown: true },
-                          link: { inDropdown: true },
-                        }}
-                      />
-                    </Modal.Description>
-                  </Modal.Content>
-                  <Modal.Actions>
-                    <Button onClick={() => setModalOpen(false)} content="Cancel" />
-                    <Button primary onClick={handleBlogEditorSave} content="Save" />
-                  </Modal.Actions>
-                </Modal>
+                {(user && user.producerId === producerId)
+                  && (
+                    <ProducerBlogEditor />
+                  )}
               </Grid.Column>
             </Grid>
             <Item.Group divided>
@@ -284,16 +190,21 @@ export function ProducerProfilePage({
         </Segment>
         <Segment basic>
           <Grid columns={2} style={{ marginBottom: '0.05em' }}>
-            <Grid.Column textAlign="left">
+            <Grid.Column width={5} textAlign="left">
               <Header as="h2">Available Items</Header>
             </Grid.Column>
-            <Grid.Column textAlign="right">
+            <Grid.Column width={11} textAlign="right">
               {(user && user.producerId === producerId)
-                  && <StockModal />}
+                  && (
+                    <>
+                      <Input value={stockCategoryNum} style={{ width: '60px', marginRight: '100px' }} onChange={(e) => setStockCategoryNum(e.target.value)} label="Categories" type="number" min={1} />
+                      <StockModal />
+                    </>
+                  )}
             </Grid.Column>
           </Grid>
           {/* <AvailabilityBasic stock={stock} /> */}
-          <AvailabilityDynamic data={stock} />
+          <AvailabilityCategories data={stock} stockCategoryNum={stockCategoryNum} />
         </Segment>
       </PageWrapper>
     </>

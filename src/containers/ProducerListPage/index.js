@@ -9,6 +9,7 @@ import {
 } from 'semantic-ui-react';
 import { createStructuredSelector } from 'reselect';
 import { Map, TileLayer } from 'react-leaflet';
+import { Link } from 'react-router-dom';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
 import { baseURL } from '../../utils/api';
@@ -25,7 +26,7 @@ import ProducerListPageStyle from './ProducerListPageStyle';
 const key = 'ProducerListPage';
 
 const ProducerListPage = ({
-  producers, producersFetch, producersClear, pushRoute,
+  producers, producersFetch, pushRoute,
 }) => {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
@@ -46,22 +47,15 @@ const ProducerListPage = ({
     <PageWrapper>
       <ProducerListPageStyle>
         <Segment basic>
-          <Header as="h1">Breweries Available</Header>
+          <Header as="h1">Breweries</Header>
           <Table basic>
-            {/* <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell></Table.HeaderCell>
-              <Table.HeaderCell></Table.HeaderCell>
-              <Table.HeaderCell></Table.HeaderCell>
-            </Table.Row>
-          </Table.Header> */}
             <Table.Body>
               {producers && producers.map((producer) => (
               // eslint-disable-next-line no-underscore-dangle
                 <Table.Row key={producer._id}>
                   <Table.Cell width={5}><Image className="image-link" onClick={() => handleClick(producer.producerId)} src={`${baseURL}${producer.avatarSource}`} size="small" bordered centered circular /></Table.Cell>
                   <Table.Cell width={6}>
-                    <h2>{producer.businessName}</h2>
+                    <Link to={`/brewery/${producer.producerId}`}><h2>{producer.businessName}</h2></Link>
                     <p>{producer.intro}</p>
                   </Table.Cell>
                   <Table.Cell width={5}>
@@ -87,7 +81,6 @@ const ProducerListPage = ({
 ProducerListPage.propTypes = {
   producers: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
   producersFetch: PropTypes.func,
-  producersClear: PropTypes.func,
   pushRoute: PropTypes.func,
 };
 

@@ -8,7 +8,7 @@ function* fetchProducers() {
     const fetchProducersData = () => publicRoute.get('/producers');
     const response = yield call(fetchProducersData);
 
-    console.log(response);
+    console.log(response.data);
 
     if (response.data) {
       yield put(producersFetched(response.data));

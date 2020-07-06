@@ -20,14 +20,14 @@ import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { getPrivateRoute } from '../../utils/api';
 import arrayMove from '../../utils/arrayMove';
-import StockModalStyle from './StockModalStyle';
+import { fetchProfile } from '../ProducerProfilePage/actions';
+import reducer from '../ProducerProfilePage/reducer';
+import saga from '../ProducerProfilePage/saga';
 
+import makeSelectProducerProfilePage from '../ProducerProfilePage/selectors';
+import StockModalStyle from './StockModalStyle';
 import StockModalMenu from './StockModalMenu';
 import StockManager from './StockManager';
-import { fetchProfile } from './actions';
-import reducer from './reducer';
-import saga from './saga';
-import makeSelectProducerProfilePage from './selectors';
 
 export function StockModal({ producerProfilePage, profileFetch, location }) {
   useInjectReducer({ key: 'producerProfilePage', reducer });
@@ -42,6 +42,7 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
     name: '',
     sku: '',
     style: '',
+    category: '',
     abv: 0.0,
     packSize: '',
     price: 0.0,

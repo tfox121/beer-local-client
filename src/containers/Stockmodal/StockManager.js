@@ -613,6 +613,10 @@ const StockManager = ({
         accessor: 'style',
       },
       {
+        Header: 'Category',
+        accessor: 'category',
+      },
+      {
         Header: 'ABV',
         accessor: 'abv',
         Filter: SliderColumnFilter,

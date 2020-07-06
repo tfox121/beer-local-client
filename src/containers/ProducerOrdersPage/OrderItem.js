@@ -70,6 +70,7 @@ const OrderItem = ({
           decimalScale={2}
           fixedDecimalScale
           prefix="£"
+          // eslint-disable-next-line no-param-reassign
           value={order.items.reduce((acc, val) => { acc += (val.price * val.orderQuant); return acc; }, 0)}
         />
       </Table.Cell>

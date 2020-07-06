@@ -49,6 +49,8 @@ const GlobalStyle = createGlobalStyle`
     margin: 0 !important;
   }
 
+  /* Blog editor */
+
   .blog-editor {
     min-height: 300px;
     cursor: text;
@@ -57,7 +59,22 @@ const GlobalStyle = createGlobalStyle`
 
   }
 
-  .blog-editor-wrapper {
+  .blogpost-display-checkbox {
+    margin-top: 1em
+  }
+
+  .blogpost-modal-actions {
+    display: flex;
+  }
+
+  .blogpost-modal-actions > div {
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+  }
+
+  .blogpost-display-checkbox > div.checkbox > input:checked~label:after {
+    top: -2px;
   }
 `;
 

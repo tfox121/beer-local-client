@@ -3,10 +3,11 @@ import styled from 'styled-components';
 const BlogStyle = styled.div`
   .blog-description {
     overflow-y: hidden;
-    height: 80px;
+    max-height: 80px;
     -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
     mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   }
+
   .fadeout {
     position: relative;
     bottom: 4em;
@@ -15,6 +16,10 @@ const BlogStyle = styled.div`
     rgba(255, 255, 255, 0) 0%,
     rgba(255, 255, 255, 1) 100%
     );
+  }
+
+  div.display-checkbox {
+    margin-top: 1em;
   }
 `;
 

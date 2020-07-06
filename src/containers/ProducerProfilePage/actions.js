@@ -9,12 +9,12 @@ import {
   FETCH_PROFILE_SUCCESS,
   FETCH_PROFILE_ERROR,
   CLEAR_PROFILE,
-  UPDATE_STOCK,
-  UPDATE_STOCK_SUCCESS,
-  UPDATE_STOCK_ERROR,
+  UPDATE_PROFILE,
+  UPDATE_PROFILE_SUCCESS,
+  UPDATE_PROFILE_ERROR,
 } from './constants';
 
-export const fetchProfile = pathName => ({
+export const fetchProfile = (pathName) => ({
   type: FETCH_PROFILE,
   pathName,
 });
@@ -39,20 +39,21 @@ export function clearProfile() {
   };
 }
 
-export const updateStock = () => ({
-  type: UPDATE_STOCK,
+export const updateProfile = (updateObj) => ({
+  type: UPDATE_PROFILE,
+  updateObj,
 });
 
-export function stockUpdated(stock) {
+export function profileUpdated(profile) {
   return {
-    type: UPDATE_STOCK_SUCCESS,
-    stock,
+    type: UPDATE_PROFILE_SUCCESS,
+    profile,
   };
 }
 
-export function stockUpdateError(error) {
+export function profileUpdateError(error) {
   return {
-    type: UPDATE_STOCK_ERROR,
+    type: UPDATE_PROFILE_ERROR,
     error,
   };
 }
