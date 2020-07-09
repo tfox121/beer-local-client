@@ -6,7 +6,7 @@ export default function ProducerMenuItems({ activeItem, handleItemClick }) {
   return (
     <>
       <Menu.Item
-        content="Store"
+        content="Your Store"
         active={activeItem === '/brewery/profile'}
         onClick={handleItemClick}
         name="/brewery/profile"

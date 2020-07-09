@@ -10,6 +10,7 @@ import {
   FETCH_PROFILE_ERROR,
   CLEAR_PROFILE,
   UPDATE_PROFILE,
+  UPDATE_PROFILE_OPTIONS,
   UPDATE_PROFILE_SUCCESS,
   UPDATE_PROFILE_ERROR,
 } from './constants';
@@ -39,10 +40,19 @@ export function clearProfile() {
   };
 }
 
-export const updateProfile = (updateObj) => ({
-  type: UPDATE_PROFILE,
-  updateObj,
-});
+export function updateProfile(updateObj) {
+  return {
+    type: UPDATE_PROFILE,
+    updateObj,
+  };
+}
+
+export function updateProfileOptions(updateObj) {
+  return {
+    type: UPDATE_PROFILE_OPTIONS,
+    updateObj,
+  };
+}
 
 export function profileUpdated(profile) {
   return {

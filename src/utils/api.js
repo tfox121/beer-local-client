@@ -8,8 +8,12 @@ export const getPrivateRoute = async () => axios.create({
   headers: {
     Authorization: `Bearer ${await getAuthToken()}`,
   },
+  timeout: 10000,
 });
 
-export const publicRoute = axios.create({ baseURL: `${baseURL}/api` });
+export const publicRoute = axios.create({
+  baseURL: `${baseURL}/api`,
+  timeout: 10000,
+});
 
 // export default axiosInstance;

@@ -72,7 +72,7 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
         setDataLoaded(false);
       }, 3000);
     }
-  }, [fetchingProfile]);
+  }, [fetchingProfile, loadingData]);
 
   useEffect(() => {
     if (stock && stock.length) {

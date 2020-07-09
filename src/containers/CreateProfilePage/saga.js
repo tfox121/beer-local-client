@@ -11,6 +11,8 @@ import {
 import { makeSelectUserProfile } from './selectors';
 import uploadAvatar from '../../utils/uploadAvatar';
 import { getPrivateRoute } from '../../utils/api';
+import createBlobUrl from '../../utils/createBlobUrl';
+import { getOwnAvatar, getOwnBanner } from '../../utils/getImages';
 
 function* saveProfile() {
   try {
@@ -18,22 +20,25 @@ function* saveProfile() {
     const newProfileData = yield select(makeSelectUserProfile());
     const privateRoute = yield call(getPrivateRoute);
 
+    console.log(newProfileData);
+
     const saveUserData = (formValues, type) => privateRoute.post(
-      `/user/${type}`,
-      formValues,
+      `/user/${type}`, formValues, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      },
     );
 
-    const response = yield call(saveUserData, newProfileData, newProfileData.type);
-
-    if (newProfileData.avatar && newProfileData.fileValid) {
-      yield call(uploadAvatar, newProfileData.pictureFile);
-    }
+    const response = yield call(saveUserData, newProfileData, newProfileData.get('type'));
 
     if (response.data.user && response.data.business) {
-      console.log(response.data);
-      yield put(profileSaved({ ...response.data.user, ...response.data.business }));
+      const bannerSource = yield call(getOwnBanner);
+      const avatarSource = yield call(getOwnAvatar);
+
+      yield put(profileSaved({
+        ...response.data.business, ...response.data.user, bannerSource, avatarSource,
+      }));
       if (newProfileData.type === 'producer') {
-        yield put(push(`/brewery/${response.data.business.producerId}`));
+        yield put(push(`/brewery/${response.data.business.businessId}`));
       } else {
         yield put(push('/'));
       }

@@ -15,6 +15,7 @@ import en from 'javascript-time-ago/locale/en';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+
 import {
   Segment,
   Image,
@@ -23,15 +24,13 @@ import {
   Item,
   Pagination,
   Button,
-  Icon,
-  Input,
+  Modal,
 } from 'semantic-ui-react';
 import { Map, TileLayer } from 'react-leaflet';
 
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
-import { baseURL } from '../../utils/api';
-import makeSelectProducerProfilePage, { makeSelectUser } from './selectors';
+import { makeSelectUser, makeSelectProducerProfile } from './selectors';
 import { fetchProfile, clearProfile } from './actions';
 import reducer from './reducer';
 import saga from './saga';
@@ -42,27 +41,35 @@ import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
 import StockModal from '../Stockmodal/StockModal';
 // import AvailabilityBasic from './AvailabilityBasic';
-import AvailabilityDynamic from './AvailabilityDynamic';
+// import AvailabilityDynamic from './AvailabilityDynamic';
 import AvailabilityCategories from './AvailabilityCategories';
 import ProducerBlogEditor from './ProducerBlogEditor';
 
 import MapStyle from './MapStyle';
 import BlogStyle from './BlogStyle';
+import BannerStyle from './BannerStyle';
 import { BLOG_ITEMS_PER_PAGE } from '../../utils/constants';
 import BlogPost from './BlogPost';
+import ProfileEditModal from '../ProfileEditModal';
+import { makeSelectLocation } from '../App/selectors';
+import { getPrivateRoute } from '../../utils/api';
+import createBlobUrl from '../../utils/createBlobUrl';
 
 export function ProducerProfilePage({
   profileFetch,
   profileClear,
-  producerProfilePage,
+  producerProfile,
   user,
+  routerLocation,
 }) {
   useInjectReducer({ key: 'producerProfilePage', reducer });
   useInjectSaga({ key: 'producerProfilePage', saga });
 
   const {
-    producerId,
+    sub,
+    businessId,
     avatarSource,
+    bannerSource,
     website,
     businessName,
     intro,
@@ -72,26 +79,44 @@ export function ProducerProfilePage({
     distributionAreas,
     stock,
     blog,
-    profileOptions,
-  } = producerProfilePage.profile;
+  } = producerProfile;
 
+  const { followedProducers } = user;
+
+  const [producerFollowed, setProducerFollowed] = useState(false);
   const [blogPage, setBlogPage] = useState(1);
-  const [stockCategoryNum, setStockCategoryNum] = useState('1');
+
+  useEffect(() => {
+    if (followedProducers && sub) {
+      const followedProducerList = followedProducers.map((producer) => producer.sub);
+      console.log('CHECKING', followedProducerList, sub);
+      if (followedProducerList.includes(sub)) {
+        setProducerFollowed(true);
+      }
+    }
+  }, [followedProducers, sub]);
+
+  useEffect(() => {
+    if (Object.keys(user).length) {
+      profileClear();
+      profileFetch();
+    }
+  }, [user, profileClear, profileFetch]);
+
+  if (!producerProfile) {
+    return null;
+  }
 
   TimeAgo.addLocale(en);
 
-  useEffect(() => {
-    profileClear();
-    profileFetch();
-  }, []);
+  const handleFollowClick = async () => {
+    const privateRoute = await getPrivateRoute();
+    const response = await privateRoute.patch('/user/follow', { follow: producerProfile.sub });
+    setProducerFollowed(!producerFollowed);
+    console.log(response.data);
+  };
 
-  useEffect(() => {
-    if (profileOptions && profileOptions.stockCategories) {
-      setStockCategoryNum(profileOptions.stockCategories.length);
-    }
-  }, [profileOptions]);
-
-  const blogRender = (blogArray, page) => blogArray.filter((blogPost) => blogPost.display === true || (user && user.producerId === producerId)).map((blogPost, index) => {
+  const blogRender = (blogArray, page) => blogArray.filter((blogPost) => blogPost.display === true || (user && user.businessId === businessId)).map((blogPost, index) => {
     if (index < (page * BLOG_ITEMS_PER_PAGE) - BLOG_ITEMS_PER_PAGE || index >= page * BLOG_ITEMS_PER_PAGE) {
       return null;
     }
@@ -102,10 +127,6 @@ export function ProducerProfilePage({
     );
   });
 
-  if (!producerProfilePage.profile) {
-    return null;
-  }
-
   return (
     <>
       <Helmet>
@@ -113,13 +134,40 @@ export function ProducerProfilePage({
         <meta name="description" content={`${businessName} - profile`} />
       </Helmet>
       <PageWrapper>
+        <BannerStyle>
+          <div className="image-stack__item image-stack__item--bottom">
+            <Grid.Row>
+              <Grid.Column width={16}>
+                <Image className="banner-image" src={bannerSource || '/images/banners/blank-banner.png'} centered />
+              </Grid.Column>
+            </Grid.Row>
+          </div>
+          <div className="image-stack__item image-stack__item--top">
+            <Grid>
+              <Grid.Row>
+                <Grid.Column width={4}>
+                  <Image className="profile-image" src={avatarSource || '/images/avatars/blank-avatar.webp'} size="small" bordered centered circular />
+                </Grid.Column>
+                <Grid.Column width={7} />
+                <Grid.Column className="profile-buttons" width={5} textAlign="right" verticalAlign="middle">
+                  {(user && user.businessId === businessId) && (
+                    <Modal closeIcon size="small" trigger={<Button primary>Edit Profile</Button>}>
+                      <Modal.Header>Edit profile</Modal.Header>
+                      <ProfileEditModal location={routerLocation} />
+                    </Modal>
+                  )}
+                  {(user && user.role === 'retailer') && (
+                    <Button positive={!producerFollowed} icon={producerFollowed ? 'check' : 'plus'} content={producerFollowed ? 'Following' : 'Follow'} onClick={handleFollowClick} />
+                  )}
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
+        </BannerStyle>
         <Segment basic textAlign="center">
           <Grid columns={3} padded="vertically">
             <Grid.Row>
-              <Grid.Column width={4} verticalAlign="middle">
-                <Image src={`${baseURL}${avatarSource}`} size="small" bordered centered circular />
-              </Grid.Column>
-              <Grid.Column width={8} textAlign="left">
+              <Grid.Column width={10} textAlign="left">
                 <Header as="h1">{businessName}</Header>
                 <a href={website} target="_blank" rel="noopener noreferrer">
                   {website}
@@ -136,7 +184,7 @@ export function ProducerProfilePage({
                   {salesContactNumber}
                 </p>
               </Grid.Column>
-              <Grid.Column width={4}>
+              <Grid.Column width={6}>
                 <MapStyle>
                   <Map
                     className="profileViewMap"
@@ -165,7 +213,7 @@ export function ProducerProfilePage({
                 <Header as="h2">Updates</Header>
               </Grid.Column>
               <Grid.Column textAlign="right">
-                {(user && user.producerId === producerId)
+                {(user && user.businessId === businessId)
                   && (
                     <ProducerBlogEditor />
                   )}
@@ -194,17 +242,19 @@ export function ProducerProfilePage({
               <Header as="h2">Available Items</Header>
             </Grid.Column>
             <Grid.Column width={11} textAlign="right">
-              {(user && user.producerId === producerId)
+              {(user && user.businessId === businessId)
                   && (
                     <>
-                      <Input value={stockCategoryNum} style={{ width: '60px', marginRight: '100px' }} onChange={(e) => setStockCategoryNum(e.target.value)} label="Categories" type="number" min={1} />
+                      {/* <Input value={stockCategoryNum} style={{ width: '60px', marginRight: '100px' }} onChange={(e) => setStockCategoryNum(e.target.value)} label="Categories" type="number" min={1} /> */}
                       <StockModal />
                     </>
                   )}
             </Grid.Column>
           </Grid>
           {/* <AvailabilityBasic stock={stock} /> */}
-          <AvailabilityCategories data={stock} stockCategoryNum={stockCategoryNum} />
+          {stock && (
+            <AvailabilityCategories data={stock} />
+          )}
         </Segment>
       </PageWrapper>
     </>
@@ -214,13 +264,14 @@ export function ProducerProfilePage({
 ProducerProfilePage.propTypes = {
   profileFetch: PropTypes.func.isRequired,
   profileClear: PropTypes.func.isRequired,
-  producerProfilePage: PropTypes.object,
+  producerProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 };
 
 const mapStateToProps = createStructuredSelector({
-  producerProfilePage: makeSelectProducerProfilePage(),
+  producerProfile: makeSelectProducerProfile(),
   user: makeSelectUser(),
+  routerLocation: makeSelectLocation(),
 });
 
 function mapDispatchToProps(dispatch, { location }) {

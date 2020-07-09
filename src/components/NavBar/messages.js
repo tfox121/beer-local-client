@@ -11,7 +11,7 @@ export const scope = 'app.components.NavBar';
 export default defineMessages({
   home: {
     id: `${scope}.navbar.home`,
-    defaultMessage: 'Home',
+    defaultMessage: 'beerLocal',
   },
   logIn: {
     id: `${scope}.navbar.logIn`,

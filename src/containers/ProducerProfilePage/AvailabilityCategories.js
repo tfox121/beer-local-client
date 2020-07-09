@@ -19,34 +19,52 @@ import { getPrivateRoute } from '../../utils/api';
 import AvailabilityStyle from './AvailabilityStyle';
 import { makeSelectProducerProfile, makeSelectUser } from './selectors';
 import OrderModalContent from '../../components/OrderModalContent';
-import { updateProfile } from './actions';
+import { updateProfileOptions } from './actions';
 
 const TableRows = ({
-  rows, prepareRow, storedCategory, index, categories, handleCategoryChange, producerProfile, user,
+  rows, prepareRow, storedCategory, index, categories, handleCategoryChange, handleRemoveCategory, producerProfile, user,
 }) => {
   const [category, setCategory] = useState(storedCategory);
   const onSelectChange = (selectedOption) => {
-    console.log(selectedOption, index);
     setCategory(selectedOption.value);
     handleCategoryChange(index, selectedOption.value);
   };
 
+  useEffect(() => {
+    setCategory(storedCategory);
+  }, [storedCategory]);
+
   return (
     <>
       <Table.Row>
-        <Table.Cell colSpan={2}>
-          {(user && user.producerId === producerProfile.producerId)
-            ? (
-              <Select
-                options={[...categories, { value: '', label: 'All' }]}
-                onChange={onSelectChange}
-                value={categories.filter((categoryObj) => categoryObj.value === category)[0]}
-                placeholder="All"
-                menuPortalTarget={document.body}
-              />
-            )
-            : <Header>{category}</Header>}
-        </Table.Cell>
+        {(user && user.businessId === producerProfile.businessId)
+          ? (
+            <>
+              <Table.Cell colSpan={2}>
+
+                <Select
+                  options={[...categories, { value: '', label: 'All' }]}
+                  onChange={onSelectChange}
+                  value={category ? { value: category, label: category } : { value: '', label: 'All' }}
+                  placeholder="All"
+                  menuPortalTarget={document.body}
+                />
+
+              </Table.Cell>
+              <Table.Cell colSpan={2} />
+              <Table.Cell colSpan={2} textAlign="right">
+                <Button content="Remove category" icon="minus" attached basic onClick={() => handleRemoveCategory(index)} />
+              </Table.Cell>
+            </>
+          )
+          : (
+            <>
+              <Table.Cell colSpan={2}>
+                <Header>{category || 'All'}</Header>
+              </Table.Cell>
+              <Table.Cell colSpan={5} />
+            </>
+          )}
       </Table.Row>
       {rows.map(
         (row) => {
@@ -54,13 +72,18 @@ const TableRows = ({
             prepareRow(row);
             return (
               <Table.Row {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <Table.Cell {...cell.getCellProps()}>
-                    {cell.column.id === 'orderQuant'
-                      ? cell.render('Cell', { editable: true })
-                      : cell.render('Cell')}
-                  </Table.Cell>
-                ))}
+                {row.cells.map((cell) => {
+                  if (cell.column.id === 'orderQuant' && user && user.role !== 'retailer') {
+                    return null;
+                  }
+                  return (
+                    <Table.Cell {...cell.getCellProps()}>
+                      {cell.column.id === 'orderQuant'
+                        ? cell.render('Cell', { editable: true })
+                        : cell.render('Cell')}
+                    </Table.Cell>
+                  );
+                })}
               </Table.Row>
             );
           }
@@ -69,6 +92,18 @@ const TableRows = ({
       )}
     </>
   );
+};
+
+TableRows.propTypes = {
+  rows: PropTypes.array,
+  prepareRow: PropTypes.func,
+  storedCategory: PropTypes.string,
+  index: PropTypes.number,
+  producerProfile: PropTypes.object,
+  categories: PropTypes.array,
+  user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  handleCategoryChange: PropTypes.func,
+  handleRemoveCategory: PropTypes.func,
 };
 
 const EditableCell = ({
@@ -122,7 +157,7 @@ EditableCell.propTypes = {
 };
 
 const AvailibilityTable = ({
-  columns, data, updateMyData, skipReset, handleSubmit, producerProfile, user, stockCategoryNum, profileUpdate,
+  columns, data, updateMyData, skipReset, handleSubmit, producerProfile, user, profileOptionsUpdate,
 }) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -155,24 +190,17 @@ const AvailibilityTable = ({
   const [stockCategories, setStockCategories] = useState(producerProfile && producerProfile.profileOptions.stockCategories);
   const isInitialMount = useRef(true);
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    } else {
-      const newLength = Number(stockCategoryNum);
-      const originalCatLength = stockCategories.length;
-      if (newLength < stockCategories.length) {
-        setStockCategories(stockCategories.slice(0, newLength));
-      }
-      if (newLength > stockCategories.length) {
-        const newCats = [];
-        for (let i = 0; i < newLength - originalCatLength; i += 1) {
-          newCats.push('');
-        }
-        setStockCategories([...stockCategories, ...newCats]);
-      }
+  const handleAddCategory = () => {
+    if (stockCategories.length < [...new Set(data.map((stockItem) => stockItem.category))].length) {
+      setStockCategories([...stockCategories, '']);
     }
-  }, [stockCategoryNum]);
+  };
+
+  const handleRemoveCategory = (index) => {
+    const newCats = [...stockCategories];
+    newCats.splice(index, 1);
+    setStockCategories([...newCats]);
+  };
 
   const handleCategoryChange = (index, value) => {
     const newCats = stockCategories;
@@ -184,45 +212,58 @@ const AvailibilityTable = ({
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else {
-      profileUpdate({ name: 'stockCategories', payload: stockCategories });
+      profileOptionsUpdate({ name: 'stockCategories', payload: stockCategories });
     }
-  }, [stockCategories]);
+  }, [stockCategories, profileOptionsUpdate]);
 
   useEffect(() => {
-    setCategories([...new Set(data.map((stockItem) => stockItem.category))].filter((category) => !!category).map((category) => ({ value: category, label: category })));
-  }, [data]);
+    setCategories([...new Set(data.map((stockItem) => stockItem.category))].filter((category) => !!category && !stockCategories.includes(category)).map((category) => ({ value: category, label: category })));
+  }, [data, stockCategories]);
 
   return (
     <Table {...getTableProps()}>
       <Table.Header>
         {headerGroups.map((headerGroup) => (
           <Table.Row {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              // Add the sorting props to control sorting. For this example
-              // we can add them into the header props
-              <Table.HeaderCell {...column.getHeaderProps(column.getSortByToggleProps())}>
-                {column.render('Header')}
-                {/* Add a sort direction indicator */}
-                <span>
-                  {column.isSorted
-                    ? column.isSortedDesc
-                      ? ' 🔽'
-                      : ' 🔼'
-                    : ''}
-                </span>
-              </Table.HeaderCell>
-            ))}
+            {headerGroup.headers.map((column) => {
+              if (column.Header === 'Order #' && user && user.role !== 'retailer') {
+                return null;
+              }
+              return (
+                // Add the sorting props to control sorting. For this example
+                // we can add them into the header props
+                <Table.HeaderCell {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  {column.render('Header')}
+                  {/* Add a sort direction indicator */}
+                  <span>
+                    {column.isSorted
+                      ? column.isSortedDesc
+                        ? ' 🔽'
+                        : ' 🔼'
+                      : ''}
+                  </span>
+                </Table.HeaderCell>
+              );
+            })}
           </Table.Row>
         ))}
       </Table.Header>
       <Table.Body {...getTableBodyProps()}>
         {stockCategories.map((storedCategory, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <React.Fragment key={index}>
-            <TableRows rows={rows} prepareRow={prepareRow} producerProfile={producerProfile} user={user} storedCategory={storedCategory} index={index} categories={categories} handleCategoryChange={handleCategoryChange} />
+            <TableRows rows={rows} prepareRow={prepareRow} producerProfile={producerProfile} user={user} storedCategory={storedCategory} index={index} categories={categories} handleCategoryChange={handleCategoryChange} handleRemoveCategory={handleRemoveCategory} />
           </React.Fragment>
         ))}
       </Table.Body>
       <Table.Footer>
+        {user && user.businessId === producerProfile.businessId && (
+          <Table.Row>
+            <Table.HeaderCell colSpan="16">
+              <Button attached basic icon="plus" content="Add category" onClick={handleAddCategory} />
+            </Table.HeaderCell>
+          </Table.Row>
+        )}
         <Table.Row>
           <Table.HeaderCell colSpan="16">
             <Menu floated="right">
@@ -253,10 +294,12 @@ AvailibilityTable.propTypes = {
   updateMyData: PropTypes.func,
   producerProfile: PropTypes.object,
   skipReset: PropTypes.bool,
+  user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  profileOptionsUpdate: PropTypes.func,
 };
 
 const AvailabilityCategories = ({
-  data, producerProfile, stockCategoryNum, profileUpdate, user,
+  data, producerProfile, profileOptionsUpdate, user,
 }) => {
   const [orderItems, setOrderItems] = useState([...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })));
 
@@ -377,8 +420,7 @@ const AvailabilityCategories = ({
         handleSubmit={handleSubmit}
         updateMyData={updateMyData}
         skipReset={skipResetRef.current}
-        stockCategoryNum={stockCategoryNum}
-        profileUpdate={profileUpdate}
+        profileOptionsUpdate={profileOptionsUpdate}
       />
     </AvailabilityStyle>
   );
@@ -387,7 +429,7 @@ const AvailabilityCategories = ({
 AvailabilityCategories.propTypes = {
   data: PropTypes.array,
   producerProfile: PropTypes.object,
-  profileUpdate: PropTypes.func,
+  profileOptionsUpdate: PropTypes.func,
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 };
 
@@ -398,7 +440,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    profileUpdate: (updateObj) => dispatch(updateProfile(updateObj)),
+    profileOptionsUpdate: (updateObj) => dispatch(updateProfileOptions(updateObj)),
 
   };
 }

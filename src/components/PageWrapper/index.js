@@ -14,12 +14,29 @@ const PageWrapperStyle = styled.div`
   div.ui.text.loader {
     min-height: 100%;
   }
-  padding: 1em;
+  .page-container {
+    height: calc(100vh - 49px);
+  }
+
+  .page-container > div.ui.basic.segment {
+    border-left: 1px solid rgb(230, 236, 240);
+    border-right: 1px solid rgb(230, 236, 240);
+    margin: 0;
+    padding-bottom: 28px;
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+
+  .page-container > div.ui.basic.primary.segment {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 const PageWrapper = ({ children }) => (
   <PageWrapperStyle>
-    <Container>
+    <Container className="page-container">
       {children}
     </Container>
   </PageWrapperStyle>

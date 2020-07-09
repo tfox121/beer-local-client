@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Form, Button } from 'semantic-ui-react';
 
+import { ACCEPTED_IMAGE_FORMATS } from '../../utils/constants';
 import ImageUploadStyle from './ImageUploadStyle';
 import messages from './messages';
 
@@ -17,12 +18,13 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
 
   const fileInputRef = createRef();
 
-  const fileChange = e => {
-    console.log(e.target.files[0]);
+  const fileChange = (e) => {
     setFormValues({
       ...formValues,
       pictureFile: e.target.files[0],
       avatar: true,
+      fileValid: !!ACCEPTED_IMAGE_FORMATS[e.target.files[0].type],
+      pictureFileExt: ACCEPTED_IMAGE_FORMATS[e.target.files[0].type],
     });
   };
   return (
@@ -41,10 +43,10 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
                   <FormattedMessage {...messages.chooseFile} />
                 )
               }
+              color={pictureFile ? 'grey' : 'blue'}
               labelPosition="left"
               icon="file image"
               onClick={() => fileInputRef.current.click()}
-              color={pictureFile ? 'grey' : 'blue'}
             />
             <input
               id="fileUpload"

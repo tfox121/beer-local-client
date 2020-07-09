@@ -2,20 +2,31 @@
  * Gets the repositories of the user from Github
  */
 
-import { call, put, takeLatest } from 'redux-saga/effects';
+import {
+  call, put, spawn, debounce,
+} from 'redux-saga/effects';
 import { push } from 'connected-react-router';
-import { FETCH_USER } from './constants';
-import { userFetched, userFetchError } from './actions';
+import { FETCH_USER, UPDATE_USER } from './constants';
+import {
+  userFetched, userFetchError, userUpdated, userUpdateError,
+} from './actions';
 import { getPrivateRoute } from '../../utils/api';
+import { getOwnAvatar, getOwnBanner } from '../../utils/getImages';
+import createBlobUrl from '../../utils/createBlobUrl';
 
 function* fetchUser() {
   try {
     const privateRoute = yield call(getPrivateRoute);
     const fetchUserData = () => privateRoute.get('/user');
     const response = yield call(fetchUserData);
-    console.log('USER RETRIEVED', response.data);
+    const bannerSource = yield call(getOwnBanner);
+    const avatarSource = yield call(getOwnAvatar);
+
+    console.log('USER RETRIEVED', response.data, bannerSource, avatarSource);
     if (Object.keys(response.data.user).length && Object.keys(response.data.business).length) {
-      yield put(userFetched({ ...response.data.user, ...response.data.business }));
+      yield put(userFetched({
+        ...response.data.business, ...response.data.user, bannerSource, avatarSource,
+      }));
     } else {
       yield put(push('/create'));
     }
@@ -25,9 +36,48 @@ function* fetchUser() {
   }
 }
 
+function* updateUser({ updateObj, pathname }) {
+  try {
+    const businessId = pathname.split('/')[2];
+    const privateRoute = yield call(getPrivateRoute);
+    const updateUserProfile = () => privateRoute.patch('/user', updateObj, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    const response = yield call(updateUserProfile);
+    const bannerSource = yield call(getOwnBanner);
+    const avatarSource = yield call(getOwnAvatar);
+
+    console.log('USER UPDATED', response.data);
+    if (Object.keys(response.data.user).length && Object.keys(response.data.business).length) {
+      yield put(userUpdated({
+        ...response.data.user, ...response.data.business, bannerSource, avatarSource,
+      }));
+      if (response.data.business.businessId !== businessId) {
+        yield put(push(`/brewery/${response.data.business.businessId}`));
+      }
+    }
+  } catch (err) {
+    yield put(userUpdateError(err));
+  }
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
-export default function* userData() {
-  yield takeLatest(FETCH_USER, fetchUser);
+// export default function* userData() {
+//   yield takeLatest(FETCH_USER, fetchUser);
+// }
+
+function* fetchUserSaga() {
+  // See example in containers/HomePage/saga.js
+  yield debounce(500, FETCH_USER, fetchUser);
+}
+
+function* updateUserSaga() {
+  yield debounce(1000, UPDATE_USER, updateUser);
+}
+
+export default function* rootSaga() {
+  yield spawn(fetchUserSaga);
+  yield spawn(updateUserSaga);
 }

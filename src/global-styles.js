@@ -21,7 +21,6 @@ const GlobalStyle = createGlobalStyle`
   }
 
   #app {
-    background-color: #fafafa;
     min-height: 100%;
     min-width: 100%;
   }
@@ -75,6 +74,10 @@ const GlobalStyle = createGlobalStyle`
 
   .blogpost-display-checkbox > div.checkbox > input:checked~label:after {
     top: -2px;
+  }
+
+  div.image-resizer.ui.modal {
+    width: unset;
   }
 `;
 

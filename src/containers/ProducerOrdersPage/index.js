@@ -35,11 +35,7 @@ const ProducerOrdersPage = ({
       return;
     }
     ordersClear();
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    console.log('ORDERS', ordersInfo);
-  }, [ordersInfo]);
+  }, [isAuthenticated, ordersFetch, ordersClear]);
 
   return (
     <>
@@ -48,7 +44,7 @@ const ProducerOrdersPage = ({
         <meta name="description" content="Your orders" />
       </Helmet>
       <PageWrapper>
-        <Segment basic padded="very">
+        <Segment basic padded="very" className="primary">
           <Header as="h1">Order History:</Header>
           <Table basic="very">
             <Table.Header>

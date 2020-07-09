@@ -5,21 +5,11 @@ import { Dropdown, Menu, Image } from 'semantic-ui-react';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import messages from './messages';
-import { baseURL } from '../../utils/api';
 
 export default function UserMenuItems({ avatarSource }) {
-  const [avatar, setAvatar] = useState('./images/avatars/blank-profile.webp');
-  const [avatarUpdated, setAvatarUpdated] = useState(false);
   const {
     user, isAuthenticated, loginWithRedirect, logout,
   } = useAuth0();
-
-  useEffect(() => {
-    if (avatarSource && !avatarUpdated) {
-      setAvatar(`${baseURL}${avatarSource}`);
-      setAvatarUpdated(true);
-    }
-  }, [avatarSource]);
 
   if (isAuthenticated) {
     // eslint-disable-next-line no-unused-expressions
@@ -29,7 +19,7 @@ export default function UserMenuItems({ avatarSource }) {
           item
           trigger={(
             <div>
-              <Image src={avatar} avatar />
+              <Image src={avatarSource || '/images/avatars/blank-avatar.webp'} avatar />
             </div>
           )}
         >
@@ -39,12 +29,12 @@ export default function UserMenuItems({ avatarSource }) {
               {' '}
               {user.name}
             </Dropdown.Header>
-            <Dropdown.Item>
+            {/* <Dropdown.Item>
               <FormattedMessage {...messages.yourProfile} />
             </Dropdown.Item>
             <Dropdown.Item>
               <FormattedMessage {...messages.settings} />
-            </Dropdown.Item>
+            </Dropdown.Item> */}
             <Dropdown.Item onClick={() => logout()}>
               <FormattedMessage {...messages.logOut} />
             </Dropdown.Item>

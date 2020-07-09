@@ -13,7 +13,6 @@ import PropTypes from 'prop-types';
 import { Editor } from 'react-draft-wysiwyg';
 import { BLOG_ITEMS_PER_PAGE } from '../../utils/constants';
 import { getPrivateRoute } from '../../utils/api';
-import BlogModalStyle from './BlogModalStyle';
 
 const BlogPost = ({ blogPost, blogPage, index }) => {
   const parsedBlog = JSON.parse(blogPost.blogData);

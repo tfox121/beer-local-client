@@ -55,7 +55,7 @@ describe('<ProducerProfilePage />', () => {
   //         lat: '51.1273626',
   //         lng: '-1.5518375',
   //       },
-  //       producerId: 'testbrewery',
+  //       businessId: 'testbrewery',
   //       salesContactNumber: '07540889237',
   //       salesEmail: 'test@gmail.com',
   //       stock: [],

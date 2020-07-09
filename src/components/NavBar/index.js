@@ -33,7 +33,7 @@ function NavBar({ userProfile, pushRoute }) {
         pushRoute('/');
         break;
       case '/brewery/profile':
-        pushRoute(`/brewery/${userProfile.producerId}`);
+        pushRoute(`/brewery/${userProfile.businessId}`);
         break;
       case '/sales/orders':
         pushRoute('/sales/orders');
@@ -53,6 +53,7 @@ function NavBar({ userProfile, pushRoute }) {
             name="/"
             active={activeItem === '/'}
             onClick={handleItemClick}
+            header
           >
             <FormattedMessage {...messages.home} />
           </Menu.Item>

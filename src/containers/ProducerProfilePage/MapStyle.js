@@ -5,7 +5,7 @@ const MapStyle = styled.div`
   width: 100%;
 
   .leaflet-container {
-    width: 90%;
+    width: 100%;
     height: 100%;
     display: block;
     z-index: 1;

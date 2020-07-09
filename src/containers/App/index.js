@@ -36,6 +36,7 @@ import saga from './saga';
 import GlobalStyle from '../../global-styles';
 import { fetchUser, clearUser } from './actions';
 import ProducerListPage from '../ProducerListPage';
+import getAuthToken from '../../utils/getAuthToken';
 
 const key = 'global';
 const AppWrapper = styled.div`
@@ -48,10 +49,10 @@ const AppWrapper = styled.div`
   flex-direction: column;
 `;
 
-const App = ({ userProfile, userFetch, userClear }) => {
+const App = ({ userFetch, userClear }) => {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
-  const { user, isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -61,7 +62,7 @@ const App = ({ userProfile, userFetch, userClear }) => {
     if (!isAuthenticated) {
       userClear();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, userFetch, userClear]);
 
   return (
     <AppWrapper>
@@ -83,7 +84,6 @@ App.propTypes = {
   // userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   userFetch: PropTypes.func,
   userClear: PropTypes.func,
-  userProfile: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
 };
 
 const mapStateToProps = createStructuredSelector({

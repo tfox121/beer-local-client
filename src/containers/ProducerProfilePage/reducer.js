@@ -8,17 +8,18 @@ import {
   FETCH_PROFILE,
   FETCH_PROFILE_SUCCESS,
   FETCH_PROFILE_ERROR,
-  CLEAR_PROFILE,
   UPDATE_PROFILE,
+  UPDATE_PROFILE_OPTIONS,
   UPDATE_PROFILE_SUCCESS,
   UPDATE_PROFILE_ERROR,
+  CLEAR_PROFILE,
 } from './constants';
 
 export const initialState = {
   fetchingProfile: false,
   fetchProfileError: false,
   updatingProfile: false,
-  updatingProfileError: false,
+  updateProfileError: false,
   profile: false,
 };
 
@@ -46,19 +47,24 @@ const producerProfilePageReducer = (state = initialState, action) => produce(sta
       draftState.profile = false;
       break;
     case UPDATE_PROFILE:
-      draftState.updatingProfileError = false;
+      draftState.updateProfileError = false;
+      draftState.updatingProfile = true;
+      break;
+    case UPDATE_PROFILE_OPTIONS:
+      draftState.updateProfileError = false;
       draftState.updatingProfile = true;
       break;
     case UPDATE_PROFILE_SUCCESS:
       if (action.profile) {
         draftState.profile = action.profile;
-        draftState.updatingProfileError = false;
+        draftState.updateProfileError = false;
       }
-      draftState.updatingProfile = false;
       break;
     case UPDATE_PROFILE_ERROR:
-      draftState.updatingProfileError = true;
-      draftState.updatingProfile = false;
+      if (action.error) {
+        draftState.updateProfileError = action.error;
+        draftState.updatingProfile = false;
+      }
       break;
   }
 });

@@ -23,7 +23,7 @@ const HomePage = ({ userProfile }) => {
   const { isAuthenticated } = useAuth0();
   return (
     <PageWrapper>
-      <Segment basic>
+      <Segment basic className="primary">
         <Header as="h1">
           <FormattedMessage {...messages.header} />
         </Header>

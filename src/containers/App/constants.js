@@ -12,4 +12,7 @@
 export const FETCH_USER = 'beerlocal/App/FETCH_USER';
 export const FETCH_USER_SUCCESS = 'beerlocal/App/FETCH_USER_SUCCESS';
 export const FETCH_USER_ERROR = 'beerlocal/App/FETCH_USER_ERROR';
+export const UPDATE_USER = 'beerlocal/App/UPDATE_USER';
+export const UPDATE_USER_SUCCESS = 'beerlocal/App/UPDATE_USER_SUCCESS';
+export const UPDATE_USER_ERROR = 'beerlocal/App/UPDATE_USER_ERROR';
 export const CLEAR_USER = 'beerlocal/App/CLEAR_USER';

@@ -16,7 +16,6 @@ import {
 
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
-import { ACCEPTED_IMAGE_FORMATS } from '../../utils/constants';
 import makeSelectCreateProfilePage from './selectors';
 import reducer from './reducer';
 import saga from './saga';
@@ -39,22 +38,21 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
 
   const formTemplate = {
     type: '',
+    businessName: '',
     location: {},
     address: '',
     avatar: false,
-    terms: false,
+    terms: true,
     pictureFile: undefined,
     pictureFileExt: undefined,
     fileValid: true,
-    businessName: '',
   };
 
   const producerFormTemplate = {
-    salesEmail: 'tfox121@gmail.com',
-    salesContactNumber: '07540889637',
-    website: 'buxtonbrewery.co.uk',
-    intro: 'dabdawdbakwd',
-    stock: [],
+    salesEmail: '',
+    salesContactNumber: '',
+    website: '',
+    intro: '',
     distributionAreas: {},
   };
 
@@ -70,6 +68,13 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
   const [mapCentre, setMapCentre] = useState([54.00366, -2.547855]);
 
   useEffect(() => {
+    if (profileStage === 0 && Object.keys(formValues).length !== Object.keys(formTemplate).length) {
+      setFormValues(formTemplate);
+      setFormErrors({});
+    }
+  }, [profileStage, formTemplate, formValues]);
+
+  useEffect(() => {
     if (
       formValues.type === 'producer'
       && Object.keys(formValues).length === Object.keys(formTemplate).length
@@ -82,24 +87,31 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
     ) {
       setFormValues({ ...formValues, ...retailerFormTemplate });
     }
-  }, [formValues]);
+  }, [formValues, formTemplate, producerFormTemplate, retailerFormTemplate]);
 
-  useEffect(() => {
-    if (formValues.pictureFile) {
-      setFormValues({
-        ...formValues,
-        fileValid: !!ACCEPTED_IMAGE_FORMATS[formValues.pictureFile.type],
-        pictureFileExt: ACCEPTED_IMAGE_FORMATS[formValues.pictureFile.type],
-      });
-    }
-  }, [formValues.pictureFile, ACCEPTED_IMAGE_FORMATS]);
+  // useEffect(() => {
+  //   console.log('CHECKING');
+  //   if (formValues.pictureFile && !formValues.fileValid) {
+  //     setFormValues({
+  //       ...formValues,
+  //       fileValid: !!ACCEPTED_IMAGE_FORMATS[formValues.pictureFile.type],
+  //       pictureFileExt: ACCEPTED_IMAGE_FORMATS[formValues.pictureFile.type],
+  //     });
+  //   }
+  // }, [formValues.pictureFile, formValues]);
 
   const handleSubmit = async () => {
-    if (formValues.type === 'producer') {
-      onSaveProfile(formValues);
-    }
-    onSaveProfile(formValues);
-    console.log('FORMVAL', formValues);
+    const formData = new FormData();
+
+    Object.keys(formValues).forEach((formKey) => {
+      if (typeof formValues[formKey] === 'object' && formKey !== 'pictureFile') {
+        formData.set(formKey, JSON.stringify(formValues[formKey]));
+      } else {
+        formData.set(formKey, formValues[formKey]);
+      }
+    });
+    console.log('formdata', formData.get('type'));
+    onSaveProfile(formData);
   };
 
   const backClickHandler = () => {
@@ -140,7 +152,7 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
 
   return (
     <PageWrapper>
-      <Segment basic textAlign="center">
+      <Segment basic textAlign="center" className="primary">
         <Header as="h1">Complete your profile</Header>
         <BusinessTypeSelection
           profileStage={profileStage}
