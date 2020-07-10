@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -9,6 +9,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { createStructuredSelector } from 'reselect';
 import { Header, Table, Segment } from 'semantic-ui-react';
 import { Helmet } from 'react-helmet';
+import Select from 'react-select';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
 // import { loadSession, closeSession } from './actions';
@@ -27,7 +28,8 @@ const ProducerOrdersPage = ({
   useInjectReducer({ key: 'ProducerOrdersPage', reducer });
   useInjectSaga({ key: 'ProducerOrdersPage', saga });
   const { isAuthenticated } = useAuth0();
-  const role = userProfile && userProfile.role;
+  const [orderStatuses, setOrderStatuses] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -36,6 +38,22 @@ const ProducerOrdersPage = ({
     }
     ordersClear();
   }, [isAuthenticated, ordersFetch, ordersClear]);
+
+  useEffect(() => {
+    if (ordersInfo && ordersInfo.orders) {
+      const statuses = [...new Set(ordersInfo && ordersInfo.orders.map((order) => order.status))];
+      setOrderStatuses(statuses.map((status) => ({ label: status, value: status })));
+    }
+  }, [ordersInfo.orders]);
+
+  const handleSelectChange = (selected, { action }) => {
+    if (action === 'clear') {
+      setStatusFilter('');
+    }
+    if (selected) {
+      setStatusFilter(selected.value);
+    }
+  };
 
   return (
     <>
@@ -51,17 +69,18 @@ const ProducerOrdersPage = ({
               <Table.Row>
                 <Table.HeaderCell>Order no.</Table.HeaderCell>
                 <Table.HeaderCell>Order date</Table.HeaderCell>
-                <Table.HeaderCell>{role === 'producer' ? 'Purchaser' : 'Brewery'}</Table.HeaderCell>
+                <Table.HeaderCell>{userProfile.role === 'producer' ? 'Purchaser' : 'Brewery'}</Table.HeaderCell>
                 <Table.HeaderCell>Total</Table.HeaderCell>
                 <Table.HeaderCell>Status</Table.HeaderCell>
-                <Table.HeaderCell />
-                <Table.HeaderCell />
+                <Table.HeaderCell colSpan={2}>
+                  <Select options={orderStatuses} placeholder="Filter status" onChange={handleSelectChange} defaultValue="" isClearable escapeClearsValue />
+                </Table.HeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {ordersInfo && ordersInfo.businesses && ordersInfo.orders.map((order, index) => (
+              {ordersInfo && ordersInfo.businesses && ordersInfo.orders.filter((order) => statusFilter ? order.status === statusFilter : true).map((order, index) => (
                 <React.Fragment key={order._id}>
-                  <OrderItem ordersInfo={ordersInfo} order={order} index={index} role={role} />
+                  <OrderItem ordersInfo={ordersInfo} order={order} index={index} />
                 </React.Fragment>
               ))}
             </Table.Body>

@@ -7,6 +7,7 @@ const rbacRules = {
       'producer-menu:visit',
       'orders:reject',
       'orders:confirm',
+      'orders:edit',
       'posts:list',
       'posts:create',
       'users:getSelf',
@@ -23,6 +24,7 @@ const rbacRules = {
   retailer: {
     static: [
       'retailer-menu:visit',
+      'orders:changes-confirm',
       'orders:cancel',
       'posts:list',
       'posts:create',
