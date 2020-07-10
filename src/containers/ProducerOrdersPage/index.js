@@ -78,11 +78,13 @@ const ProducerOrdersPage = ({
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {ordersInfo && ordersInfo.businesses && ordersInfo.orders.filter((order) => statusFilter ? order.status === statusFilter : true).map((order, index) => (
-                <React.Fragment key={order._id}>
-                  <OrderItem ordersInfo={ordersInfo} order={order} index={index} />
-                </React.Fragment>
-              ))}
+              {ordersInfo && ordersInfo.businesses && ordersInfo.orders
+                .filter((order) => statusFilter ? order.status === statusFilter : true)
+                .map((order, index) => (
+                  <React.Fragment key={order._id}>
+                    <OrderItem ordersInfo={ordersInfo} order={order} index={index} />
+                  </React.Fragment>
+                ))}
             </Table.Body>
           </Table>
         </Segment>

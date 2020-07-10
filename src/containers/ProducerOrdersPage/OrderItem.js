@@ -52,7 +52,9 @@ const OrderItem = ({
 
   const handleChangesConfirm = async () => {
     const privateRoute = await getPrivateRoute();
-    const itemsApproved = orderItems.map((orderItem) => ({ ...orderItem, orderChange: '' }));
+    const itemsApproved = orderItems
+      .filter((orderItem) => orderItem.orderChange !== 'delete')
+      .map((orderItem) => ({ ...orderItem, orderChange: '' }));
     const confirmedOrder = { ...orderData, status: 'Pending', items: itemsApproved };
 
     try {
