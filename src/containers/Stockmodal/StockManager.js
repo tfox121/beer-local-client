@@ -392,7 +392,7 @@ const MyTable = ({
   return (
     <>
       <StockTableStyle>
-        <Table {...getTableProps()} className="stock-table" compact>
+        <Table {...getTableProps()} className="stock-table" compact unstackable>
           <Table.Header className="table-header">
             {headerGroups.map((headerGroup, index) => (
               <Table.Row key={index} {...headerGroup.getHeaderGroupProps()}>

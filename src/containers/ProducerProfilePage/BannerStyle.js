@@ -6,6 +6,7 @@ const BannerStyle = styled.div`
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   position: relative;
+  width: 100%;
 
   .image-stack {
     border-left: 1px solid rgb(230, 236, 240);

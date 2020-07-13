@@ -164,6 +164,7 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
   return (
     <>
       <Modal
+        style={{ left: 0, minWidth: '800px' }}
         size="large"
         open={modalOpen}
         onClose={handleModalClose}

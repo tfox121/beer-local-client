@@ -64,7 +64,7 @@ const ProducerOrdersPage = ({
       <PageWrapper>
         <Segment basic padded="very" className="primary wrapper">
           <Header as="h1">Order History:</Header>
-          <Table basic="very">
+          <Table unstackable basic="very">
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Order no.</Table.HeaderCell>

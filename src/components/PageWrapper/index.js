@@ -12,7 +12,11 @@ import PropTypes from 'prop-types';
 const PageWrapperStyle = styled(Container)`
   &&& {
     min-height: calc(100vh - 49px);
-    /* width: fit-content; */
+    min-width: 900px;
+
+  @media only screen and (max-width: 767px) {
+    margin-left: 0 !important;
+  }
 
     div.ui.text.loader {
       min-height: 100%;
@@ -22,7 +26,7 @@ const PageWrapperStyle = styled(Container)`
     } */
 
     div.ui.basic.segment.wrapper {
-      width: fit-content;
+      width: 100%;
       border-left: 1px solid rgb(230, 236, 240);
       border-right: 1px solid rgb(230, 236, 240);
       margin: 0;
@@ -41,7 +45,7 @@ const PageWrapperStyle = styled(Container)`
 `;
 
 const PageWrapper = ({ children }) => (
-  <PageWrapperStyle fluid>
+  <PageWrapperStyle>
     {children}
   </PageWrapperStyle>
 );

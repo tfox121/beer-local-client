@@ -57,6 +57,21 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
     border-radius: 50%;
   `;
 
+  const StyledDropdownMenu = styled(Dropdown.Menu)`
+    &&& {
+      @media only screen and (max-width: 425px) {
+        left: 0;
+        right: 0;
+        top: 50px;
+        position: fixed;
+
+        .item {
+          white-space: normal;
+        }
+      }
+    }
+  `;
+
   if (isAuthenticated) {
     // eslint-disable-next-line no-unused-expressions
     return (
@@ -78,11 +93,9 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
               )}
             </>
           )}
-          direction="left"
           scrolling
         >
-
-          <Dropdown.Menu>
+          <StyledDropdownMenu direction="left">
             {notificationsArr.length ? notificationsArr.map((notification) => (
               <React.Fragment key={notification._id}>
                 <Notification notification={notification} />
@@ -93,7 +106,7 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
                   No notifications.
                 </Dropdown.Item>
               )}
-          </Dropdown.Menu>
+          </StyledDropdownMenu>
         </Dropdown>
         <Dropdown
           item

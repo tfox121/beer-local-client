@@ -304,23 +304,26 @@ const AvailibilityTable = ({
             </Table.HeaderCell>
           </Table.Row>
         )}
-        <Table.Row>
-          <Table.HeaderCell colSpan="16">
-            <Menu floated="right">
-              <Modal
-                trigger={<Menu.Item color="blue" name="Place Order" onClick={handleModalOpen} />}
-                open={modalOpen}
-              >
-                <Modal.Header>Confirm Order</Modal.Header>
-                <OrderModalContent orderItems={data} businessName={producerProfile.businessName} type="draftOrder" />
-                <Modal.Actions>
-                  <Button content="Cancel" onClick={() => setModalOpen(false)} />
-                  <Button primary content="Confirm" onClick={handleSendOrder} />
-                </Modal.Actions>
-              </Modal>
-            </Menu>
-          </Table.HeaderCell>
-        </Table.Row>
+        {user && user.role === 'retailer' && (
+          <Table.Row>
+            <Table.HeaderCell colSpan="16">
+              <Menu floated="right">
+                <Modal
+                  trigger={<Menu.Item name="Place Order" onClick={handleModalOpen} />}
+                  open={modalOpen}
+                  size="large"
+                >
+                  <Modal.Header>Confirm Order</Modal.Header>
+                  <OrderModalContent orderItems={data} businessName={producerProfile.businessName} type="draftOrder" />
+                  <Modal.Actions>
+                    <Button content="Cancel" onClick={() => setModalOpen(false)} />
+                    <Button primary content="Confirm" onClick={handleSendOrder} />
+                  </Modal.Actions>
+                </Modal>
+              </Menu>
+            </Table.HeaderCell>
+          </Table.Row>
+        )}
       </Table.Footer>
     </Table>
   );

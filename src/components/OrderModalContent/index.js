@@ -33,14 +33,14 @@ function OrderModalContent({
     return null;
   }
   return (
-    <Modal.Content>
+    <Modal.Content style={{ overflowX: 'scroll' }}>
       {type === 'draftOrder' && (
         <>
           <Header as="h5">{`Your order from ${businessName}`}</Header>
           <p>This is the contents of your order. Click below to confirm, or cancel to go back.</p>
         </>
       )}
-      <Table celled unstackable>
+      <Table celled unstackable style={{ minWidth: '600px' }}>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>

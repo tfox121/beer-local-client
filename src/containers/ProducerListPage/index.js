@@ -110,7 +110,7 @@ const ProducerListPage = ({
               <Checkbox label="Followed" toggle checked={followedFilterToggle} onClick={() => setfollowedFilterToggle(!followedFilterToggle)} /> */}
             </Grid.Column>
           </Grid>
-          <Table basic>
+          <Table basic unstackable>
             <Table.Body>
               {producers && filterCombine(producers).map((producer) => (
               // eslint-disable-next-line no-underscore-dangle
