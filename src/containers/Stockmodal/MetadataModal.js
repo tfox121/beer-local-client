@@ -85,7 +85,7 @@ const MetadataModal = ({ cell, updateMyData }) => {
           <Grid width={16}>
             <Grid.Column width={6}>
               <div className="button-image-container">
-                <Image className="product-image" src={itemMetadata.imageSource || '/images/products/blank-product.svg'} size="small" bordered centered />
+                <Image className="product-image" src={itemMetadata.imageSource || '/images/products/blank-product.png'} size="small" bordered centered />
                 <Button inverted circular basic className="image-button" icon="camera" onClick={() => productPictureRef.current.click()} />
                 <input
                   id="productPictureUpload"

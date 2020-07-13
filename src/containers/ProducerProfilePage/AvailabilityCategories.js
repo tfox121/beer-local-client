@@ -41,7 +41,6 @@ const TableRows = ({
           ? (
             <>
               <Table.Cell colSpan={2}>
-
                 <Select
                   options={[...categories, { value: '', label: 'All' }]}
                   onChange={onSelectChange}
@@ -51,7 +50,7 @@ const TableRows = ({
                 />
 
               </Table.Cell>
-              <Table.Cell colSpan={2} />
+              <Table.Cell colSpan={3} />
               <Table.Cell colSpan={2} textAlign="right">
                 <Button content="Remove category" icon="minus" attached basic onClick={() => handleRemoveCategory(index)} />
               </Table.Cell>
@@ -59,10 +58,9 @@ const TableRows = ({
           )
           : (
             <>
-              <Table.Cell colSpan={2}>
-                <Header>{category || 'All'}</Header>
+              <Table.Cell colSpan={8} textAlign="left">
+                <Header textAlign="left">{category || 'All'}</Header>
               </Table.Cell>
-              <Table.Cell colSpan={5} />
             </>
           )}
       </Table.Row>
@@ -75,12 +73,15 @@ const TableRows = ({
                 key={row.id}
                 trigger={(
                   <Table.Row {...row.getRowProps()}>
-                    {row.cells.map((cell) => {
+                    <Table.Cell>
+                      <Image src={row.original.imageSource || '/images/products/blank-product.png'} size="mini" bordered centered circular />
+                    </Table.Cell>
+                    {row.cells.map((cell, i) => {
                       if (cell.column.id === 'orderQuant' && user && user.role !== 'retailer') {
                         return null;
                       }
                       return (
-                        <Table.Cell {...cell.getCellProps()}>
+                        <Table.Cell className={`data-cell-${i}`} {...cell.getCellProps()}>
                           {cell.column.id === 'orderQuant'
                             ? cell.render('Cell', { editable: true })
                             : cell.render('Cell')}
@@ -90,14 +91,15 @@ const TableRows = ({
                   </Table.Row>
                 )}
                 wide
-                position="top center"
-                pinned
+                size="tiny"
+                position="bottom right"
+                hoverable
               >
                 <Popup.Header>{row.original.name}</Popup.Header>
                 <Popup.Content>
                   <Grid with={16}>
                     <Grid.Column width={5}>
-                      <Image src={row.original.imageSource || '/images/products/blank-product.svg'} size="small" bordered centered />
+                      <Image src={row.original.imageSource || '/images/products/blank-product.png'} size="large" bordered centered />
                     </Grid.Column>
                     <Grid.Column width={11}>
                       <p>{row.original.description || 'No description'}</p>
@@ -258,18 +260,19 @@ const AvailibilityTable = ({
   };
 
   return (
-    <Table {...getTableProps()}>
+    <Table {...getTableProps()} unstackable>
       <Table.Header>
         {headerGroups.map((headerGroup) => (
           <Table.Row {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => {
+            <Table.HeaderCell />
+            {headerGroup.headers.map((column, index) => {
               if (column.Header === 'Order #' && user && user.role !== 'retailer') {
                 return null;
               }
               return (
                 // Add the sorting props to control sorting. For this example
                 // we can add them into the header props
-                <Table.HeaderCell {...column.getHeaderProps(column.getSortByToggleProps())}>
+                <Table.HeaderCell className={`data-header-${index}`} {...column.getHeaderProps(column.getSortByToggleProps())}>
                   {column.render('Header')}
                   {/* Add a sort direction indicator */}
                   <span>
