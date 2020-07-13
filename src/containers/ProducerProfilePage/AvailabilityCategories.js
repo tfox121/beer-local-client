@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTable, useSortBy } from 'react-table';
 import {
-  Table, Input, Menu, Modal, Header, Button, Icon,
+  Table, Input, Menu, Modal, Header, Button, Icon, Popup, Image, Grid,
 } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
@@ -71,20 +71,40 @@ const TableRows = ({
           if (row.original.display === 'Show' && (row.original.category === category || category === '')) {
             prepareRow(row);
             return (
-              <Table.Row {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  if (cell.column.id === 'orderQuant' && user && user.role !== 'retailer') {
-                    return null;
-                  }
-                  return (
-                    <Table.Cell {...cell.getCellProps()}>
-                      {cell.column.id === 'orderQuant'
-                        ? cell.render('Cell', { editable: true })
-                        : cell.render('Cell')}
-                    </Table.Cell>
-                  );
-                })}
-              </Table.Row>
+              <Popup
+                key={row.id}
+                trigger={(
+                  <Table.Row {...row.getRowProps()}>
+                    {row.cells.map((cell) => {
+                      if (cell.column.id === 'orderQuant' && user && user.role !== 'retailer') {
+                        return null;
+                      }
+                      return (
+                        <Table.Cell {...cell.getCellProps()}>
+                          {cell.column.id === 'orderQuant'
+                            ? cell.render('Cell', { editable: true })
+                            : cell.render('Cell')}
+                        </Table.Cell>
+                      );
+                    })}
+                  </Table.Row>
+                )}
+                wide
+                position="top center"
+                pinned
+              >
+                <Popup.Header>{row.original.name}</Popup.Header>
+                <Popup.Content>
+                  <Grid with={16}>
+                    <Grid.Column width={5}>
+                      <Image src={row.original.imageSource || '/images/products/blank-product.svg'} size="small" bordered centered />
+                    </Grid.Column>
+                    <Grid.Column width={11}>
+                      <p>{row.original.description || 'No description'}</p>
+                    </Grid.Column>
+                  </Grid>
+                </Popup.Content>
+              </Popup>
             );
           }
           return null;

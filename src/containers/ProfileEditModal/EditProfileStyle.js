@@ -51,10 +51,11 @@ const EditProfileStyle = styled.div`
       margin: 0;
       display: flex;
       justify-content: center;
-      align-items: center
+      align-items: center;
 
       i.camera.icon {
         margin: 0;
+        height: auto;
       }
     }
   }
@@ -78,9 +79,6 @@ const EditProfileStyle = styled.div`
     cursor: pointer;
     border-radius: 5px;
   }
-
-
-
 `;
 
 export default EditProfileStyle;

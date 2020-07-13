@@ -22,13 +22,16 @@ import {
   useRowSelect,
 } from 'react-table';
 import matchSorter from 'match-sorter';
-import { Table, Button, Icon } from 'semantic-ui-react';
+import {
+  Table, Button, Icon, Modal,
+} from 'semantic-ui-react';
 // import PropTypes from 'prop-types';
 
 // import { FormattedMessage } from 'react-intl';
 import { PACK_SIZES } from '../../utils/constants';
 
 import StockTableStyle from './StockTableStyle';
+import MetadataModal from './MetadataModal';
 
 // Create an editable cell renderer
 const EditableCell = ({
@@ -444,13 +447,12 @@ const MyTable = ({
                           {row.subRows.length}
                           )
                         </>
-                      ) : cell.isAggregated ? (
-                        // If the cell is aggregated, use the Aggregated
-                        // renderer for cell
-                        cell.render('Aggregated')
                       ) : cell.isPlaceholder ? null : ( // For cells with repeated values, render null
                         // Otherwise, just render the regular cell
-                        cell.render('Cell', { editable: true })
+                        cell.column.id === 'metadata' ? (
+                          <MetadataModal cell={cell} updateMyData={updateMyData} />
+                        )
+                          : cell.render('Cell', { editable: true })
                       )}
                     </Table.Cell>
                   ))}
@@ -598,11 +600,6 @@ const StockManager = ({
         Header: 'Name',
         accessor: 'name',
         filter: 'fuzzyText',
-        // Use our custom `fuzzyText` filter on this column
-        // Use another two-stage aggregator here to
-        // first count the UNIQUE values from the rows
-        // being aggregated, then sum those counts if
-        // they are aggregated further
       },
       {
         Header: 'SKU',
@@ -621,8 +618,6 @@ const StockManager = ({
         accessor: 'abv',
         Filter: SliderColumnFilter,
         filter: filterLesserThan,
-        // Aggregate the average age of visitors
-        aggregate: 'average',
       },
       {
         Header: 'Pack Size',
@@ -633,7 +628,6 @@ const StockManager = ({
         Header: 'Availability',
         accessor: 'availability',
         Filter: SelectColumnFilter,
-        // filter: 'includes',
       },
       {
         Header: 'List Price',
@@ -642,19 +636,15 @@ const StockManager = ({
         filter: filterLesserThan,
         // eslint-disable-next-line react/display-name
         // Cell: EditableCell((props) => toCurrency(props.value)),
-        // Use our custom roundedMedian aggregator
-        // aggregate: roundedMedian,
-        // Aggregated: ({ value }) => `${value} (med)`,
       },
       {
         Header: 'Display',
         accessor: 'display',
         Filter: SelectColumnFilter,
-        // eslint-disable-next-line react/display-name
-        // Cell: EditableCell((props) => toCurrency(props.value)),
-        // Use our custom roundedMedian aggregator
-        // aggregate: roundedMedian,
-        // Aggregated: ({ value }) => `${value} (med)`,
+      },
+      {
+        Header: 'Metadata',
+        accessor: 'metadata',
       },
     ],
     [],

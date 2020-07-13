@@ -49,7 +49,6 @@ const ProfileEditModal = ({
   const {
     businessName, website, avatarSource, bannerSource, salesEmail, salesContactNumber, intro,
   } = user;
-  // const { salesEmail, salesContactNumber, intro } = producerProfile;
 
   useEffect(() => {
     if (Object.keys(user).length) {
@@ -62,16 +61,10 @@ const ProfileEditModal = ({
     }
   }, [user, businessName, website, avatarSource, bannerSource]);
 
-  // useEffect(() => {
-  //   if (Object.keys(producerProfile).length) {
-  //     setProducerFormValues({
-  //       salesEmail, salesContactNumber, intro,
-  //     });
-  //   }
-  // }, [producerProfile, salesEmail, salesContactNumber, intro]);
-
   useEffect(() => {
-    if (profilePicture.name || bannerPicture.name) {
+    if (!profilePicture && !bannerPicture) {
+      setImageResizeModalOpen(false);
+    } else if (profilePicture.name || bannerPicture.name) {
       setImageResizeModalOpen(true);
     }
   }, [profilePicture, bannerPicture]);

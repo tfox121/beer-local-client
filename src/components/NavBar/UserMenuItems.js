@@ -30,7 +30,6 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
       const unreadNotificationCount = notificationsArr.filter((notification) => (
         notification.read === false
       )).length;
-      console.log(notifications, 'UNREAD', unreadNotificationCount);
       setUnreadNotifications(unreadNotificationCount);
     }
   }, [notificationsArr]);
@@ -39,7 +38,6 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
     if (unreadNotifications) {
       const privateRoute = await getPrivateRoute();
       const response = await privateRoute.patch('/user/notifications');
-      console.log(response);
       setNotificationsArr([...response.data.notifications]);
     }
   };
@@ -85,11 +83,16 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
         >
 
           <Dropdown.Menu>
-            {notificationsArr && notificationsArr.map((notification) => (
+            {notificationsArr.length ? notificationsArr.map((notification) => (
               <React.Fragment key={notification._id}>
                 <Notification notification={notification} />
               </React.Fragment>
-            ))}
+            ))
+              : (
+                <Dropdown.Item disabled>
+                  No notifications.
+                </Dropdown.Item>
+              )}
           </Dropdown.Menu>
         </Dropdown>
         <Dropdown
