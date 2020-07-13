@@ -27,3 +27,9 @@ export const PACK_SIZES = {
 };
 
 export const BLOG_ITEMS_PER_PAGE = 2;
+
+export const notificationTypes = {
+  newOrder: 'new_order',
+  orderStatusChange: 'order_status_change',
+  newOrderMessage: 'new_order_message',
+};

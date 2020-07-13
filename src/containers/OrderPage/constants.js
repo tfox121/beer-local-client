@@ -1,5 +1,5 @@
 /*
- * ProducerOrdersPage Constants
+ * OrderPage Constants
  * Each action has a corresponding type, which the reducer knows and picks up on.
  * To avoid weird typos between the reducer and the actions, we save them as
  * constants here. We prefix them with 'yourproject/YourComponent' so we avoid
@@ -9,7 +9,7 @@
  * export const YOUR_ACTION_CONSTANT = 'yourproject/YourContainer/YOUR_ACTION_CONSTANT';
  */
 
-export const FETCH_ORDERS = 'beerlocal/ProducerOrdersPage/FETCH_ORDERS';
-export const FETCH_ORDERS_SUCCESS = 'beerlocal/ProducerOrdersPage/FETCH_ORDERS_SUCCESS';
-export const FETCH_ORDERS_ERROR = 'beerlocal/ProducerOrdersPage/FETCH_ORDERS_ERROR';
-export const CLEAR_ORDERS = 'beerlocal/ProducerOrdersPage/CLEAR_ORDERS';
+export const FETCH_ORDER = 'beerlocal/OrderPage/FETCH_ORDER';
+export const FETCH_ORDER_SUCCESS = 'beerlocal/OrderPage/FETCH_ORDER_SUCCESS';
+export const FETCH_ORDER_ERROR = 'beerlocal/OrderPage/FETCH_ORDER_ERROR';
+export const CLEAR_ORDER = 'beerlocal/OrderPage/CLEAR_ORDER';

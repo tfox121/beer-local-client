@@ -157,7 +157,6 @@ const RetailerForm = ({
               <MarkerMapStyle>
                 <Map center={mapCentre} zoom={zoomLevel} zoomControl={false}>
                   <TileLayer
-                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                   />
                   <MapMarker location={formValues.location} />

@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import { Table, Button } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import { PACK_SIZES } from '../../utils/constants';
+import QuantityButtonStyle from './QuantityButtonStyle';
 
 function OrderLine({
   orderLine, editingOrder, handleDeleteItem, handleDecreaseQuant, handleIncreaseQuant,
@@ -42,13 +43,15 @@ function OrderLine({
         />
       </Table.Cell>
       <Table.Cell disabled={orderLine.orderChange === 'delete'} positive={orderLine.orderChange === 'increase'} negative={orderLine.orderChange === 'decrease'}>
-        {orderLine.orderQuant}
-        {editingOrder && (
-          <>
-            <Button primary size="tiny" icon="minus" onClick={() => handleDecreaseQuant(orderLine.id)} title="Decrease quantity" />
-            <Button primary size="tiny" icon="plus" onClick={() => handleIncreaseQuant(orderLine.id)} title="Increase quantity" />
-          </>
-        )}
+        <QuantityButtonStyle>
+          <span>{orderLine.orderQuant}</span>
+          {editingOrder && (
+            <Button.Group className="quantity-buttons" size="mini" compact>
+              <Button primary basic icon="minus" onClick={() => handleDecreaseQuant(orderLine.id)} title="Decrease quantity" />
+              <Button primary basic icon="plus" onClick={() => handleIncreaseQuant(orderLine.id)} title="Increase quantity" />
+            </Button.Group>
+          )}
+        </QuantityButtonStyle>
       </Table.Cell>
       <Table.Cell disabled={orderLine.orderChange === 'delete'}>
         <NumberFormat
@@ -61,7 +64,7 @@ function OrderLine({
         />
       </Table.Cell>
       {editingOrder && (
-        <Table.Cell textAlign="center"><Button color="red" icon="close" title="Cancel item" onClick={() => handleDeleteItem(orderLine.id)} /></Table.Cell>
+        <Table.Cell textAlign="center"><Button color="red" size="mini" icon="close" title="Cancel item" onClick={() => handleDeleteItem(orderLine.id)} /></Table.Cell>
       )}
     </Table.Row>
   );

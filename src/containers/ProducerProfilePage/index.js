@@ -98,9 +98,11 @@ export function ProducerProfilePage({
 
   useEffect(() => {
     if (Object.keys(user).length) {
-      profileClear();
       profileFetch();
     }
+    return () => {
+      profileClear();
+    };
   }, [user, profileClear, profileFetch]);
 
   if (!producerProfile) {
@@ -164,7 +166,7 @@ export function ProducerProfilePage({
             </Grid>
           </div>
         </BannerStyle>
-        <Segment basic textAlign="center">
+        <Segment basic className="wrapper" textAlign="center">
           <Grid columns={3} padded="vertically">
             <Grid.Row>
               <Grid.Column width={10} textAlign="left">
@@ -193,7 +195,6 @@ export function ProducerProfilePage({
                     zoomControl={false}
                   >
                     <TileLayer
-                      attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                       url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                     />
                     <DistributionAreaDisplay
@@ -206,7 +207,7 @@ export function ProducerProfilePage({
             </Grid.Row>
           </Grid>
         </Segment>
-        <Segment basic>
+        <Segment basic className="wrapper">
           <BlogStyle>
             <Grid columns={2} style={{ marginBottom: '0.05em' }}>
               <Grid.Column textAlign="left">
@@ -236,7 +237,7 @@ export function ProducerProfilePage({
             </Item.Group>
           </BlogStyle>
         </Segment>
-        <Segment basic>
+        <Segment basic className="wrapper">
           <Grid columns={2} style={{ marginBottom: '0.05em' }}>
             <Grid.Column width={5} textAlign="left">
               <Header as="h2">Available Items</Header>
@@ -266,6 +267,7 @@ ProducerProfilePage.propTypes = {
   profileClear: PropTypes.func.isRequired,
   producerProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  routerLocation: PropTypes.object,
 };
 
 const mapStateToProps = createStructuredSelector({

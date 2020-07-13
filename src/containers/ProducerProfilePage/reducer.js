@@ -13,6 +13,9 @@ import {
   UPDATE_PROFILE_SUCCESS,
   UPDATE_PROFILE_ERROR,
   CLEAR_PROFILE,
+  SEND_ORDER,
+  SEND_ORDER_SUCCESS,
+  SEND_ORDER_ERROR,
 } from './constants';
 
 export const initialState = {
@@ -21,6 +24,8 @@ export const initialState = {
   updatingProfile: false,
   updateProfileError: false,
   profile: false,
+  sendingOrder: false,
+  sendingOrderError: false,
 };
 
 /* eslint-disable default-case, no-param-reassign */
@@ -65,6 +70,17 @@ const producerProfilePageReducer = (state = initialState, action) => produce(sta
         draftState.updateProfileError = action.error;
         draftState.updatingProfile = false;
       }
+      break;
+    case SEND_ORDER:
+      draftState.sendingOrderError = false;
+      draftState.sendingOrder = true;
+      break;
+    case SEND_ORDER_SUCCESS:
+      draftState.sendingOrder = false;
+      break;
+    case SEND_ORDER_ERROR:
+      draftState.sendingOrderError = true;
+      draftState.sendingOrder = false;
       break;
   }
 });

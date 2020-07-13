@@ -8,11 +8,11 @@ import { stateToHTML } from 'draft-js-export-html';
 import {
   Item, Modal, Button, Form,
 } from 'semantic-ui-react';
-import TimeAgo from 'javascript-time-ago';
 import PropTypes from 'prop-types';
 import { Editor } from 'react-draft-wysiwyg';
 import { BLOG_ITEMS_PER_PAGE } from '../../utils/constants';
 import { getPrivateRoute } from '../../utils/api';
+import timeAgo from '../../utils/timeAgo';
 
 const BlogPost = ({ blogPost, blogPage, index }) => {
   const parsedBlog = JSON.parse(blogPost.blogData);
@@ -23,7 +23,6 @@ const BlogPost = ({ blogPost, blogPage, index }) => {
   const [editingBlog, setEditingBlog] = useState(false);
 
   const htmlString = stateToHTML(blogData.getCurrentContent());
-  const timeAgo = new TimeAgo('en-UK');
 
   if (index < (blogPage * BLOG_ITEMS_PER_PAGE) - BLOG_ITEMS_PER_PAGE || index >= blogPage * BLOG_ITEMS_PER_PAGE) {
     return null;

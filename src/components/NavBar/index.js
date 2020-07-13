@@ -82,7 +82,11 @@ function NavBar({ userProfile, pushRoute }) {
             </>
           )}
           <Menu.Menu position="right">
-            <UserMenuItems avatarSource={userProfile.avatarSource} />
+            <UserMenuItems
+              notifications={userProfile.notifications}
+              avatarSource={userProfile.avatarSource}
+              businessName={userProfile.businessName}
+            />
           </Menu.Menu>
         </Menu>
       </header>

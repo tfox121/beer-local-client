@@ -13,6 +13,9 @@ import {
   UPDATE_PROFILE_OPTIONS,
   UPDATE_PROFILE_SUCCESS,
   UPDATE_PROFILE_ERROR,
+  SEND_ORDER,
+  SEND_ORDER_SUCCESS,
+  SEND_ORDER_ERROR,
 } from './constants';
 
 export const fetchProfile = (pathName) => ({
@@ -20,50 +23,50 @@ export const fetchProfile = (pathName) => ({
   pathName,
 });
 
-export function profileFetched(profile) {
-  return {
-    type: FETCH_PROFILE_SUCCESS,
-    profile,
-  };
-}
+export const profileFetched = (profile) => ({
+  type: FETCH_PROFILE_SUCCESS,
+  profile,
+});
 
-export function profileFetchError(error) {
-  return {
-    type: FETCH_PROFILE_ERROR,
-    error,
-  };
-}
+export const profileFetchError = (error) => ({
+  type: FETCH_PROFILE_ERROR,
+  error,
+});
 
-export function clearProfile() {
-  return {
-    type: CLEAR_PROFILE,
-  };
-}
+export const clearProfile = () => ({
+  type: CLEAR_PROFILE,
+});
 
-export function updateProfile(updateObj) {
-  return {
-    type: UPDATE_PROFILE,
-    updateObj,
-  };
-}
+export const updateProfile = (updateObj) => ({
+  type: UPDATE_PROFILE,
+  updateObj,
+});
 
-export function updateProfileOptions(updateObj) {
-  return {
-    type: UPDATE_PROFILE_OPTIONS,
-    updateObj,
-  };
-}
+export const updateProfileOptions = (updateObj) => ({
+  type: UPDATE_PROFILE_OPTIONS,
+  updateObj,
+});
 
-export function profileUpdated(profile) {
-  return {
-    type: UPDATE_PROFILE_SUCCESS,
-    profile,
-  };
-}
+export const profileUpdated = (profile) => ({
+  type: UPDATE_PROFILE_SUCCESS,
+  profile,
+});
 
-export function profileUpdateError(error) {
-  return {
-    type: UPDATE_PROFILE_ERROR,
-    error,
-  };
-}
+export const profileUpdateError = (error) => ({
+  type: UPDATE_PROFILE_ERROR,
+  error,
+});
+
+export const sendOrder = (orderInfo) => ({
+  type: SEND_ORDER,
+  orderInfo,
+});
+
+export const orderSent = () => ({
+  type: SEND_ORDER_SUCCESS,
+});
+
+export const orderSendError = (error) => ({
+  type: SEND_ORDER_ERROR,
+  error,
+});

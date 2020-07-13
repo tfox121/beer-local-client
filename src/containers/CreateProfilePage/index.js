@@ -152,7 +152,7 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
 
   return (
     <PageWrapper>
-      <Segment basic textAlign="center" className="primary">
+      <Segment basic textAlign="center" className="primary wrapper">
         <Header as="h1">Complete your profile</Header>
         <BusinessTypeSelection
           profileStage={profileStage}

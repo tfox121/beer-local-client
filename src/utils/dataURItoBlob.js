@@ -7,3 +7,11 @@ export default function dataURItoBlob(dataURI) {
   }
   return new Blob([new Uint8Array(array)], { type: mime });
 }
+
+export function binaryWithMimeToBlob(binary, mime) {
+  const array = [];
+  for (let i = 0; i < binary.length; i++) {
+    array.push(binary.charCodeAt(i));
+  }
+  return new Blob([new Uint8Array(array)], { type: mime });
+}

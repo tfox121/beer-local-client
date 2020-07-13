@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTable, useSortBy } from 'react-table';
 import {
-  Table, Input, Menu, Modal, Header, Button,
+  Table, Input, Menu, Modal, Header, Button, Icon,
 } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
@@ -17,9 +17,9 @@ import { PACK_SIZES } from '../../utils/constants';
 import { getPrivateRoute } from '../../utils/api';
 
 import AvailabilityStyle from './AvailabilityStyle';
-import { makeSelectProducerProfile, makeSelectUser } from './selectors';
+import { makeSelectProducerProfile, makeSelectUser, makeSelectOrderSending } from './selectors';
 import OrderModalContent from '../../components/OrderModalContent';
-import { updateProfileOptions } from './actions';
+import { updateProfileOptions, sendOrder } from './actions';
 
 const TableRows = ({
   rows, prepareRow, storedCategory, index, categories, handleCategoryChange, handleRemoveCategory, producerProfile, user,
@@ -157,7 +157,7 @@ EditableCell.propTypes = {
 };
 
 const AvailibilityTable = ({
-  columns, data, updateMyData, skipReset, handleSubmit, producerProfile, user, profileOptionsUpdate,
+  columns, data, updateMyData, skipReset, handleSubmit, producerProfile, user, profileOptionsUpdate, orderSending,
 }) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -220,6 +220,23 @@ const AvailibilityTable = ({
     setCategories([...new Set(data.map((stockItem) => stockItem.category))].filter((category) => !!category && !stockCategories.includes(category)).map((category) => ({ value: category, label: category })));
   }, [data, stockCategories]);
 
+  const handleModalOpen = () => {
+    const orderQuantity = data.reduce((acc, cur) => acc + cur.orderQuant, 0);
+    if (orderQuantity) {
+      setModalOpen(true);
+    }
+  };
+
+  const handleSendOrder = () => {
+    handleSubmit();
+    setTimeout(() => {
+      while (orderSending) {
+        console.log('Sending');
+      }
+      setModalOpen(false);
+    }, 0);
+  };
+
   return (
     <Table {...getTableProps()}>
       <Table.Header>
@@ -238,8 +255,8 @@ const AvailibilityTable = ({
                   <span>
                     {column.isSorted
                       ? column.isSortedDesc
-                        ? ' 🔽'
-                        : ' 🔼'
+                        ? <Icon name="triangle down" />
+                        : <Icon name="triangle up" />
                       : ''}
                   </span>
                 </Table.HeaderCell>
@@ -268,14 +285,14 @@ const AvailibilityTable = ({
           <Table.HeaderCell colSpan="16">
             <Menu floated="right">
               <Modal
-                trigger={<Menu.Item color="blue" name="Place Order" onClick={() => setModalOpen(true)} />}
+                trigger={<Menu.Item color="blue" name="Place Order" onClick={handleModalOpen} />}
                 open={modalOpen}
               >
                 <Modal.Header>Confirm Order</Modal.Header>
                 <OrderModalContent orderItems={data} businessName={producerProfile.businessName} type="draftOrder" />
                 <Modal.Actions>
                   <Button content="Cancel" onClick={() => setModalOpen(false)} />
-                  <Button primary content="Confirm" onClick={handleSubmit} />
+                  <Button primary content="Confirm" onClick={handleSendOrder} />
                 </Modal.Actions>
               </Modal>
             </Menu>
@@ -296,27 +313,30 @@ AvailibilityTable.propTypes = {
   skipReset: PropTypes.bool,
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   profileOptionsUpdate: PropTypes.func,
+  orderSending: PropTypes.bool,
 };
 
 const AvailabilityCategories = ({
-  data, producerProfile, profileOptionsUpdate, user,
+  data, producerProfile, profileOptionsUpdate, user, orderSend, orderSending,
 }) => {
   const [orderItems, setOrderItems] = useState([...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })));
 
   const handleSubmit = async () => {
     const order = orderItems.filter((stockItem) => stockItem.orderQuant);
-    const privateRoute = await getPrivateRoute();
-    try {
-      const response = await privateRoute.post('retailer/order', {
-        orderItems: order,
-        producerSub: producerProfile.sub,
-      });
-      if (response.data) {
-        push('/');
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    orderSend({ orderItems: order, producerSub: producerProfile.sub });
+
+    // const privateRoute = await getPrivateRoute();
+    // try {
+    //   const response = await privateRoute.post('/orders', {
+    //     orderItems: order,
+    //     producerSub: producerProfile.sub,
+    //   });
+    //   if (response.data) {
+    //     push('/');
+    //   }
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
   useEffect(() => {
@@ -421,6 +441,7 @@ const AvailabilityCategories = ({
         updateMyData={updateMyData}
         skipReset={skipResetRef.current}
         profileOptionsUpdate={profileOptionsUpdate}
+        orderSending={orderSending}
       />
     </AvailabilityStyle>
   );
@@ -431,16 +452,20 @@ AvailabilityCategories.propTypes = {
   producerProfile: PropTypes.object,
   profileOptionsUpdate: PropTypes.func,
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  orderSend: PropTypes.func,
+  orderSending: PropTypes.bool,
 };
 
 const mapStateToProps = createStructuredSelector({
   producerProfile: makeSelectProducerProfile(),
   user: makeSelectUser(),
+  orderSending: makeSelectOrderSending(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     profileOptionsUpdate: (updateObj) => dispatch(updateProfileOptions(updateObj)),
+    orderSend: (orderInfo) => dispatch(sendOrder(orderInfo)),
 
   };
 }

@@ -1,12 +1,16 @@
 import {
-  call, debounce, put, spawn,
+  call, debounce, put, spawn, takeLatest,
 } from 'redux-saga/effects';
-import { FETCH_PROFILE, UPDATE_PROFILE, UPDATE_PROFILE_OPTIONS } from './constants';
+import {
+  FETCH_PROFILE, UPDATE_PROFILE, UPDATE_PROFILE_OPTIONS, SEND_ORDER,
+} from './constants';
 import {
   profileFetched,
   profileFetchError,
   profileUpdated,
   profileUpdateError,
+  orderSent,
+  orderSendError,
 } from './actions';
 import { publicRoute, getPrivateRoute } from '../../utils/api';
 import { getBanner, getAvatar } from '../../utils/getImages';
@@ -50,6 +54,7 @@ function* updateProfile({ updateObj }) {
 }
 
 function* updateProfileOptions({ updateObj }) {
+  console.log('UPDATING PROFILE');
   try {
     const privateRoute = yield call(getPrivateRoute);
     const fetchProfileData = () => privateRoute.patch('/producer/profile/options', updateObj);
@@ -65,6 +70,23 @@ function* updateProfileOptions({ updateObj }) {
   }
 }
 
+function* sendOrder({ orderInfo }) {
+  console.log(orderInfo);
+  try {
+    const privateRoute = yield call(getPrivateRoute);
+    const sendOrderData = () => privateRoute.post('/orders', orderInfo);
+
+    const response = yield call(sendOrderData);
+
+    if (response.data) {
+      yield put(orderSent());
+    }
+  } catch (err) {
+    console.log('ERROR', err);
+    yield put(orderSendError(err));
+  }
+}
+
 function* fetchProfileSaga() {
   yield debounce(500, FETCH_PROFILE, fetchProfile);
 }
@@ -77,8 +99,13 @@ function* updateProfileOptionsSaga() {
   yield debounce(1000, UPDATE_PROFILE_OPTIONS, updateProfileOptions);
 }
 
+function* sendOrderSaga() {
+  yield takeLatest(SEND_ORDER, sendOrder);
+}
+
 export default function* rootSaga() {
   yield spawn(fetchProfileSaga);
   yield spawn(updateProfileSaga);
   yield spawn(updateProfileOptionsSaga);
+  yield spawn(sendOrderSaga);
 }

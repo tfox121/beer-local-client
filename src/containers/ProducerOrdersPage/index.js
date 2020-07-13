@@ -62,7 +62,7 @@ const ProducerOrdersPage = ({
         <meta name="description" content="Your orders" />
       </Helmet>
       <PageWrapper>
-        <Segment basic padded="very" className="primary">
+        <Segment basic padded="very" className="primary wrapper">
           <Header as="h1">Order History:</Header>
           <Table basic="very">
             <Table.Header>
@@ -71,9 +71,8 @@ const ProducerOrdersPage = ({
                 <Table.HeaderCell>Order date</Table.HeaderCell>
                 <Table.HeaderCell>{userProfile.role === 'producer' ? 'Purchaser' : 'Brewery'}</Table.HeaderCell>
                 <Table.HeaderCell>Total</Table.HeaderCell>
-                <Table.HeaderCell>Status</Table.HeaderCell>
-                <Table.HeaderCell colSpan={2}>
-                  <Select options={orderStatuses} placeholder="Filter status" onChange={handleSelectChange} defaultValue="" isClearable escapeClearsValue />
+                <Table.HeaderCell colSpan={3}>
+                  <Select options={orderStatuses} placeholder="Filter" onChange={handleSelectChange} defaultValue="" isClearable escapeClearsValue />
                 </Table.HeaderCell>
               </Table.Row>
             </Table.Header>

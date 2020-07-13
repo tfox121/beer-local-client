@@ -16,8 +16,9 @@ import { PACK_SIZES } from '../../utils/constants';
 import { getPrivateRoute } from '../../utils/api';
 
 import AvailabilityStyle from './AvailabilityStyle';
-import { makeSelectProducerProfile } from './selectors';
+import { makeSelectProducerProfile, makeSelectOrderSending } from './selectors';
 import OrderModalContent from '../../components/OrderModalContent';
+import { sendOrder } from './actions';
 
 const EditableCell = ({
   value: initialValue,
@@ -70,7 +71,7 @@ EditableCell.propTypes = {
 };
 
 const AvailibilityTable = ({
-  columns, data, updateMyData, skipReset, handleSubmit, producerProfile,
+  columns, data, updateMyData, skipReset, handleSubmit, producerProfile, orderSending,
 }) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -99,6 +100,14 @@ const AvailibilityTable = ({
   );
 
   const [modalOpen, setModalOpen] = useState(false);
+
+  const handleSendOrder = () => {
+    handleSubmit();
+    while (orderSending) {
+      console.log('Sending');
+    }
+    setModalOpen(false);
+  };
 
   return (
     <Table {...getTableProps()}>
@@ -156,7 +165,7 @@ const AvailibilityTable = ({
                 <OrderModalContent orderItems={data} businessName={producerProfile.businessName} type="draftOrder" />
                 <Modal.Actions>
                   <Button content="Cancel" onClick={() => setModalOpen(false)} />
-                  <Button primary content="Confirm" onClick={handleSubmit} />
+                  <Button primary content="Confirm" loading={orderSending} onClick={handleSendOrder} />
                 </Modal.Actions>
               </Modal>
             </Menu>
@@ -175,25 +184,29 @@ AvailibilityTable.propTypes = {
   updateMyData: PropTypes.func,
   producerProfile: PropTypes.object,
   skipReset: PropTypes.bool,
+  orderSending: PropTypes.bool,
 };
 
-const AvailabilityDynamic = ({ data, producerProfile }) => {
+const AvailabilityDynamic = ({
+  data, producerProfile, orderSend, orderSending,
+}) => {
   const [orderItems, setOrderItems] = useState([...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })));
 
   const handleSubmit = async () => {
     const order = orderItems.filter((stockItem) => stockItem.orderQuant);
-    const privateRoute = await getPrivateRoute();
-    try {
-      const response = await privateRoute.post('retailer/order', {
-        orderItems: order,
-        producerSub: producerProfile.sub,
-      });
-      if (response.data) {
-        push('/');
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    orderSend({ orderItems: order, producerSub: producerProfile.sub });
+    // const privateRoute = await getPrivateRoute();
+    // try {
+    //   const response = await privateRoute.post('/orders', {
+    //     orderItems: order,
+    //     producerSub: producerProfile.sub,
+    //   });
+    //   if (response.data) {
+    //     push('/');
+    //   }
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
   useEffect(() => {
@@ -294,6 +307,7 @@ const AvailabilityDynamic = ({ data, producerProfile }) => {
         producerProfile={producerProfile}
         // handleChange={handleChange}
         handleSubmit={handleSubmit}
+        orderSending={orderSending}
         updateMyData={updateMyData}
         skipReset={skipResetRef.current}
       />
@@ -304,22 +318,24 @@ const AvailabilityDynamic = ({ data, producerProfile }) => {
 AvailabilityDynamic.propTypes = {
   data: PropTypes.array,
   producerProfile: PropTypes.object,
+  orderSend: PropTypes.func,
+  orderSending: PropTypes.bool,
 };
 
 const mapStateToProps = createStructuredSelector({
   producerProfile: makeSelectProducerProfile(),
+  orderSending: makeSelectOrderSending(),
 });
 
-// function mapDispatchToProps(dispatch, { location }) {
-//   return {
-//     profileFetch: () => dispatch(fetchProfile(location.pathname)),
-//     profileClear: () => dispatch(clearProfile()),
-//   };
-// }
+function mapDispatchToProps(dispatch) {
+  return {
+    orderSend: (orderObj) => dispatch(sendOrder(orderObj)),
+  };
+}
 
 const withConnect = connect(
   mapStateToProps,
-  null,
+  mapDispatchToProps,
 );
 
 export default compose(withConnect)(AvailabilityDynamic);

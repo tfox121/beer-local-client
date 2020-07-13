@@ -11,6 +11,7 @@ const selectProducerProfilePageDomain = (state) => state.producerProfilePage || 
  * Other specific selectors
  */
 const selectGlobal = (state) => state.global || initialState;
+
 const makeSelectUser = () => createSelector(
   selectGlobal,
   (globalState) => globalState.user,
@@ -29,5 +30,12 @@ const makeSelectProducerProfile = () => createSelector(
   (substate) => substate.profile,
 );
 
+const makeSelectOrderSending = () => createSelector(
+  selectProducerProfilePageDomain,
+  (substate) => substate.sendingOrder,
+);
+
 export default makeSelectProducerProfilePage;
-export { selectProducerProfilePageDomain, makeSelectUser, makeSelectProducerProfile };
+export {
+  selectProducerProfilePageDomain, makeSelectUser, makeSelectProducerProfile, makeSelectOrderSending,
+};

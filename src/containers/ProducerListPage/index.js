@@ -5,7 +5,7 @@ import { compose } from 'redux';
 import { push } from 'connected-react-router';
 
 import {
-  Header, Segment, Table, Image, Checkbox,
+  Header, Segment, Table, Image, Checkbox, Dropdown, Grid,
 } from 'semantic-ui-react';
 import { createStructuredSelector } from 'reselect';
 import { Map, TileLayer } from 'react-leaflet';
@@ -36,6 +36,7 @@ const ProducerListPage = ({
 
   const [areaFilterToggle, setareaFilterToggle] = useState(true);
   const [followedFilterToggle, setfollowedFilterToggle] = useState(false);
+  const [filter, setFilter] = useState([]);
 
   const checkPolygonsContainCoords = (polygonsObj, latlng) => {
     if (!polygonsObj) {
@@ -54,12 +55,12 @@ const ProducerListPage = ({
 
   // const filteredProducers = !!producers && !!user && producers.filter();
 
-  const filterCombine = (producers) => {
-    let filteredProducers = [...producers];
-    if (areaFilterToggle) {
+  const filterCombine = (producerArr) => {
+    let filteredProducers = [...producerArr];
+    if (filter.includes('area')) {
       filteredProducers = filteredProducers.filter(areaFilter);
     }
-    if (followedFilterToggle) {
+    if (filter.includes('followed')) {
       filteredProducers = filteredProducers.filter(followedFilter);
     }
     return filteredProducers;
@@ -73,6 +74,10 @@ const ProducerListPage = ({
   //   });
   // }
 
+  const handleChange = (e, { value }) => {
+    setFilter(value);
+  };
+
   useEffect(() => {
     producersFetch();
   }, [producersFetch]);
@@ -85,24 +90,27 @@ const ProducerListPage = ({
     return null;
   }
 
+  const filterOptions = [
+    { key: 'area', text: 'In my area', value: 'area' },
+    { key: 'followed', text: 'Followed breweries', value: 'followed' },
+  ];
+
   return (
     <PageWrapper>
       <ProducerListPageStyle>
-        <Segment basic>
-          <Header as="h1" floated="left">Breweries</Header>
-          <Segment basic textAlign="right" floated="right">
-            <Checkbox label="In my area" toggle checked={areaFilterToggle} onClick={() => setareaFilterToggle(!areaFilterToggle)} />
-            {' '}
-            <Checkbox label="Followed" toggle checked={followedFilterToggle} onClick={() => setfollowedFilterToggle(!followedFilterToggle)} />
-          </Segment>
+        <Segment basic className="primary wrapper">
+          <Grid width={16}>
+            <Grid.Column width={6}>
+              <Header as="h1" floated="left">Breweries</Header>
+            </Grid.Column>
+            <Grid.Column width={10} textAlign="right">
+              <Dropdown compact value={filter} onChange={handleChange} placeholder="Filter" multiple selection options={filterOptions} />
+              {/* <Checkbox label="In my area" toggle checked={areaFilterToggle} onClick={() => setareaFilterToggle(!areaFilterToggle)} />
+              {' '}
+              <Checkbox label="Followed" toggle checked={followedFilterToggle} onClick={() => setfollowedFilterToggle(!followedFilterToggle)} /> */}
+            </Grid.Column>
+          </Grid>
           <Table basic>
-            {/* <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell colSpan="3" verticalAlign="middle" textAlign="right">
-
-                </Table.HeaderCell>
-              </Table.Row>
-            </Table.Header> */}
             <Table.Body>
               {producers && filterCombine(producers).map((producer) => (
               // eslint-disable-next-line no-underscore-dangle
@@ -115,12 +123,11 @@ const ProducerListPage = ({
                   <Table.Cell width={5}>
                     <Map center={producer.location} zoom={6} zoomControl={false}>
                       <TileLayer
-                        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
                       />
                       <DistributionAreaDisplay distributionAreas={producer.distributionAreas} />
                       <MapMarker location={producer.location} />
-                      <MapMarker location={user.location} />
+                      <MapMarker type="user" location={user.location} />
                     </Map>
                   </Table.Cell>
                 </Table.Row>

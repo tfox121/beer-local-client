@@ -29,14 +29,14 @@ import ProducerProfilePage from '../ProducerProfilePage/Loadable';
 import ProducerOrdersPage from '../ProducerOrdersPage/Loadable';
 import NotFoundPage from '../NotFoundPage/Loadable';
 import NavBar from '../../components/NavBar/index';
+import ProducerListPage from '../ProducerListPage';
+import OrderPage from '../OrderPage/Loadable';
 // import { loadSession, closeSession } from './actions';
 import reducer from './reducer';
 import saga from './saga';
 
 import GlobalStyle from '../../global-styles';
 import { fetchUser, clearUser } from './actions';
-import ProducerListPage from '../ProducerListPage';
-import getAuthToken from '../../utils/getAuthToken';
 
 const key = 'global';
 const AppWrapper = styled.div`
@@ -73,6 +73,7 @@ const App = ({ userFetch, userClear }) => {
         <Route exact path="/brewery/:id" component={ProducerProfilePage} />
         <Route exact path="/sales/orders" component={ProducerOrdersPage} />
         <Route exact path="/breweries" component={ProducerListPage} />
+        <Route exact path="/order/:id" component={OrderPage} />
         <Route component={NotFoundPage} />
       </Switch>
       <GlobalStyle />
