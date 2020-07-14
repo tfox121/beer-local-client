@@ -80,6 +80,14 @@ const GlobalStyle = createGlobalStyle`
   div.image-resizer.ui.modal {
     width: unset;
   }
+
+  /* Modal Style */
+  div.ui.modal {
+    @media only screen and (max-width: 425px) {
+      left: 0px;
+      min-width: 800px;
+    }
+  }
 `;
 
 export default GlobalStyle;

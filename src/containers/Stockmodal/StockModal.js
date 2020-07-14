@@ -50,7 +50,7 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
     display: 'Hide',
   };
 
-  const [stockData, setStockData] = React.useState([stockDataTemplate]);
+  const [stockData, setStockData] = useState([stockDataTemplate]);
   const [selected, setSelected] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [stockEditPending, setStockEditPending] = useState(false);
@@ -164,7 +164,6 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
   return (
     <>
       <Modal
-        style={{ left: 0, minWidth: '800px' }}
         size="large"
         open={modalOpen}
         onClose={handleModalClose}

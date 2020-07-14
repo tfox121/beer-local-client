@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-comment-textnodes */
 /* eslint-disable no-underscore-dangle */
 /**
  *
@@ -15,6 +16,7 @@ import en from 'javascript-time-ago/locale/en';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import PhoneNumber from 'awesome-phonenumber';
 
 import {
   Segment,
@@ -25,6 +27,7 @@ import {
   Pagination,
   Button,
   Modal,
+  Card,
 } from 'semantic-ui-react';
 import { Map, TileLayer } from 'react-leaflet';
 
@@ -48,12 +51,13 @@ import ProducerBlogEditor from './ProducerBlogEditor';
 import MapStyle from './MapStyle';
 import BlogStyle from './BlogStyle';
 import BannerStyle from './BannerStyle';
-import { BLOG_ITEMS_PER_PAGE } from '../../utils/constants';
+import { BLOG_ITEMS_PER_PAGE, PACK_SIZES } from '../../utils/constants';
 import BlogPost from './BlogPost';
 import ProfileEditModal from '../ProfileEditModal';
 import { makeSelectLocation } from '../App/selectors';
 import { getPrivateRoute } from '../../utils/api';
-import createBlobUrl from '../../utils/createBlobUrl';
+import PromotionModal from './PromotionModal';
+import promotionCopySelection from '../../utils/promotionCopy';
 
 export function ProducerProfilePage({
   profileFetch,
@@ -113,9 +117,14 @@ export function ProducerProfilePage({
 
   const handleFollowClick = async () => {
     const privateRoute = await getPrivateRoute();
-    const response = await privateRoute.patch('/user/follow', { follow: producerProfile.sub });
+    await privateRoute.patch('/user/follow', { follow: producerProfile.sub });
     setProducerFollowed(!producerFollowed);
-    console.log(response.data);
+  };
+
+  const handleDeletePromo = async (id) => {
+    const privateRoute = await getPrivateRoute();
+    const response = await privateRoute.delete(`/producer/promotions/${id}`);
+    console.log(response);
   };
 
   const blogRender = (blogArray, page) => blogArray.filter((blogPost) => blogPost.display === true || (user && user.businessId === businessId)).map((blogPost, index) => {
@@ -171,20 +180,25 @@ export function ProducerProfilePage({
             <Grid.Row>
               <Grid.Column width={10} textAlign="left">
                 <Header as="h1">{businessName}</Header>
-                <a href={website} target="_blank" rel="noopener noreferrer">
-                  {website}
-                </a>
-                <p>{intro}</p>
-                <Header as="h4">Contact</Header>
-                <p>
-                  Email:
-                  {' '}
-                  {salesEmail}
-                  {' '}
-                  / Tel:
-                  {' '}
-                  {salesContactNumber}
-                </p>
+                <Card fluid>
+                  <Card.Content>
+                    <Card.Description>{intro}</Card.Description>
+                  </Card.Content>
+                  {/* <Header as="h4">Contact</Header> */}
+                  <Card.Content extra>
+                    <a href={website} target="_blank" rel="noopener noreferrer">
+                      {website}
+                    </a>
+                    {' '}
+                    //
+                    {' '}
+                    <a href={`mailto:${salesEmail}`} target="_blank" rel="noopener noreferrer">{salesEmail}</a>
+                    {' '}
+                    //
+                    {' '}
+                    {new PhoneNumber(salesContactNumber, 'GB').getNumber('national')}
+                  </Card.Content>
+                </Card>
               </Grid.Column>
               <Grid.Column width={6}>
                 <MapStyle>
@@ -236,6 +250,51 @@ export function ProducerProfilePage({
               )}
             </Item.Group>
           </BlogStyle>
+        </Segment>
+        <Segment basic className="wrapper">
+          <Grid columns={2} style={{ marginBottom: '0.05em' }}>
+            <Grid.Column width={5} textAlign="left">
+              <Header as="h2">Promotions</Header>
+            </Grid.Column>
+            <Grid.Column width={11} textAlign="right">
+              {(user && user.businessId === businessId)
+                && (
+                  <>
+                    <PromotionModal />
+                  </>
+                )}
+            </Grid.Column>
+          </Grid>
+          <Segment>
+            {(producerProfile.promotions && producerProfile.promotions.length) ? (
+              <ul>
+                {producerProfile.promotions.map((promotion) => (
+                  <li key={promotion._id}>
+                    <Grid>
+                      <Grid.Column width={14}>
+                        {promotionCopySelection(promotion, producerProfile.stock
+                          .filter((stockItem) => stockItem.display === 'Show')
+                          .map((stockItem) => ({
+                            key: stockItem.id, value: stockItem.id, text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]}`,
+                          })))}
+                      </Grid.Column>
+                      <Grid.Column width={2}>
+                        {(user && user.businessId === businessId)
+                          && (
+                            <Button negative compact basic size="small" icon="cancel" onClick={() => handleDeletePromo(promotion._id)} />
+                          )}
+                      </Grid.Column>
+                    </Grid>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <>
+                No promotions currently available.
+              </>
+            )}
+
+          </Segment>
         </Segment>
         <Segment basic className="wrapper">
           <Grid columns={2} style={{ marginBottom: '0.05em' }}>

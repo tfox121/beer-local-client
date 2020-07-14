@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
-
+import PhoneNumber from 'awesome-phonenumber';
 import Geosuggest from 'react-geosuggest';
 
 import ImageUpload from '../../components/ImageUpload';
 import MapMarker from '../../components/MapMarker';
 import MarkerMapStyle from './MarkerMapStyle';
 import SuggestBlockStyle from './SuggestBlockStyle';
+
+const ayt = PhoneNumber.getAsYouType('GB');
 
 const RetailerForm = ({
   formValues,
@@ -20,6 +23,7 @@ const RetailerForm = ({
 }) => {
   const [zoomLevel, setZoomLevel] = useState(5);
   const [visible, setVisible] = useState(false);
+  const [unformattedTel, setUnformattedTel] = useState('');
 
   useEffect(() => {
     if (profileStage === 1 && formValues.type === 'retailer') {
@@ -35,6 +39,19 @@ const RetailerForm = ({
       setZoomLevel(15);
     }
   }, [setMapCentre, formValues.location]);
+
+  useEffect(() => {
+    const newErrors = { ...formErrors };
+    delete newErrors.purchasingContactNumber;
+    setFormErrors({ ...newErrors });
+    if (unformattedTel === '') {
+      ayt.reset(null);
+      handleChange(null, { name: 'purchasingContactNumber', value: '' });
+    } else {
+      ayt.reset(unformattedTel);
+      handleChange(null, { name: 'purchasingContactNumber', value: ayt.number() });
+    }
+  }, [unformattedTel]);
 
   const handleChange = (e, { name, value }) => {
     const newErrors = { ...formErrors };
@@ -52,7 +69,6 @@ const RetailerForm = ({
 
   const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
-      console.log(suggestion);
       const { location, gmaps } = suggestion;
       const newErrors = { ...formErrors };
       delete newErrors.location;
@@ -81,6 +97,19 @@ const RetailerForm = ({
                 }
               />
               <Form.Input
+                label="Primary contact name"
+                name="primaryContactName"
+                value={formValues.primaryContactName}
+                required
+                onChange={handleChange}
+                error={
+                  formErrors.primaryContactName && {
+                    content: formErrors.primaryContactName,
+                    pointing: 'above',
+                  }
+                }
+              />
+              <Form.Input
                 label="Purchasing email address"
                 name="purchasingEmail"
                 type="email"
@@ -99,7 +128,13 @@ const RetailerForm = ({
                 name="purchasingContactNumber"
                 type="tel"
                 value={formValues.purchasingContactNumber}
-                onChange={handleChange}
+                onChange={(e) => setUnformattedTel(e.target.value)}
+                error={
+                  formErrors.purchasingContactNumber && {
+                    content: formErrors.purchasingContactNumber,
+                    pointing: 'above',
+                  }
+                }
               />
               <div
                 className={`${formErrors.location && 'error'} required field`}
@@ -168,6 +203,16 @@ const RetailerForm = ({
       </Grid>
     )
   );
+};
+
+RetailerForm.propTypes = {
+  formValues: PropTypes.object,
+  setFormValues: PropTypes.func,
+  formErrors: PropTypes.object,
+  setFormErrors: PropTypes.func,
+  profileStage: PropTypes.number,
+  mapCentre: PropTypes.array,
+  setMapCentre: PropTypes.func,
 };
 
 export default RetailerForm;

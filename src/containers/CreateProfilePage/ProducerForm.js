@@ -1,12 +1,16 @@
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
 import React, { useEffect, useState, useRef } from 'react';
+import PropTypes from 'prop-types';
 import Geosuggest from 'react-geosuggest';
+import PhoneNumber from 'awesome-phonenumber';
 
 import ImageUpload from '../../components/ImageUpload';
 import MapMarker from '../../components/MapMarker';
 import SuggestBlockStyle from './SuggestBlockStyle';
 import MarkerMapStyle from './MarkerMapStyle';
+
+const ayt = PhoneNumber.getAsYouType('GB');
 
 const ProducerForm = ({
   formValues,
@@ -19,6 +23,7 @@ const ProducerForm = ({
 }) => {
   const [zoomLevel, setZoomLevel] = useState(5);
   const [visible, setVisible] = useState(false);
+  const [unformattedTel, setUnformattedTel] = useState('');
   const geosuggestEl = useRef(null);
 
   useEffect(() => {
@@ -35,6 +40,19 @@ const ProducerForm = ({
       setZoomLevel(15);
     }
   }, [setMapCentre, formValues.location]);
+
+  useEffect(() => {
+    const newErrors = { ...formErrors };
+    delete newErrors.salesContactNumber;
+    setFormErrors({ ...newErrors });
+    if (unformattedTel === '') {
+      ayt.reset(null);
+      handleChange(null, { name: 'salesContactNumber', value: '' });
+    } else {
+      ayt.reset(unformattedTel);
+      handleChange(null, { name: 'salesContactNumber', value: ayt.number() });
+    }
+  }, [unformattedTel]);
 
   const handleChange = (e, { name, value }) => {
     const newErrors = { ...formErrors };
@@ -99,7 +117,13 @@ const ProducerForm = ({
                 name="salesContactNumber"
                 type="tel"
                 value={formValues.salesContactNumber}
-                onChange={handleChange}
+                onChange={(e) => setUnformattedTel(e.target.value)}
+                error={
+                  formErrors.salesContactNumber && {
+                    content: formErrors.salesContactNumber,
+                    pointing: 'above',
+                  }
+                }
               />
               <Form.Input
                 label="Website"
@@ -185,6 +209,16 @@ const ProducerForm = ({
       </Grid>
     )
   );
+};
+
+ProducerForm.propTypes = {
+  formValues: PropTypes.object,
+  setFormValues: PropTypes.func,
+  formErrors: PropTypes.object,
+  setFormErrors: PropTypes.func,
+  profileStage: PropTypes.number,
+  mapCentre: PropTypes.array,
+  setMapCentre: PropTypes.func,
 };
 
 export default ProducerForm;

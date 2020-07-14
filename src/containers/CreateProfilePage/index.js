@@ -13,6 +13,7 @@ import { compose } from 'redux';
 import {
   Segment, Header, Dimmer, Loader,
 } from 'semantic-ui-react';
+import PhoneNumber from 'awesome-phonenumber';
 
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
@@ -35,6 +36,8 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
   useInjectSaga({ key: 'global', saga });
 
   const { savingUser } = createProfilePage;
+
+  const ayt = PhoneNumber.getAsYouType('GB');
 
   const formTemplate = {
     type: '',
@@ -122,10 +125,21 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
     const errors = {};
 
     if (formValues.type === 'retailer') {
+      const puchasingNumber = new PhoneNumber(formValues.purchasingContactNumber, 'GB');
+      if (!puchasingNumber.isValid()) {
+        errors.purchasingContactNumber = 'This is not a valid phone number';
+      }
       if (!formValues.purchasingEmail) {
         errors.purchasingEmail = 'This field is required';
       }
+      if (!formValues.primaryContactName) {
+        errors.primaryContactName = 'This field is required';
+      }
     } else if (formValues.type === 'producer') {
+      const salesNumber = new PhoneNumber(formValues.salesContactNumber, 'GB');
+      if (!salesNumber.isValid()) {
+        errors.salesContactNumber = 'This is not a valid phone number';
+      }
       if (!formValues.salesEmail) {
         errors.salesEmail = 'This field is required';
       }
