@@ -346,7 +346,7 @@ const OrderPage = ({
                       zoomControl={false}
                     >
                       <TileLayer
-                        url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                        url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
                       />
                       <MapMarker location={orderInfo.business.location} />
                     </Map>

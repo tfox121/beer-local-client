@@ -34,7 +34,7 @@ import PageWrapper from '../../components/PageWrapper';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
 
-export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
+export function CreateProfilePage({ profileSave, createProfilePage }) {
   useInjectReducer({ key: 'global', reducer });
   useInjectSaga({ key: 'global', saga });
 
@@ -120,17 +120,6 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
   //   }
   // }, [formValues.pictureFile, formValues]);
 
-  const handleSubmit = async () => {
-    let avatarSource;
-    if (avatarSaved) {
-      const response = await imageToBucket(avatarRoute, avatarSaved);
-      if (response.status === 204) {
-        avatarSource = getImageUrl(user.sub, 'avatar');
-      }
-    }
-    onSaveProfile({ ...formValues, avatarSource });
-  };
-
   const backClickHandler = () => {
     setProfileStage(profileStage - 1);
   };
@@ -178,6 +167,29 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
     }
   };
 
+  const handleSubmit = async () => {
+    const errors = {};
+
+    if (formValues.type === 'producer') {
+      if (formValues.distributionAreas && (!formValues.distributionAreas.features || !formValues.distributionAreas.features.length)) {
+        errors.distributionAreas = 'You need to save at least one distribution area. If you have already drawn a shape, make sure you click \'Finish\' in order to proceed';
+      }
+    }
+
+    if (!Object.keys(errors).length) {
+      let avatarSource;
+      if (avatarSaved) {
+        const response = await imageToBucket(avatarRoute, avatarSaved);
+        if (response.status === 204) {
+          avatarSource = getImageUrl(user.sub, 'avatar');
+        }
+      }
+      profileSave({ ...formValues, avatarSource });
+    } else {
+      setFormErrors(errors);
+    }
+  };
+
   return (
     <PageWrapper>
       <Segment basic textAlign="center" className="primary wrapper">
@@ -204,6 +216,8 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
           setFormValues={setFormValues}
           profileStage={profileStage}
           mapCentre={mapCentre}
+          formErrors={formErrors}
+          setFormErrors={setFormErrors}
         />
         <RetailerForm
           formValues={formValues}
@@ -238,7 +252,7 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
 }
 
 CreateProfilePage.propTypes = {
-  onSaveProfile: PropTypes.func,
+  profileSave: PropTypes.func,
   createProfilePage: PropTypes.object,
 };
 
@@ -248,7 +262,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    onSaveProfile: (profileData) => dispatch(saveProfile(profileData)),
+    profileSave: (profileData) => dispatch(saveProfile(profileData)),
   };
 }
 

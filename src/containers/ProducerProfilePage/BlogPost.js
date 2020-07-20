@@ -13,6 +13,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+
 import { BLOG_ITEMS_PER_PAGE } from '../../utils/constants';
 import timeAgo from '../../utils/timeAgo';
 import { editBlog } from './actions';

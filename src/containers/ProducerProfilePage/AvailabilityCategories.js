@@ -69,6 +69,7 @@ const TableRows = ({
             prepareRow(row);
             return (
               <Popup
+                mouseEnterDelay={500}
                 key={row.id}
                 trigger={(
                   <Table.Row {...row.getRowProps()}>
@@ -76,7 +77,7 @@ const TableRows = ({
                       <Image src={row.original.imageSource || '/images/products/blank-product.png'} size="mini" bordered centered circular />
                     </Table.Cell>
                     {row.cells.map((cell, i) => {
-                      if (cell.column.id === 'orderQuant' && user && user.role !== 'retailer') {
+                      if (cell.column.id === 'orderQuant' && ((user && user.role !== 'retailer') || !user)) {
                         return null;
                       }
                       return (
@@ -265,7 +266,7 @@ const AvailibilityTable = ({
           <Table.Row {...headerGroup.getHeaderGroupProps()}>
             <Table.HeaderCell />
             {headerGroup.headers.map((column, index) => {
-              if (column.Header === 'Order #' && user && user.role !== 'retailer') {
+              if (column.Header === 'Order #' && ((user && user.role !== 'retailer') || !user)) {
                 return null;
               }
               return (
@@ -326,7 +327,7 @@ const AvailibilityTable = ({
                       <Button
                         primary
                         content="Confirm"
-                        disabled={producerProfile.profileOptions.distantPurchasingConditions && data.reduce((acc, val) => { acc += (val.orderChange !== 'delete' && val.price * val.orderQuant); return acc; }, 0) < producerProfile.profileOptions.distantPurchasingConditions.minSpend}
+                        disabled={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location) && producerProfile.profileOptions.distantPurchasingConditions && data.reduce((acc, val) => { acc += (val.orderChange !== 'delete' && val.price * val.orderQuant); return acc; }, 0) < producerProfile.profileOptions.distantPurchasingConditions.minSpend}
                         onClick={handleSendOrder}
                       />
                     </Modal.Actions>

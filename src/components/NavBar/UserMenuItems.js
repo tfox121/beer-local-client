@@ -137,7 +137,7 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
     );
   }
   return (
-    <Menu.Item onClick={() => loginWithRedirect()}>
+    <Menu.Item onClick={loginWithRedirect}>
       <FormattedMessage {...messages.logIn} />
     </Menu.Item>
   );

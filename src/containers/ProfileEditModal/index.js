@@ -25,7 +25,7 @@ import getImageUrl from '../../utils/getImageUrl';
 // import { fetchUser } from '../App/actions';
 
 const ProfileEditModal = ({
-  producerProfile, user, userUpdate, profileUpdate, userUpdating,
+  producerProfile, user, userUpdate, profileUpdate, userUpdating, profileEditModalOpen, setProfileEditModalOpen,
 }) => {
   // useInjectReducer({ key: 'global', reducer });
   // useInjectSaga({ key: 'profileEditModal', saga });
@@ -102,11 +102,11 @@ const ProfileEditModal = ({
     }
   }, [user, profileOptions]);
 
-  useEffect(() => {
-    if (producerFormValues.profileOptions.distantPurchasing) {
-      setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, distantPurchasingConditions: {} } });
-    }
-  }, [producerFormValues.profileOptions.distantPurchasing]);
+  // useEffect(() => {
+  //   if (profileOptions.distantPurchasing) {
+  //     setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, distantPurchasingConditions: {} } });
+  //   }
+  // }, [profileOptions.distantPurchasing]);
 
   useEffect(() => {
     if (!avatar && !banner) {
@@ -167,6 +167,12 @@ const ProfileEditModal = ({
   };
 
   const handleProfileOptionsToggle = (e, { name, checked }) => {
+    const newErrors = { ...formErrors };
+    delete newErrors[name];
+    if (name === 'distantPurchasing') {
+      delete newErrors.minSpend;
+    }
+    setFormErrors({ ...newErrors });
     setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, [name]: checked } });
   };
 
@@ -189,7 +195,7 @@ const ProfileEditModal = ({
     if (userFormValues.businessName === '') {
       errors.businessName = 'This field is required';
     }
-    if (producerFormValues.profileOptions.distantPurchasing && !producerFormValues.profileOptions.distantPurchasingConditions.minSpend) {
+    if (producerFormValues.profileOptions.distantPurchasing && (!producerFormValues.profileOptions.distantPurchasingConditions || !producerFormValues.profileOptions.distantPurchasingConditions.minSpend)) {
       errors.minSpend = 'If you wish to enable ordering from outside your distribution area, you must enter a minimum order value.';
     }
 
@@ -207,9 +213,15 @@ const ProfileEditModal = ({
           imagesObj.avatarSource = getImageUrl(user.sub, 'avatar');
         }
       }
-
       userUpdate({ ...userFormValues, ...imagesObj });
       profileUpdate({ ...producerFormValues, ...userFormValues });
+      setTimeout(() => {
+        if (bannerSaved || avatarSaved) {
+          window.location.reload();
+          return;
+        }
+        setProfileEditModalOpen(false);
+      }, 1500);
     } else {
       setFormErrors(errors);
     }
@@ -335,7 +347,7 @@ const ProfileEditModal = ({
               >
                 <Form.Group style={{ alignItems: 'center', height: '2em' }}>
                   <Form.Checkbox checked={producerFormValues.profileOptions.distantPurchasing} onClick={handleProfileOptionsToggle} toggle label="Allow" name="distantPurchasing" />
-                  {producerFormValues.profileOptions.distantPurchasing && producerFormValues.profileOptions.distantPurchasingConditions && (
+                  {producerFormValues.profileOptions.distantPurchasing && (
 
                     <NumberFormat
                       style={{ width: '50%', marginLeft: '1em' }}
@@ -346,7 +358,7 @@ const ProfileEditModal = ({
                       prefix="£"
                       onValueChange={(values) => handleDistantPurchasingOptionsChange(null, { name: 'minSpend', value: values.floatValue })}
                       allowNegative={false}
-                      value={producerFormValues.profileOptions.distantPurchasingConditions.minSpend || undefined}
+                      value={(producerFormValues.profileOptions.distantPurchasingConditions && producerFormValues.profileOptions.distantPurchasingConditions.minSpend) || undefined}
                     />
                   )}
                 </Form.Group>
@@ -402,6 +414,7 @@ ProfileEditModal.propTypes = {
   userUpdating: PropTypes.bool,
   userUpdate: PropTypes.func,
   profileUpdate: PropTypes.func,
+  setProfileEditModalOpen: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({

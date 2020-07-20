@@ -91,6 +91,7 @@ export function ProducerProfilePage({
 
   const [producerFollowed, setProducerFollowed] = useState(false);
   const [blogPage, setBlogPage] = useState(1);
+  const [profileEditModalOpen, setProfileEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (followedProducers && sub) {
@@ -102,14 +103,15 @@ export function ProducerProfilePage({
   }, [followedProducers, sub]);
 
   useEffect(() => {
-    if (Object.keys(user).length) {
-      console.log('FETCHING PROFILE');
-      profileFetch();
-    }
+    // if (Object.keys(user).length) {
+    console.log('FETCHING PROFILE');
+    profileFetch();
+    // }
     return () => {
+      console.log('CLEAR PROFILE');
       profileClear();
     };
-  }, [user.businessName]);
+  }, []);
 
   if (!producerProfile) {
     return null;
@@ -165,9 +167,9 @@ export function ProducerProfilePage({
                 <Grid.Column width={7} />
                 <Grid.Column className="profile-buttons" width={5} textAlign="right" verticalAlign="middle">
                   {(user && user.businessId === businessId) && (
-                    <Modal closeIcon size="small" trigger={<Button primary>Edit Profile</Button>}>
+                    <Modal open={profileEditModalOpen} onClose={() => setProfileEditModalOpen(false)} closeIcon size="small" trigger={<Button onClick={() => setProfileEditModalOpen(true)} primary>Edit Profile</Button>}>
                       <Modal.Header>Edit profile</Modal.Header>
-                      <ProfileEditModal location={routerLocation} />
+                      <ProfileEditModal profileEditModalOpen={profileEditModalOpen} setProfileEditModalOpen={setProfileEditModalOpen} location={routerLocation} />
                     </Modal>
                   )}
                   {(user && user.role === 'retailer') && (
@@ -211,7 +213,7 @@ export function ProducerProfilePage({
                     zoomControl={false}
                   >
                     <TileLayer
-                      url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                      url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
                     />
                     <DistributionAreaDisplay
                       distributionAreas={distributionAreas}

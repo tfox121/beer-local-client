@@ -11,6 +11,7 @@ import MapMarker from '../../components/MapMarker';
 import SuggestBlockStyle from './SuggestBlockStyle';
 import MarkerMapStyle from './MarkerMapStyle';
 import ImageSelect from './ImageSelect';
+import { INTRO_CHARACTER_LIMIT } from '../../utils/constants';
 
 const ProducerForm = ({
   formValues,
@@ -173,7 +174,12 @@ const ProducerForm = ({
                 value={formValues.intro}
                 name="intro"
                 onChange={handleChange}
+                maxlength={INTRO_CHARACTER_LIMIT}
               />
+              <p style={{ textAlign: 'right', fontSize: '10px' }}>
+                {formValues.intro.length}
+                /350
+              </p>
               <Form.Checkbox
                 label="I agree to the Terms and Conditions"
                 name="terms"
@@ -196,7 +202,7 @@ const ProducerForm = ({
               <MarkerMapStyle>
                 <Map center={mapCentre} zoom={zoomLevel} zoomControl={false}>
                   <TileLayer
-                    url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                    url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
                   />
                   <MapMarker location={formValues.location} />
                 </Map>

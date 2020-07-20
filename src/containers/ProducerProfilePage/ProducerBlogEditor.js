@@ -6,6 +6,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { postBlog } from './actions';
+import { BLOG_CHARACTER_LIMIT } from '../../utils/constants';
 
 const ProducerBlogEditor = ({ blogPost }) => {
   const [blogEditor, setBlogEditor] = useState(EditorState.createEmpty());
@@ -44,6 +45,17 @@ const ProducerBlogEditor = ({ blogPost }) => {
               list: { inDropdown: true },
               textAlign: { inDropdown: true },
               link: { inDropdown: true },
+            }}
+            handleBeforeInput={(val) => {
+              const textLength = blogEditor.getCurrentContent().getPlainText().length;
+              if (val && textLength >= BLOG_CHARACTER_LIMIT) {
+                return 'handled';
+              }
+              return 'not-handled';
+            }}
+            handlePastedText={(val) => {
+              const textLength = blogEditor.getCurrentContent().getPlainText().length;
+              return ((val.length + textLength) >= BLOG_CHARACTER_LIMIT);
             }}
           />
         </Modal.Description>

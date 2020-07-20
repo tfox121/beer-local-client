@@ -1,7 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Table, Button, Popup } from 'semantic-ui-react';
+import {
+  Table, Button, Popup, Image,
+} from 'semantic-ui-react';
 import moment from 'moment';
 import NumberFormat from 'react-number-format';
 import { connect } from 'react-redux';
@@ -91,11 +93,13 @@ const OrderItem = ({
 
   return (
     <Popup
+      mouseEnterDelay={500}
       trigger={(
         <Table.Row warning={userProfile.role === 'producer' ? orderData.producerNotification : orderData.retailerNotification} style={{ color: (order.status === 'Rejected' || order.status === 'Cancelled') && 'lightgray' }}>
           <Table.Cell>{`SO-${order.orderNumber.toString().padStart(6, '0')}`}</Table.Cell>
           <Table.Cell>{moment(order.received).format('DD/MM/YYYY')}</Table.Cell>
           <Table.Cell>
+            <Image style={{ marginLeft: '0.5em' }} src={ordersInfo.businesses[index].avatarSource || '/images/avatars/blank-avatar.webp'} alt="user avatar" avatar />
             {userProfile.role === 'retailer'
               ? <Link to={`/brewery/${ordersInfo.businesses[index].businessId}`}>{ordersInfo.businesses[index].businessName}</Link>
               : <>{ordersInfo.businesses[index].businessName}</>}

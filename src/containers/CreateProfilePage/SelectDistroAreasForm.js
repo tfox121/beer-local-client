@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 import React, { useState, useEffect } from 'react';
-import { Transition } from 'semantic-ui-react';
+import { Transition, Message } from 'semantic-ui-react';
 import { Map, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import PropTypes from 'prop-types';
@@ -11,6 +11,8 @@ import DistroMapStyle from './DistroMapStyle';
 const SelectDistroAreasForm = ({
   formValues,
   setFormValues,
+  formErrors,
+  setFormErrors,
   profileStage,
   mapCentre,
 }) => {
@@ -36,9 +38,11 @@ const SelectDistroAreasForm = ({
     if (!editableFG || !onChange) {
       return;
     }
-
     const geojsonData = editableFG.leafletElement.toGeoJSON();
 
+    const newErrors = { ...formErrors };
+    delete newErrors.distributionAreas;
+    setFormErrors({ ...newErrors });
     setFormValues({ ...formValues, distributionAreas: geojsonData });
   };
 
@@ -73,7 +77,7 @@ const SelectDistroAreasForm = ({
           <DistroMapStyle>
             <Map center={mapCentre} zoom={10} zoomControl={false}>
               <TileLayer
-                url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
               />
               <MapMarker location={formValues.location} />
               <FeatureGroup
@@ -108,6 +112,12 @@ const SelectDistroAreasForm = ({
               </FeatureGroup>
             </Map>
           </DistroMapStyle>
+          {formErrors.distributionAreas && (
+            <Message warning>
+              <Message.Header>Error</Message.Header>
+              <p>{formErrors.distributionAreas}</p>
+            </Message>
+          )}
         </>
       )}
     </Transition.Group>

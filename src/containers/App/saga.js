@@ -26,11 +26,11 @@ function* fetchUser() {
         ...response.data.business, ...response.data.user,
       }));
     } else {
-      yield put(push('/create'));
+      // yield put(push('/create'));
     }
   } catch (err) {
     yield put(userFetchError(err));
-    yield put(push('/create'));
+    // yield put(push('/create'));
   }
 }
 

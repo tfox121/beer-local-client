@@ -27,6 +27,8 @@ export const PACK_SIZES = {
 };
 
 export const BLOG_ITEMS_PER_PAGE = 2;
+export const INTRO_CHARACTER_LIMIT = 350;
+export const BLOG_CHARACTER_LIMIT = 1500;
 
 export const notificationTypes = {
   newOrder: 'new_order',

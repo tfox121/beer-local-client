@@ -119,7 +119,7 @@ const ProducerListPage = ({
                   <Table.Cell width={5}>
                     <Map center={producer.location} zoom={6} zoomControl={false}>
                       <TileLayer
-                        url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                        url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
                       />
                       <DistributionAreaDisplay distributionAreas={producer.distributionAreas} />
                       <MapMarker location={producer.location} />

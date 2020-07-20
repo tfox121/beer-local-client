@@ -8,7 +8,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -17,6 +17,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import styled from 'styled-components';
 // import { push } from 'connected-react-router';
 
+import { push } from 'connected-react-router';
 import {
   makeSelectUser,
   makeSelectFetchingUser,
@@ -30,7 +31,8 @@ import CreateProfilePage from '../CreateProfilePage/Loadable';
 import ProducerProfilePage from '../ProducerProfilePage/Loadable';
 import ProducerOrdersPage from '../ProducerOrdersPage/Loadable';
 import NotFoundPage from '../NotFoundPage/Loadable';
-import NavBar from '../../components/NavBar/index';
+import NavBar from '../../components/NavBar';
+import ProtectedRoute from '../../components/ProtectedRoute';
 import ProducerListPage from '../ProducerListPage';
 import OrderPage from '../OrderPage/Loadable';
 // import { loadSession, closeSession } from './actions';
@@ -51,35 +53,42 @@ const AppWrapper = styled.div`
   flex-direction: column;
 `;
 
-const App = ({ userFetch, userClear, location }) => {
+const App = ({
+  userProfile, userFetch, userClear, pushRoute, location,
+}) => {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth0();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    console.log('AUTHENTICATED', isAuthenticated, isLoading);
+    if (isAuthenticated && !userProfile.businessName) {
       userFetch();
     }
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !isLoading && userProfile.businessName) {
+      console.log('CLEARING USER');
       userClear();
+      // pushRoute('/');
     }
     return () => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoading && userProfile.businessName) {
+        console.log('CLEARING USER');
         userClear();
+        // pushRoute('/');
       }
     };
-  }, [location.pathname, isAuthenticated, userFetch, userClear]);
+  }, [userProfile, location.pathname, isAuthenticated, userFetch, userClear]);
 
   return (
     <AppWrapper>
       <NavBar />
       <Switch>
         <Route exact path="/" component={HomePage} />
-        <Route exact path="/create" component={CreateProfilePage} />
+        <ProtectedRoute exact path="/create" isEnabled={isAuthenticated && !userProfile.businessName} component={CreateProfilePage} />
         <Route exact path="/brewery/:id" component={ProducerProfilePage} />
-        <Route exact path="/sales/orders" component={ProducerOrdersPage} />
-        <Route exact path="/breweries" component={ProducerListPage} />
-        <Route exact path="/order/:id" component={OrderPage} />
+        <ProtectedRoute exact path="/sales/orders" isEnabled={userProfile.businessName} component={ProducerOrdersPage} />
+        <ProtectedRoute exact path="/breweries" isEnabled={userProfile.businessName} component={ProducerListPage} />
+        <ProtectedRoute exact path="/order/:id" isEnabled={userProfile.businessName} component={OrderPage} />
         <Route component={NotFoundPage} />
       </Switch>
       <GlobalStyle />
@@ -88,9 +97,11 @@ const App = ({ userFetch, userClear, location }) => {
 };
 
 App.propTypes = {
-  // userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   userFetch: PropTypes.func,
   userClear: PropTypes.func,
+  location: PropTypes.object,
+  pushRoute: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -104,7 +115,7 @@ export function mapDispatchToProps(dispatch) {
   return {
     userFetch: () => dispatch(fetchUser()),
     userClear: () => dispatch(clearUser()),
-    // pushRoute: (path) => dispatch(push(path)),
+    pushRoute: (path) => dispatch(push(path)),
   };
 }
 
