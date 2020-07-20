@@ -12,6 +12,9 @@ import {
   UPDATE_USER_SUCCESS,
   UPDATE_USER_ERROR,
   CLEAR_USER,
+  FOLLOW_PRODUCER,
+  FOLLOW_PRODUCER_SUCCESS,
+  FOLLOW_PRODUCER_ERROR,
 } from './constants';
 
 export const fetchUser = () => ({
@@ -57,3 +60,18 @@ export function userUpdateError(error) {
     error,
   };
 }
+
+export const followProducer = (producerSub) => ({
+  type: FOLLOW_PRODUCER,
+  producerSub,
+});
+
+export const producerFollowed = ({ followedProducers }) => ({
+  type: FOLLOW_PRODUCER_SUCCESS,
+  followedProducers,
+});
+
+export const producerFollowError = (error) => ({
+  type: FOLLOW_PRODUCER_ERROR,
+  error,
+});

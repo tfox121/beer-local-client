@@ -9,10 +9,8 @@ import {
   profileSaveError,
 } from './actions';
 import { makeSelectUserProfile } from './selectors';
-import uploadAvatar from '../../utils/uploadAvatar';
 import { getPrivateRoute } from '../../utils/api';
-import createBlobUrl from '../../utils/createBlobUrl';
-import { getOwnAvatar, getOwnBanner } from '../../utils/getImages';
+// import { getOwnAvatar, getOwnBanner } from '../../utils/getImages';
 
 function* saveProfile() {
   try {
@@ -23,22 +21,17 @@ function* saveProfile() {
     console.log(newProfileData);
 
     const saveUserData = (formValues, type) => privateRoute.post(
-      `/user/${type}`, formValues, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      },
+      '/user', formValues,
     );
 
-    const response = yield call(saveUserData, newProfileData, newProfileData.get('type'));
+    const response = yield call(saveUserData, newProfileData, newProfileData.type);
 
     if (response.data.user && response.data.business) {
-      const bannerSource = yield call(getOwnBanner);
-      const avatarSource = yield call(getOwnAvatar);
-
       yield put(profileSaved({
-        ...response.data.business, ...response.data.user, bannerSource, avatarSource,
+        ...response.data.business, ...response.data.user,
       }));
       if (newProfileData.type === 'producer') {
-        yield put(push(`/brewery/${response.data.business.businessId}`));
+        yield put(push(`/brewery/${response.data.user.businessId}`));
       } else {
         yield put(push('/'));
       }

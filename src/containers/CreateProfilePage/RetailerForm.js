@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
-import PhoneNumber from 'awesome-phonenumber';
 import Geosuggest from 'react-geosuggest';
+
+import ayt from '../../utils/phoneNumberValidation';
 
 import ImageUpload from '../../components/ImageUpload';
 import MapMarker from '../../components/MapMarker';
 import MarkerMapStyle from './MarkerMapStyle';
 import SuggestBlockStyle from './SuggestBlockStyle';
-
-const ayt = PhoneNumber.getAsYouType('GB');
+import ImageSelect from './ImageSelect';
 
 const RetailerForm = ({
   formValues,
@@ -20,6 +20,8 @@ const RetailerForm = ({
   profileStage,
   mapCentre,
   setMapCentre,
+  avatarSaved,
+  setAvatarSaved,
 }) => {
   const [zoomLevel, setZoomLevel] = useState(5);
   const [visible, setVisible] = useState(false);
@@ -60,7 +62,7 @@ const RetailerForm = ({
     setFormValues({ ...formValues, [name]: value });
   };
 
-  const handleCheckboxchange = () => {
+  const handleCheckboxChange = () => {
     const newErrors = { ...formErrors };
     delete newErrors.terms;
     setFormErrors({ ...newErrors });
@@ -172,7 +174,7 @@ const RetailerForm = ({
                 // value={formValues.terms}
                 checked={formValues.terms}
                 required
-                onChange={handleCheckboxchange}
+                onChange={handleCheckboxChange}
                 error={
                   formErrors.terms && {
                     content: formErrors.terms,
@@ -183,11 +185,7 @@ const RetailerForm = ({
             </Form>
           </Grid.Column>
           <Grid.Column width={6}>
-            <ImageUpload
-              formValues={formValues}
-              setFormValues={setFormValues}
-              formErrors={formErrors}
-            />
+            <ImageSelect avatarSaved={avatarSaved} setAvatarSaved={setAvatarSaved} />
             {formValues.location && formValues.location.lat && (
               <MarkerMapStyle>
                 <Map center={mapCentre} zoom={zoomLevel} zoomControl={false}>
@@ -213,6 +211,8 @@ RetailerForm.propTypes = {
   profileStage: PropTypes.number,
   mapCentre: PropTypes.array,
   setMapCentre: PropTypes.func,
+  avatarSaved: PropTypes.string,
+  setAvatarSaved: PropTypes.func,
 };
 
 export default RetailerForm;

@@ -11,15 +11,14 @@ import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { push } from 'connected-react-router';
 import Select from 'react-select';
 import { PACK_SIZES } from '../../utils/constants';
-import { getPrivateRoute } from '../../utils/api';
 
 import AvailabilityStyle from './AvailabilityStyle';
 import { makeSelectProducerProfile, makeSelectUser, makeSelectOrderSending } from './selectors';
 import OrderModalContent from '../../components/OrderModalContent';
 import { updateProfileOptions, sendOrder } from './actions';
+import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
 
 const TableRows = ({
   rows, prepareRow, storedCategory, index, categories, handleCategoryChange, handleRemoveCategory, producerProfile, user,
@@ -52,7 +51,7 @@ const TableRows = ({
               </Table.Cell>
               <Table.Cell colSpan={3} />
               <Table.Cell colSpan={2} textAlign="right">
-                <Button content="Remove category" icon="minus" attached basic onClick={() => handleRemoveCategory(index)} />
+                <Button content="Remove section" icon="minus" attached basic onClick={() => handleRemoveCategory(index)} />
               </Table.Cell>
             </>
           )
@@ -300,7 +299,7 @@ const AvailibilityTable = ({
         {user && user.businessId === producerProfile.businessId && (
           <Table.Row>
             <Table.HeaderCell colSpan="16">
-              <Button attached basic icon="plus" content="Add category" onClick={handleAddCategory} />
+              <Button attached basic icon="plus" content="Add category section" onClick={handleAddCategory} />
             </Table.HeaderCell>
           </Table.Row>
         )}
@@ -308,18 +307,33 @@ const AvailibilityTable = ({
           <Table.Row>
             <Table.HeaderCell colSpan="16">
               <Menu floated="right">
-                <Modal
-                  trigger={<Menu.Item name="Place Order" onClick={handleModalOpen} />}
-                  open={modalOpen}
-                  size="large"
-                >
-                  <Modal.Header>Confirm Order</Modal.Header>
-                  <OrderModalContent orderItems={data} businessName={producerProfile.businessName} type="draftOrder" />
-                  <Modal.Actions>
-                    <Button content="Cancel" onClick={() => setModalOpen(false)} />
-                    <Button primary content="Confirm" onClick={handleSendOrder} />
-                  </Modal.Actions>
-                </Modal>
+                {geoJsonContainsCoords(producerProfile.distributionAreas, user.location) || producerProfile.profileOptions.distantPurchasing ? (
+                  <Modal
+                    trigger={<Menu.Item name="Place Order" onClick={handleModalOpen} />}
+                    open={modalOpen}
+                    size="large"
+                  >
+                    <Modal.Header>Confirm Order</Modal.Header>
+                    <OrderModalContent
+                      orderItems={data}
+                      businessName={producerProfile.businessName}
+                      type="draftOrder"
+                      distancePurchase={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)}
+                      distantPurchasingConditions={producerProfile.profileOptions.distantPurchasingConditions}
+                    />
+                    <Modal.Actions>
+                      <Button content="Cancel" onClick={() => setModalOpen(false)} />
+                      <Button
+                        primary
+                        content="Confirm"
+                        disabled={producerProfile.profileOptions.distantPurchasingConditions && data.reduce((acc, val) => { acc += (val.orderChange !== 'delete' && val.price * val.orderQuant); return acc; }, 0) < producerProfile.profileOptions.distantPurchasingConditions.minSpend}
+                        onClick={handleSendOrder}
+                      />
+                    </Modal.Actions>
+                  </Modal>
+                ) : (
+                  <Menu.Item disabled name="Not available in your area" />
+                )}
               </Menu>
             </Table.HeaderCell>
           </Table.Row>
@@ -350,19 +364,6 @@ const AvailabilityCategories = ({
   const handleSubmit = async () => {
     const order = orderItems.filter((stockItem) => stockItem.orderQuant);
     orderSend({ orderItems: order, producerSub: producerProfile.sub });
-
-    // const privateRoute = await getPrivateRoute();
-    // try {
-    //   const response = await privateRoute.post('/orders', {
-    //     orderItems: order,
-    //     producerSub: producerProfile.sub,
-    //   });
-    //   if (response.data) {
-    //     push('/');
-    //   }
-    // } catch (err) {
-    //   console.error(err);
-    // }
   };
 
   useEffect(() => {

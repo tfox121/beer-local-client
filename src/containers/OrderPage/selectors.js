@@ -15,6 +15,16 @@ const makeSelectOrder = () => createSelector(
   (substate) => substate.order,
 );
 
+const makeSelectEditingOrder = () => createSelector(
+  selectOrderPageDomain,
+  (substate) => substate.editingOrder,
+);
+
+const makeSelectSendingMessage = () => createSelector(
+  selectOrderPageDomain,
+  (substate) => substate.sendingMessage,
+);
+
 /**
  * Default selector used by OrderPage
  */
@@ -25,4 +35,6 @@ const makeSelectOrderPage = () => createSelector(
 );
 
 export default makeSelectOrderPage;
-export { selectOrderPageDomain, makeSelectOrder };
+export {
+  selectOrderPageDomain, makeSelectOrder, makeSelectEditingOrder, makeSelectSendingMessage,
+};

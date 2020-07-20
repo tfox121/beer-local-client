@@ -110,7 +110,6 @@ const PromotionModal = ({
   const handleSave = async () => {
     const privateRoute = await getPrivateRoute();
     const response = await privateRoute.post('/producer/promotions', promotionSelectedValues);
-    profileFetch();
     setModalOpen(false);
     console.log(response.data);
   };

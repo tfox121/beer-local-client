@@ -14,6 +14,7 @@ import {
   Segment, Header, Dimmer, Loader,
 } from 'semantic-ui-react';
 import PhoneNumber from 'awesome-phonenumber';
+import { useAuth0 } from '@auth0/auth0-react';
 
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
@@ -30,14 +31,16 @@ import SelectDistroAreasForm from './SelectDistroAreasForm';
 import RetailerForm from './RetailerForm';
 import CommsOptionsForm from './CommsOptionsForm';
 import PageWrapper from '../../components/PageWrapper';
+import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
+import getImageUrl from '../../utils/getImageUrl';
 
 export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
   useInjectReducer({ key: 'global', reducer });
   useInjectSaga({ key: 'global', saga });
 
-  const { savingUser } = createProfilePage;
+  const { user } = useAuth0();
 
-  const ayt = PhoneNumber.getAsYouType('GB');
+  const { savingUser } = createProfilePage;
 
   const formTemplate = {
     type: '',
@@ -65,6 +68,8 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
     contactOptions: {},
   };
 
+  const [avatarSaved, setAvatarSaved] = useState(undefined);
+  const [avatarRoute, setAvatarRoute] = useState({});
   const [formValues, setFormValues] = useState(formTemplate);
   const [formErrors, setFormErrors] = useState({});
   const [profileStage, setProfileStage] = useState(0);
@@ -92,6 +97,18 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
     }
   }, [formValues, formTemplate, producerFormTemplate, retailerFormTemplate]);
 
+  useEffect(() => {
+    if (avatarSaved) {
+      const setAvatarRouteAsync = async () => {
+        setAvatarRoute(await getPresignedRoute('avatar'));
+      };
+      setAvatarRouteAsync();
+    }
+    return () => {
+      setAvatarRoute({});
+    };
+  }, [avatarSaved]);
+
   // useEffect(() => {
   //   console.log('CHECKING');
   //   if (formValues.pictureFile && !formValues.fileValid) {
@@ -104,17 +121,14 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
   // }, [formValues.pictureFile, formValues]);
 
   const handleSubmit = async () => {
-    const formData = new FormData();
-
-    Object.keys(formValues).forEach((formKey) => {
-      if (typeof formValues[formKey] === 'object' && formKey !== 'pictureFile') {
-        formData.set(formKey, JSON.stringify(formValues[formKey]));
-      } else {
-        formData.set(formKey, formValues[formKey]);
+    let avatarSource;
+    if (avatarSaved) {
+      const response = await imageToBucket(avatarRoute, avatarSaved);
+      if (response.status === 204) {
+        avatarSource = getImageUrl(user.sub, 'avatar');
       }
-    });
-    console.log('formdata', formData.get('type'));
-    onSaveProfile(formData);
+    }
+    onSaveProfile({ ...formValues, avatarSource });
   };
 
   const backClickHandler = () => {
@@ -182,6 +196,8 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
           profileStage={profileStage}
           mapCentre={mapCentre}
           setMapCentre={setMapCentre}
+          avatarSaved={avatarSaved}
+          setAvatarSaved={setAvatarSaved}
         />
         <SelectDistroAreasForm
           formValues={formValues}
@@ -197,6 +213,8 @@ export function CreateProfilePage({ onSaveProfile, createProfilePage }) {
           profileStage={profileStage}
           mapCentre={mapCentre}
           setMapCentre={setMapCentre}
+          avatarSaved={avatarSaved}
+          setAvatarSaved={setAvatarSaved}
         />
         <CommsOptionsForm
           formValues={formValues}

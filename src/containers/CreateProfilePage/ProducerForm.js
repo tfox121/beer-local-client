@@ -1,16 +1,16 @@
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
-import React, { useEffect, useState, useRef } from 'react';
+import React, {
+  useEffect, useState, useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import Geosuggest from 'react-geosuggest';
-import PhoneNumber from 'awesome-phonenumber';
+import ayt from '../../utils/phoneNumberValidation';
 
-import ImageUpload from '../../components/ImageUpload';
 import MapMarker from '../../components/MapMarker';
 import SuggestBlockStyle from './SuggestBlockStyle';
 import MarkerMapStyle from './MarkerMapStyle';
-
-const ayt = PhoneNumber.getAsYouType('GB');
+import ImageSelect from './ImageSelect';
 
 const ProducerForm = ({
   formValues,
@@ -20,6 +20,8 @@ const ProducerForm = ({
   profileStage,
   mapCentre,
   setMapCentre,
+  avatarSaved,
+  setAvatarSaved,
 }) => {
   const [zoomLevel, setZoomLevel] = useState(5);
   const [visible, setVisible] = useState(false);
@@ -61,7 +63,7 @@ const ProducerForm = ({
     setFormValues({ ...formValues, [name]: value });
   };
 
-  const handleCheckboxchange = () => {
+  const handleCheckboxChange = () => {
     const newErrors = { ...formErrors };
     delete newErrors.terms;
     setFormErrors({ ...newErrors });
@@ -178,7 +180,7 @@ const ProducerForm = ({
                 // value={formValues.terms}
                 checked={formValues.terms}
                 required
-                onChange={handleCheckboxchange}
+                onChange={handleCheckboxChange}
                 error={
                   formErrors.terms && {
                     content: formErrors.terms,
@@ -189,11 +191,7 @@ const ProducerForm = ({
             </Form>
           </Grid.Column>
           <Grid.Column width={6}>
-            <ImageUpload
-              formValues={formValues}
-              setFormValues={setFormValues}
-              formErrors={formErrors}
-            />
+            <ImageSelect avatarSaved={avatarSaved} setAvatarSaved={setAvatarSaved} />
             {formValues.location && formValues.location.lat && (
               <MarkerMapStyle>
                 <Map center={mapCentre} zoom={zoomLevel} zoomControl={false}>
@@ -219,6 +217,8 @@ ProducerForm.propTypes = {
   profileStage: PropTypes.number,
   mapCentre: PropTypes.array,
   setMapCentre: PropTypes.func,
+  avatarSaved: PropTypes.string,
+  setAvatarSaved: PropTypes.func,
 };
 
 export default ProducerForm;

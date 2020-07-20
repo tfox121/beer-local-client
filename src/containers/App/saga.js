@@ -19,13 +19,11 @@ function* fetchUser() {
     const privateRoute = yield call(getPrivateRoute);
     const fetchUserData = () => privateRoute.get('/user');
     const response = yield call(fetchUserData);
-    const bannerSource = yield call(getOwnBanner);
-    const avatarSource = yield call(getOwnAvatar);
 
-    console.log('USER RETRIEVED', response.data, bannerSource, avatarSource);
+    console.log('USER RETRIEVED', response.data);
     if (Object.keys(response.data.user).length && Object.keys(response.data.business).length) {
       yield put(userFetched({
-        ...response.data.business, ...response.data.user, bannerSource, avatarSource,
+        ...response.data.business, ...response.data.user,
       }));
     } else {
       yield put(push('/create'));
@@ -40,20 +38,16 @@ function* updateUser({ updateObj, pathname }) {
   try {
     const businessId = pathname.split('/')[2];
     const privateRoute = yield call(getPrivateRoute);
-    const updateUserProfile = () => privateRoute.patch('/user', updateObj, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const updateUserProfile = () => privateRoute.patch('/user', updateObj);
     const response = yield call(updateUserProfile);
-    const bannerSource = yield call(getOwnBanner);
-    const avatarSource = yield call(getOwnAvatar);
 
     console.log('USER UPDATED', response.data);
     if (Object.keys(response.data.user).length && Object.keys(response.data.business).length) {
       yield put(userUpdated({
-        ...response.data.user, ...response.data.business, bannerSource, avatarSource,
+        ...response.data.user, ...response.data.business,
       }));
-      if (response.data.business.businessId !== businessId) {
-        yield put(push(`/brewery/${response.data.business.businessId}`));
+      if (response.data.user.businessId !== businessId) {
+        yield put(push(`/brewery/${response.data.user.businessId}`));
       }
     }
   } catch (err) {

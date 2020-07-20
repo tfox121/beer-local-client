@@ -18,9 +18,8 @@ import { withRouter } from 'react-router';
 
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
-import { getPrivateRoute } from '../../utils/api';
 import arrayMove from '../../utils/arrayMove';
-import { fetchProfile } from '../ProducerProfilePage/actions';
+import { updateStock } from '../ProducerProfilePage/actions';
 import reducer from '../ProducerProfilePage/reducer';
 import saga from '../ProducerProfilePage/saga';
 
@@ -29,13 +28,15 @@ import StockModalStyle from './StockModalStyle';
 import StockModalMenu from './StockModalMenu';
 import StockManager from './StockManager';
 
-export function StockModal({ producerProfilePage, profileFetch, location }) {
+export function StockModal({
+  producerProfilePage, stockUpdate,
+}) {
   useInjectReducer({ key: 'producerProfilePage', reducer });
   useInjectSaga({ key: 'producerProfilePage', saga });
 
   const { stock } = producerProfilePage.profile;
 
-  const { fetchingProfile } = producerProfilePage;
+  const { fetchingProfile, updatingStock } = producerProfilePage;
 
   const stockDataTemplate = {
     id: shortid.generate(),
@@ -94,9 +95,8 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
   };
 
   const moveStockLineDown = () => {
-    console.log(selected);
     const rows = Object.keys(selected);
-    if (rows.includes(rows.length.toString())) {
+    if (rows.includes((stock.length - 1).toString())) {
       return;
     }
     let tempArr = [...stockData];
@@ -133,11 +133,13 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
     setStockData([...duplicateRows, ...stockData]);
   };
 
-  const updateStock = async () => {
-    const privateRoute = await getPrivateRoute();
-    await privateRoute.patch('/producer/stock', stockData);
+  const handleStockSave = async () => {
+    stockUpdate(stockData);
     setStockEditPending(false);
-    profileFetch(location);
+    while (updatingStock) {
+      console.log('Updating stock');
+    }
+    setModalOpen(false);
   };
 
   const handleModalClose = () => {
@@ -193,8 +195,9 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
         <Modal.Actions>
           <Button onClick={handleModalClose} content="Close" />
           <Button
+            loading={updatingStock}
             className="stock-save"
-            onClick={updateStock}
+            onClick={handleStockSave}
             primary={!dataLoaded}
             positive={dataLoaded}
           >
@@ -218,8 +221,7 @@ export function StockModal({ producerProfilePage, profileFetch, location }) {
 StockModal.propTypes = {
   // dispatch: PropTypes.func.isRequired,
   producerProfilePage: PropTypes.object,
-  profileFetch: PropTypes.func,
-  location: PropTypes.object,
+  stockUpdate: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -228,7 +230,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    profileFetch: (location) => dispatch(fetchProfile(location.pathname)),
+    stockUpdate: (stockData) => dispatch(updateStock(stockData)),
   };
 }
 

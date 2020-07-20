@@ -8,6 +8,9 @@ import {
   FETCH_ORDERS,
   FETCH_ORDERS_SUCCESS,
   FETCH_ORDERS_ERROR,
+  EDIT_ORDER,
+  EDIT_ORDER_SUCCESS,
+  EDIT_ORDER_ERROR,
   CLEAR_ORDERS,
 } from './constants';
 
@@ -25,6 +28,25 @@ export function ordersFetched(orders) {
 export function ordersFetchError(error) {
   return {
     type: FETCH_ORDERS_ERROR,
+    error,
+  };
+}
+
+export const editOrder = (editObj) => ({
+  type: EDIT_ORDER,
+  editObj,
+});
+
+export function orderEdited(order) {
+  return {
+    type: EDIT_ORDER_SUCCESS,
+    order,
+  };
+}
+
+export function orderEditError(error) {
+  return {
+    type: EDIT_ORDER_ERROR,
     error,
   };
 }

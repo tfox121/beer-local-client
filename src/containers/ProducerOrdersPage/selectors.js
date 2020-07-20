@@ -15,6 +15,11 @@ const makeSelectProducerOrders = () => createSelector(
   (substate) => substate.orders,
 );
 
+const makeSelectEditingOrder = () => createSelector(
+  selectProducerOrdersPageDomain,
+  (substate) => substate.editingOrder,
+);
+
 /**
  * Default selector used by ProducerOrdersPage
  */
@@ -25,4 +30,4 @@ const makeSelectProducerOrdersPage = () => createSelector(
 );
 
 export default makeSelectProducerOrdersPage;
-export { selectProducerOrdersPageDomain, makeSelectProducerOrders };
+export { selectProducerOrdersPageDomain, makeSelectProducerOrders, makeSelectEditingOrder };

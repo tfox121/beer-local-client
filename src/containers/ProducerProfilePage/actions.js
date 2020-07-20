@@ -16,6 +16,15 @@ import {
   SEND_ORDER,
   SEND_ORDER_SUCCESS,
   SEND_ORDER_ERROR,
+  BLOG_POST,
+  BLOG_POST_SUCCESS,
+  BLOG_POST_ERROR,
+  BLOG_EDIT,
+  BLOG_EDIT_SUCCESS,
+  BLOG_EDIT_ERROR,
+  UPDATE_STOCK,
+  UPDATE_STOCK_SUCCESS,
+  UPDATE_STOCK_ERROR,
 } from './constants';
 
 export const fetchProfile = (pathName) => ({
@@ -68,5 +77,50 @@ export const orderSent = () => ({
 
 export const orderSendError = (error) => ({
   type: SEND_ORDER_ERROR,
+  error,
+});
+
+export const postBlog = (blogPostData) => ({
+  type: BLOG_POST,
+  blogPostData,
+});
+
+export const blogPosted = (blogPosts) => ({
+  type: BLOG_POST_SUCCESS,
+  blogPosts,
+});
+
+export const blogPostError = (error) => ({
+  type: BLOG_POST_ERROR,
+  error,
+});
+
+export const editBlog = (blogEditData) => ({
+  type: BLOG_EDIT,
+  blogEditData,
+});
+
+export const blogEdited = (blogPosts) => ({
+  type: BLOG_EDIT_SUCCESS,
+  blogPosts,
+});
+
+export const blogEditError = (error) => ({
+  type: BLOG_EDIT_ERROR,
+  error,
+});
+
+export const updateStock = (stockEditData) => ({
+  type: UPDATE_STOCK,
+  stockEditData,
+});
+
+export const stockUpdated = (stock) => ({
+  type: UPDATE_STOCK_SUCCESS,
+  stock,
+});
+
+export const stockUpdateError = (error) => ({
+  type: UPDATE_STOCK_ERROR,
   error,
 });

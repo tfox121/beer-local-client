@@ -18,9 +18,15 @@ import { compose } from 'redux';
 import messages from './messages';
 import PageWrapper from '../../components/PageWrapper';
 import { makeSelectUser } from '../App/selectors';
+import { fetchUser } from '../App/actions';
 
-const HomePage = ({ userProfile }) => {
+const HomePage = ({ userProfile, userFetch }) => {
   const { isAuthenticated } = useAuth0();
+
+  // if (!userProfile.sub) {
+  //   userFetch();
+  // }
+
   return (
     <PageWrapper>
       <Segment basic className="primary wrapper">
@@ -48,14 +54,22 @@ const HomePage = ({ userProfile }) => {
 
 HomePage.propTypes = {
   userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  userFetch: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
   userProfile: makeSelectUser(),
 });
 
+export function mapDispatchToProps(dispatch) {
+  return {
+    userFetch: () => dispatch(fetchUser()),
+  };
+}
+
 const withConnect = connect(
   mapStateToProps,
+  mapDispatchToProps,
 );
 
 export default compose(

@@ -17,7 +17,6 @@ import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import PhoneNumber from 'awesome-phonenumber';
-
 import {
   Segment,
   Image,
@@ -33,10 +32,15 @@ import { Map, TileLayer } from 'react-leaflet';
 
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
+import { BLOG_ITEMS_PER_PAGE, PACK_SIZES } from '../../utils/constants';
 import { makeSelectUser, makeSelectProducerProfile } from './selectors';
+import { makeSelectLocation, makeSelectProducerFollowing } from '../App/selectors';
 import { fetchProfile, clearProfile } from './actions';
+import { followProducer } from '../App/actions';
 import reducer from './reducer';
 import saga from './saga';
+import { getPrivateRoute } from '../../utils/api';
+import promotionCopySelection from '../../utils/promotionCopy';
 // import messages from './messages';
 
 import PageWrapper from '../../components/PageWrapper';
@@ -47,17 +51,13 @@ import StockModal from '../Stockmodal/StockModal';
 // import AvailabilityDynamic from './AvailabilityDynamic';
 import AvailabilityCategories from './AvailabilityCategories';
 import ProducerBlogEditor from './ProducerBlogEditor';
+import ProfileEditModal from '../ProfileEditModal';
+import BlogPost from './BlogPost';
+import PromotionModal from './PromotionModal';
 
 import MapStyle from './MapStyle';
 import BlogStyle from './BlogStyle';
 import BannerStyle from './BannerStyle';
-import { BLOG_ITEMS_PER_PAGE, PACK_SIZES } from '../../utils/constants';
-import BlogPost from './BlogPost';
-import ProfileEditModal from '../ProfileEditModal';
-import { makeSelectLocation } from '../App/selectors';
-import { getPrivateRoute } from '../../utils/api';
-import PromotionModal from './PromotionModal';
-import promotionCopySelection from '../../utils/promotionCopy';
 
 export function ProducerProfilePage({
   profileFetch,
@@ -65,6 +65,8 @@ export function ProducerProfilePage({
   producerProfile,
   user,
   routerLocation,
+  producerFollow,
+  producerFollowing,
 }) {
   useInjectReducer({ key: 'producerProfilePage', reducer });
   useInjectSaga({ key: 'producerProfilePage', saga });
@@ -72,8 +74,6 @@ export function ProducerProfilePage({
   const {
     sub,
     businessId,
-    avatarSource,
-    bannerSource,
     website,
     businessName,
     intro,
@@ -83,6 +83,8 @@ export function ProducerProfilePage({
     distributionAreas,
     stock,
     blog,
+    bannerSource,
+    avatarSource,
   } = producerProfile;
 
   const { followedProducers } = user;
@@ -93,7 +95,6 @@ export function ProducerProfilePage({
   useEffect(() => {
     if (followedProducers && sub) {
       const followedProducerList = followedProducers.map((producer) => producer.sub);
-      console.log('CHECKING', followedProducerList, sub);
       if (followedProducerList.includes(sub)) {
         setProducerFollowed(true);
       }
@@ -102,12 +103,13 @@ export function ProducerProfilePage({
 
   useEffect(() => {
     if (Object.keys(user).length) {
+      console.log('FETCHING PROFILE');
       profileFetch();
     }
     return () => {
       profileClear();
     };
-  }, [user, profileClear, profileFetch]);
+  }, [user.businessName]);
 
   if (!producerProfile) {
     return null;
@@ -116,9 +118,10 @@ export function ProducerProfilePage({
   TimeAgo.addLocale(en);
 
   const handleFollowClick = async () => {
-    const privateRoute = await getPrivateRoute();
-    await privateRoute.patch('/user/follow', { follow: producerProfile.sub });
-    setProducerFollowed(!producerFollowed);
+    // const privateRoute = await getPrivateRoute();
+    // await privateRoute.patch('/user/follow', { follow: producerProfile.sub });
+    producerFollow(producerProfile.sub);
+    // setProducerFollowed(!producerFollowed);
   };
 
   const handleDeletePromo = async (id) => {
@@ -168,7 +171,7 @@ export function ProducerProfilePage({
                     </Modal>
                   )}
                   {(user && user.role === 'retailer') && (
-                    <Button positive={!producerFollowed} icon={producerFollowed ? 'check' : 'plus'} content={producerFollowed ? 'Following' : 'Follow'} onClick={handleFollowClick} />
+                    <Button loading={producerFollowing} positive={!followedProducers.map((producer) => producer.sub).includes(sub)} icon={followedProducers.map((producer) => producer.sub).includes(sub) ? 'check' : 'plus'} content={producerFollowed ? 'Following' : 'Follow'} onClick={handleFollowClick} />
                   )}
                 </Grid.Column>
               </Grid.Row>
@@ -184,7 +187,6 @@ export function ProducerProfilePage({
                   <Card.Content>
                     <Card.Description>{intro}</Card.Description>
                   </Card.Content>
-                  {/* <Header as="h4">Contact</Header> */}
                   <Card.Content extra>
                     <a href={website} target="_blank" rel="noopener noreferrer">
                       {website}
@@ -221,101 +223,107 @@ export function ProducerProfilePage({
             </Grid.Row>
           </Grid>
         </Segment>
-        <Segment basic className="wrapper">
-          <BlogStyle>
-            <Grid columns={2} style={{ marginBottom: '0.05em' }}>
-              <Grid.Column textAlign="left">
-                <Header as="h2">Updates</Header>
-              </Grid.Column>
-              <Grid.Column textAlign="right">
-                {(user && user.businessId === businessId)
+        {producerProfile.profileOptions.activeModules.includes('blog') && (
+          <Segment basic className="wrapper">
+            <BlogStyle>
+              <Grid columns={2} style={{ marginBottom: '0.05em' }}>
+                <Grid.Column textAlign="left">
+                  <Header as="h2">Updates</Header>
+                </Grid.Column>
+                <Grid.Column textAlign="right">
+                  {(user && user.businessId === businessId)
                   && (
                     <ProducerBlogEditor />
                   )}
+                </Grid.Column>
+              </Grid>
+              <Item.Group divided>
+                {blog && blog.length
+                  ? blogRender(blog, blogPage)
+                  : <Segment>No posts yet!</Segment>}
+                {blog && blog.length > BLOG_ITEMS_PER_PAGE && (
+                  <Segment basic textAlign="center">
+                    <Pagination
+                      secondary
+                      activePage={blogPage}
+                      onPageChange={(e, { activePage }) => setBlogPage(activePage)}
+                      totalPages={blog ? Math.ceil(blog.length / BLOG_ITEMS_PER_PAGE) : 0}
+                    />
+                  </Segment>
+                )}
+              </Item.Group>
+            </BlogStyle>
+          </Segment>
+        )}
+        {producerProfile.profileOptions.activeModules.includes('promotions') && (
+          <Segment basic className="wrapper">
+            <Grid columns={2} style={{ marginBottom: '0.05em' }}>
+              <Grid.Column width={5} textAlign="left">
+                <Header as="h2">Promotions</Header>
               </Grid.Column>
-            </Grid>
-            <Item.Group divided>
-              {blog && blog.length
-                ? blogRender(blog, blogPage)
-                : <Segment>No posts yet!</Segment>}
-              {blog && blog.length > BLOG_ITEMS_PER_PAGE && (
-                <Segment basic textAlign="center">
-                  <Pagination
-                    secondary
-                    activePage={blogPage}
-                    onPageChange={(e, { activePage }) => setBlogPage(activePage)}
-                    totalPages={blog ? Math.ceil(blog.length / BLOG_ITEMS_PER_PAGE) : 0}
-                  />
-                </Segment>
-              )}
-            </Item.Group>
-          </BlogStyle>
-        </Segment>
-        <Segment basic className="wrapper">
-          <Grid columns={2} style={{ marginBottom: '0.05em' }}>
-            <Grid.Column width={5} textAlign="left">
-              <Header as="h2">Promotions</Header>
-            </Grid.Column>
-            <Grid.Column width={11} textAlign="right">
-              {(user && user.businessId === businessId)
+              <Grid.Column width={11} textAlign="right">
+                {(user && user.businessId === businessId)
                 && (
                   <>
                     <PromotionModal />
                   </>
                 )}
-            </Grid.Column>
-          </Grid>
-          <Segment>
-            {(producerProfile.promotions && producerProfile.promotions.length) ? (
-              <ul>
-                {producerProfile.promotions.map((promotion) => (
-                  <li key={promotion._id}>
-                    <Grid>
-                      <Grid.Column width={14}>
-                        {promotionCopySelection(promotion, producerProfile.stock
-                          .filter((stockItem) => stockItem.display === 'Show')
-                          .map((stockItem) => ({
-                            key: stockItem.id, value: stockItem.id, text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]}`,
-                          })))}
-                      </Grid.Column>
-                      <Grid.Column width={2}>
-                        {(user && user.businessId === businessId)
+              </Grid.Column>
+            </Grid>
+            <Segment>
+              {(producerProfile.promotions && producerProfile.promotions.length) ? (
+                <ul>
+                  {producerProfile.promotions.map((promotion) => (
+                    <li key={promotion._id}>
+                      <Grid>
+                        <Grid.Column width={14}>
+                          {promotionCopySelection(promotion, producerProfile.stock
+                            .filter((stockItem) => stockItem.display === 'Show')
+                            .map((stockItem) => ({
+                              key: stockItem.id, value: stockItem.id, text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]}`,
+                            })))}
+                        </Grid.Column>
+                        <Grid.Column width={2}>
+                          {(user && user.businessId === businessId)
                           && (
                             <Button negative compact basic size="small" icon="cancel" onClick={() => handleDeletePromo(promotion._id)} />
                           )}
-                      </Grid.Column>
-                    </Grid>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <>
-                No promotions currently available.
-              </>
-            )}
+                        </Grid.Column>
+                      </Grid>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <>
+                  No promotions currently available.
+                </>
+              )}
 
+            </Segment>
           </Segment>
-        </Segment>
-        <Segment basic className="wrapper">
-          <Grid columns={2} style={{ marginBottom: '0.05em' }}>
-            <Grid.Column width={5} textAlign="left">
-              <Header as="h2">Available Items</Header>
-            </Grid.Column>
-            <Grid.Column width={11} textAlign="right">
-              {(user && user.businessId === businessId)
+        )}
+        {producerProfile.profileOptions.activeModules.includes('availability') && (
+          <Segment basic className="wrapper">
+            <Grid columns={2} style={{ marginBottom: '0.05em' }}>
+              <Grid.Column width={5} textAlign="left">
+                <Header as="h2">Available Items</Header>
+              </Grid.Column>
+              <Grid.Column width={11} textAlign="right">
+                {(user && user.businessId === businessId)
                   && (
                     <>
                       {/* <Input value={stockCategoryNum} style={{ width: '60px', marginRight: '100px' }} onChange={(e) => setStockCategoryNum(e.target.value)} label="Categories" type="number" min={1} /> */}
                       <StockModal />
                     </>
                   )}
-            </Grid.Column>
-          </Grid>
-          {/* <AvailabilityBasic stock={stock} /> */}
-          {stock && (
-            <AvailabilityCategories data={stock} />
-          )}
-        </Segment>
+              </Grid.Column>
+            </Grid>
+            {/* <AvailabilityBasic stock={stock} /> */}
+            {stock && (
+              <AvailabilityCategories data={stock} />
+            )}
+          </Segment>
+        )}
       </PageWrapper>
     </>
   );
@@ -327,18 +335,22 @@ ProducerProfilePage.propTypes = {
   producerProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   routerLocation: PropTypes.object,
+  producerFollow: PropTypes.func,
+  producerFollowing: PropTypes.bool,
 };
 
 const mapStateToProps = createStructuredSelector({
   producerProfile: makeSelectProducerProfile(),
   user: makeSelectUser(),
   routerLocation: makeSelectLocation(),
+  producerFollowing: makeSelectProducerFollowing(),
 });
 
 function mapDispatchToProps(dispatch, { location }) {
   return {
     profileFetch: () => dispatch(fetchProfile(location.pathname)),
     profileClear: () => dispatch(clearProfile()),
+    producerFollow: (producerSub) => dispatch(followProducer(producerSub)),
   };
 }
 

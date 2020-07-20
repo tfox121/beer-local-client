@@ -15,12 +15,13 @@ import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import { useAuth0 } from '@auth0/auth0-react';
 import styled from 'styled-components';
-import { push } from 'connected-react-router';
+// import { push } from 'connected-react-router';
 
 import {
   makeSelectUser,
   makeSelectFetchingUser,
   makeSelectUserFetchError,
+  makeSelectLocation,
 } from './selectors';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
@@ -50,7 +51,7 @@ const AppWrapper = styled.div`
   flex-direction: column;
 `;
 
-const App = ({ userFetch, userClear, pushRoute }) => {
+const App = ({ userFetch, userClear, location }) => {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
   const { isAuthenticated } = useAuth0();
@@ -58,15 +59,16 @@ const App = ({ userFetch, userClear, pushRoute }) => {
   useEffect(() => {
     if (isAuthenticated) {
       userFetch();
-      return;
     }
     if (!isAuthenticated) {
       userClear();
-      // setTimeout(() => {
-      //   pushRoute('/');
-      // }, 3000);
     }
-  }, [isAuthenticated, userFetch, userClear]);
+    return () => {
+      if (!isAuthenticated) {
+        userClear();
+      }
+    };
+  }, [location.pathname, isAuthenticated, userFetch, userClear]);
 
   return (
     <AppWrapper>
@@ -89,20 +91,20 @@ App.propTypes = {
   // userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   userFetch: PropTypes.func,
   userClear: PropTypes.func,
-  pushRoute: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
   userProfile: makeSelectUser(),
   loading: makeSelectFetchingUser(),
   error: makeSelectUserFetchError(),
+  location: makeSelectLocation(),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
     userFetch: () => dispatch(fetchUser()),
     userClear: () => dispatch(clearUser()),
-    pushRoute: (path) => dispatch(push(path)),
+    // pushRoute: (path) => dispatch(push(path)),
   };
 }
 

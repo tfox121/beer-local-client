@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Form, Button } from 'semantic-ui-react';
 import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
-import { getPrivateRoute } from '../../utils/api';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { postBlog } from './actions';
 
-const ProducerBlogEditor = () => {
+const ProducerBlogEditor = ({ blogPost }) => {
   const [blogEditor, setBlogEditor] = useState(EditorState.createEmpty());
   const [blogMeta, setBlogMeta] = useState({ title: '', author: '', display: true });
   const [modalOpen, setModalOpen] = useState(false);
@@ -12,9 +15,7 @@ const ProducerBlogEditor = () => {
   const handleBlogEditorSave = async () => {
     const contentState = blogEditor.getCurrentContent();
     const rawBlogData = convertToRaw(contentState);
-    const privateRoute = await getPrivateRoute();
-    const response = await privateRoute.post('/producer/blog', { rawBlogData: JSON.stringify(rawBlogData), blogMeta });
-    console.log(response.data);
+    blogPost({ rawBlogData: JSON.stringify(rawBlogData), blogMeta });
     setBlogEditor(EditorState.createEmpty());
     setBlogMeta({ title: '', author: '', display: true });
     setModalOpen(false);
@@ -57,4 +58,23 @@ const ProducerBlogEditor = () => {
   );
 };
 
-export default ProducerBlogEditor;
+ProducerBlogEditor.propTypes = {
+  blogPost: PropTypes.func,
+};
+
+// const mapStateToProps = createStructuredSelector({
+//   blogPosting: makeSelectBlogPosting(),
+// });
+
+function mapDispatchToProps(dispatch) {
+  return {
+    blogPost: (blogPost) => dispatch(postBlog(blogPost)),
+  };
+}
+
+const withConnect = connect(
+  null,
+  mapDispatchToProps,
+);
+
+export default compose(withConnect)(ProducerBlogEditor);

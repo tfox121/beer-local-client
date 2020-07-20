@@ -16,3 +16,6 @@ export const UPDATE_USER = 'beerlocal/App/UPDATE_USER';
 export const UPDATE_USER_SUCCESS = 'beerlocal/App/UPDATE_USER_SUCCESS';
 export const UPDATE_USER_ERROR = 'beerlocal/App/UPDATE_USER_ERROR';
 export const CLEAR_USER = 'beerlocal/App/CLEAR_USER';
+export const FOLLOW_PRODUCER = 'beerlocal/App/FOLLOW_PRODUCER';
+export const FOLLOW_PRODUCER_SUCCESS = 'beerlocal/App/FOLLOW_PRODUCER_SUCCESS';
+export const FOLLOW_PRODUCER_ERROR = 'beerlocal/App/FOLLOW_PRODUCER_ERROR';

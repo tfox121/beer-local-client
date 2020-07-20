@@ -1,186 +1,92 @@
 /* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Table, Modal, Button, Header, Form, Popup,
-} from 'semantic-ui-react';
+import { Table, Button, Popup } from 'semantic-ui-react';
 import moment from 'moment';
 import NumberFormat from 'react-number-format';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router-dom';
-import { getPrivateRoute } from '../../utils/api';
 import OrderModalContent from '../../components/OrderModalContent';
 import Can from '../../components/Can';
-import { fetchOrders } from './actions';
+import { editOrder } from './actions';
 import { makeSelectUser } from '../App/selectors';
-import MessageFeed from '../../components/MessageFeed';
+import { makeSelectEditingOrder } from './selectors';
 
 const OrderItem = ({
-  userProfile, ordersInfo, order, index, ordersFetch,
+  userProfile, ordersInfo, order, index, orderEdit, orderEditing,
 }) => {
   const [orderData, setOrderData] = useState({ ...order });
-  const [orderItems, setOrderItems] = useState([...order.items]);
-  const [availableStock, setAvailableStock] = useState([]);
-  const [editingOrder, setEditingOrder] = useState(false);
-  const [orderEditPending, setOrderEditPending] = useState(false);
-  const [messageModalOpen, setMessageModalOpen] = useState(false);
-  const [messageContent, setMessageContent] = useState('');
 
   const { role } = userProfile;
 
   useEffect(() => {
-    console.log(ordersInfo);
     setOrderData({ ...order });
   }, [order]);
 
-  useEffect(() => {
-    if (userProfile && userProfile.stock) {
-      const orderIds = orderItems.map((orderItem) => orderItem.id);
-      setAvailableStock(userProfile.stock
-        .filter((stockItem) => stockItem.display === 'Show' && !orderIds.includes(stockItem.id))
-        .map((stockItem) => ({ ...stockItem, value: stockItem.id, label: `${stockItem.name} ${stockItem.packSize} ${stockItem.availability}` })));
-    }
-  }, [userProfile.stock, orderItems]);
-
   const handleConfirm = async () => {
-    const privateRoute = await getPrivateRoute();
-    const confirmedOrder = { status: orderData.status === 'Confirmed' ? 'Pending' : 'Confirmed' };
-    try {
-      const response = await privateRoute.patch(`/orders/${order._id}`, confirmedOrder);
-      // setOrderData(confirmedOrder);
-      ordersFetch();
-      console.log('RESPONSE', response.data);
-    } catch (err) {
-      console.error(err);
-    }
+    // const privateRoute = await getPrivateRoute();
+    const confirmedOrder = { _id: orderData._id, status: orderData.status === 'Confirmed' ? 'Pending' : 'Confirmed' };
+    orderEdit(confirmedOrder);
+    // try {
+    //   const response = await privateRoute.patch(`/orders/${order._id}`, confirmedOrder);
+    //   // setOrderData(confirmedOrder);
+    //   ordersFetch();
+    //   console.log('RESPONSE', response.data);
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
   const handleChangesConfirm = async () => {
-    const privateRoute = await getPrivateRoute();
-    const itemsApproved = orderItems
+    // const privateRoute = await getPrivateRoute();
+    const itemsApproved = order.items
       .filter((orderItem) => orderItem.orderChange !== 'delete')
       .map((orderItem) => ({ ...orderItem, orderChange: '' }));
-    const confirmedOrder = { status: 'Pending', items: itemsApproved };
+    const pendingOrder = { _id: orderData._id, status: 'Pending', items: itemsApproved };
 
-    try {
-      const response = await privateRoute.patch(`/orders/${order._id}`, confirmedOrder);
-      // setOrderData(confirmedOrder);
-      ordersFetch();
-      console.log(response);
-    } catch (err) {
-      console.error(err);
-    }
+    orderEdit(pendingOrder);
+
+    // try {
+    //   const response = await privateRoute.patch(`/orders/${order._id}`, confirmedOrder);
+    //   // setOrderData(confirmedOrder);
+    //   ordersFetch();
+    //   console.log(response);
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
   const handleReject = async () => {
-    const privateRoute = await getPrivateRoute();
-    const rejectedOrder = { status: orderData.status === 'Rejected' ? 'Pending' : 'Rejected' };
-    try {
-      const response = await privateRoute.patch(`/orders/${order._id}`, rejectedOrder);
-      // setOrderData(rejectedOrder);
-      ordersFetch();
-      console.log(response);
-    } catch (err) {
-      console.error(err);
-    }
+    // const privateRoute = await getPrivateRoute();
+    const rejectedOrder = { _id: orderData._id, status: orderData.status === 'Rejected' ? 'Pending' : 'Rejected' };
+
+    orderEdit(rejectedOrder);
+    // try {
+    //   const response = await privateRoute.patch(`/orders/${order._id}`, rejectedOrder);
+    //   // setOrderData(rejectedOrder);
+    //   ordersFetch();
+    //   console.log(response);
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
   const handleCancel = async () => {
-    const privateRoute = await getPrivateRoute();
-    const cancelledOrder = { status: 'Cancelled' };
-    try {
-      const response = await privateRoute.patch(`/orders/${order._id}`, cancelledOrder);
-      // setOrderData(rejectedOrder);
-      ordersFetch();
-      console.log(response);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    // const privateRoute = await getPrivateRoute();
+    const cancelledOrder = { _id: orderData._id, status: 'Cancelled' };
 
-  const handleDeleteItem = (id) => {
-    setOrderEditPending(true);
-    setOrderItems(orderItems.map((orderItem) => {
-      if (orderItem.id === id && orderItem.orderChange === 'delete') {
-        return { ...orderItem, orderChange: '' };
-      }
-      if (orderItem.id === id) {
-        return { ...orderItem, orderChange: 'delete' };
-      }
-      return orderItem;
-    }));
-  };
+    orderEdit(cancelledOrder);
 
-  const handleAddItem = (newItem) => {
-    setOrderEditPending(true);
-    const item = newItem;
-    delete item.label;
-    delete item.value;
-    item.orderChange = 'add';
-    item.orderQuant = 1;
-    setOrderItems([...orderItems, item]);
-  };
-
-  const handleDecreaseQuant = (id) => {
-    setOrderEditPending(true);
-    const orderItemsEdit = orderItems.map((orderItem) => {
-      if (orderItem.id === id && orderItem.orderQuant > 0) {
-        const decreasedItem = { ...orderItem, orderQuant: orderItem.orderQuant - 1 };
-        const originalItem = orderData.items.filter((origOrderItem) => origOrderItem.id === id)[0];
-        if (orderItem.orderChange !== 'add') {
-          if (originalItem && decreasedItem.orderQuant < originalItem.orderQuant) {
-            decreasedItem.orderChange = 'decrease';
-          } else {
-            delete decreasedItem.orderChange;
-          }
-        }
-        return decreasedItem;
-      }
-      return orderItem;
-    });
-    setOrderItems(orderItemsEdit);
-  };
-
-  const handleIncreaseQuant = (id) => {
-    setOrderEditPending(true);
-    const orderItemsEdit = orderItems.map((orderItem) => {
-      if (orderItem.id === id) {
-        const increasedItem = { ...orderItem, orderQuant: orderItem.orderQuant + 1 };
-        const originalItem = orderData.items.filter((origOrderItem) => origOrderItem.id === id)[0];
-        if (orderItem.orderChange !== 'add') {
-          if (originalItem && increasedItem.orderQuant > originalItem.orderQuant) {
-            increasedItem.orderChange = 'increase';
-          } else {
-            delete increasedItem.orderChange;
-          }
-        }
-        return increasedItem;
-      }
-      return orderItem;
-    });
-    setOrderItems(orderItemsEdit);
-  };
-
-  const handleSave = async () => {
-    const privateRoute = await getPrivateRoute();
-    const editedOrder = { status: 'Changes pending', items: [...orderItems] };
-    const response = await privateRoute.patch(`/orders/${order._id}`, editedOrder);
-    // setOrderData(rejectedOrder);
-    ordersFetch();
-    setEditingOrder(false);
-    setOrderEditPending(false);
-    console.log(response);
-  };
-
-  const handleMessageSend = async () => {
-    const privateRoute = await getPrivateRoute();
-    const response = await privateRoute.post(`/orders/${order._id}/message`, { content: messageContent });
-    // setOrderData(rejectedOrder);
-    ordersFetch();
-    setMessageModalOpen(false);
-    console.log(response);
+    // try {
+    //   const response = await privateRoute.patch(`/orders/${order._id}`, cancelledOrder);
+    //   // setOrderData(rejectedOrder);
+    //   ordersFetch();
+    //   console.log(response);
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
   return (
@@ -215,7 +121,7 @@ const OrderItem = ({
           <Modal.Description>
             <OrderModalContent
               editingOrder={editingOrder}
-              orderItems={orderItems}
+              orderItems={order.items}
               availableStock={availableStock}
               handleAddItem={handleAddItem}
               handleDeleteItem={handleDeleteItem}
@@ -265,28 +171,28 @@ const OrderItem = ({
               role={role}
               perform="orders:confirm"
               yes={() => (orderData.status === 'Pending' || orderData.status === 'Confirmed') && (
-                <Button onClick={handleConfirm} basic={orderData.status !== 'Confirmed'} color="green" icon="check" title="Confirm order" />
+                <Button loading={orderEditing === orderData._id} onClick={handleConfirm} basic={orderData.status !== 'Confirmed'} color="green" icon="check" title="Confirm order" />
               )}
             />
             <Can
               role={role}
               perform="orders:changes-confirm"
               yes={() => (orderData.status === 'Changes pending') && (
-                <Button onClick={handleChangesConfirm} color="green" icon="check" title="Approve changes" />
+                <Button loading={orderEditing === orderData._id} onClick={handleChangesConfirm} color="green" icon="check" title="Approve changes" />
               )}
             />
             <Can
               role={role}
               perform="orders:reject"
               yes={() => (orderData.status === 'Changes pending' || orderData.status === 'Pending' || orderData.status === 'Rejected') && (
-                <Button onClick={handleReject} basic={orderData.status !== 'Rejected'} color="red" icon="ban" title="Reject order" />
+                <Button loading={orderEditing === orderData._id} onClick={handleReject} basic={orderData.status !== 'Rejected'} color="red" icon="ban" title="Reject order" />
               )}
             />
             <Can
               role={role}
               perform="orders:cancel"
               yes={() => (orderData.status === 'Changes pending' || orderData.status === 'Pending') && (
-                <Button onClick={handleCancel} basic={orderData.status !== 'Cancelled'} color="red" icon="close" title="Cancel order" />
+                <Button loading={orderEditing === orderData._id} onClick={handleCancel} basic={orderData.status !== 'Cancelled'} color="red" icon="close" title="Cancel order" />
               )}
             />
           </Table.Cell>
@@ -295,7 +201,7 @@ const OrderItem = ({
       content={(
         <>
           <OrderModalContent
-            orderItems={orderItems}
+            orderItems={order.items}
             businessName={ordersInfo.businesses[index].businessName}
             type="orderInfo"
           />
@@ -312,17 +218,19 @@ OrderItem.propTypes = {
   ordersInfo: PropTypes.object,
   order: PropTypes.object,
   index: PropTypes.number,
-  ordersFetch: PropTypes.func,
+  orderEdit: PropTypes.func,
   role: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  orderEditing: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
 const mapStateToProps = createStructuredSelector({
   userProfile: makeSelectUser(),
+  orderEditing: makeSelectEditingOrder(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    ordersFetch: () => dispatch(fetchOrders()),
+    orderEdit: (editObj) => dispatch(editOrder(editObj)),
   };
 }
 

@@ -8,14 +8,14 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Modal, Header, Table, Button, Grid,
+  Modal, Header, Table, Button, Grid, Message,
 } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import Select from 'react-select';
 import OrderLine from '../OrderLine';
 
 function OrderModalContent({
-  editingOrder, businessName, orderItems, availableStock, handleAddItem, handleDeleteItem, handleDecreaseQuant, handleIncreaseQuant, type,
+  editingOrder, businessName, orderItems, distancePurchase, distantPurchasingConditions, availableStock, handleAddItem, handleDeleteItem, handleDecreaseQuant, handleIncreaseQuant, type,
 }) {
   const [newItem, setNewItem] = useState({});
   const [addingItem, setAddingItem] = useState(false);
@@ -98,6 +98,16 @@ function OrderModalContent({
           </Table.Row>
         </Table.Footer>
       </Table>
+      {distancePurchase && distantPurchasingConditions.minSpend && (
+        <Message warning>
+          <Message.Header>You are outside this brewery&apos;s distribution area</Message.Header>
+          <p>
+            To process your order, you must spent at least £
+            {Number(distantPurchasingConditions.minSpend).toFixed(2)}
+            .
+          </p>
+        </Message>
+      )}
     </Modal.Content>
   );
 }

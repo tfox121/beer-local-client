@@ -43,6 +43,7 @@ function NavBar({ userProfile, pushRoute }) {
         break;
     }
   };
+
   return (
     <>
       <header>

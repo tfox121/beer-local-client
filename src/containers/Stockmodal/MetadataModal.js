@@ -5,17 +5,24 @@ import {
 } from 'semantic-ui-react';
 import { Slider } from 'react-semantic-ui-range';
 import AvatarEditor from 'react-avatar-editor';
+import { useAuth0 } from '@auth0/auth0-react';
 
 import MetadataModalStyle from './MetadataModalStyle';
+import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
+import getImageUrl from '../../utils/getImageUrl';
 
 const MetadataModal = ({ cell, updateMyData }) => {
+  const { user } = useAuth0();
+
   const [itemMetadata, setItemMetadata] = useState({});
-  const [productPicture, setProductPicture] = useState(undefined);
+  const [productImage, setProductImage] = useState(undefined);
+  const [productImageRoute, setProuctImageRoute] = useState({});
+  const [productImageSaved, setProductImageSaved] = useState(undefined);
   const [modalOpen, setModalOpen] = useState(false);
   const [imageResizeModalOpen, setImageResizeModalOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
 
-  const productPictureRef = createRef();
+  const productImageRef = createRef();
   const editorRef = createRef();
 
   const sliderSettings = {
@@ -38,12 +45,24 @@ const MetadataModal = ({ cell, updateMyData }) => {
   }, [cell]);
 
   useEffect(() => {
-    if (!productPicture) {
+    if (!productImage) {
       setImageResizeModalOpen(false);
-    } else if (productPicture.name) {
+    } else if (productImage.name) {
       setImageResizeModalOpen(true);
     }
-  }, [productPicture]);
+  }, [productImage]);
+
+  useEffect(() => {
+    if (productImageSaved) {
+      const setBannerRouteAsync = async () => {
+        setProuctImageRoute(await getPresignedRoute('product', cell.row.original.id));
+      };
+      setBannerRouteAsync();
+    }
+    return () => {
+      setProuctImageRoute({});
+    };
+  }, [productImageSaved]);
 
   const handleChange = (e, { name, value }) => {
     setItemMetadata({ ...itemMetadata, [name]: value });
@@ -52,22 +71,30 @@ const MetadataModal = ({ cell, updateMyData }) => {
   const handleApply = () => {
     if (editorRef.current) {
       const canvasScaled = editorRef.current.getImageScaledToCanvas();
-      if (productPicture.name) {
-        setItemMetadata({ ...itemMetadata, imageSource: canvasScaled.toDataURL() });
-        setProductPicture(undefined);
+      if (productImage.name) {
+        setProductImageSaved(canvasScaled.toDataURL());
+        setProductImage(undefined);
       }
     }
     setImageResizeModalOpen(false);
   };
 
   const handleModalClose = () => {
-    setProductPicture(undefined);
+    setProductImage(undefined);
     setImageResizeModalOpen(false);
   };
 
-  const handleSave = () => {
-    updateMyData(cell.row.index, 'imageSource', itemMetadata.imageSource);
+  const handleSave = async () => {
+    let imageSource;
+    if (productImageSaved) {
+      const response = await imageToBucket(productImageRoute, productImageSaved);
+      if (response.status === 204) {
+        imageSource = getImageUrl(user.sub, 'product', cell.row.original.id);
+      }
+    }
+    updateMyData(cell.row.index, 'imageSource', imageSource);
     updateMyData(cell.row.index, 'description', itemMetadata.description);
+
     setModalOpen(false);
   };
 
@@ -85,15 +112,15 @@ const MetadataModal = ({ cell, updateMyData }) => {
           <Grid width={16}>
             <Grid.Column width={6}>
               <div className="button-image-container">
-                <Image className="product-image" src={itemMetadata.imageSource || '/images/products/blank-product.png'} size="small" bordered centered />
-                <Button inverted circular basic className="image-button" icon="camera" onClick={() => productPictureRef.current.click()} />
+                <Image className="product-image" src={productImageSaved || cell.row.original.imageSource || '/images/products/blank-product.png'} size="small" bordered centered />
+                <Button inverted circular basic className="image-button" icon="camera" onClick={() => productImageRef.current.click()} />
                 <input
-                  id="productPictureUpload"
-                  ref={productPictureRef}
+                  id="productImageUpload"
+                  ref={productImageRef}
                   type="file"
                   accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
                   hidden
-                  onChange={(e) => setProductPicture(e.target.files[0])}
+                  onChange={(e) => setProductImage(e.target.files[0])}
                 />
               </div>
             </Grid.Column>
@@ -113,7 +140,7 @@ const MetadataModal = ({ cell, updateMyData }) => {
           </Modal.Header>
           <AvatarEditor
             ref={editorRef}
-            image={productPicture}
+            image={productImage}
             width={250}
             height={250}
             border={25}

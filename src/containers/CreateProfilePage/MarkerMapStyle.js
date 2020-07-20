@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const MarkerMapStyle = styled.div`
-  height 100%;
+  height: 70%;
   width: 100%;
 
   .leaflet-container {

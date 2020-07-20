@@ -4,7 +4,6 @@ import {
 import { FETCH_PRODUCERS } from './constants';
 import { producersFetched, producersFetchError } from './actions';
 import { publicRoute } from '../../utils/api';
-import dataURItoBlob from '../../utils/dataURItoBlob';
 import { getAvatar } from '../../utils/getImages';
 
 function* fetchProducers() {
@@ -12,11 +11,11 @@ function* fetchProducers() {
     const fetchProducersData = () => publicRoute.get('/producers');
     const response = yield call(fetchProducersData);
 
-    const images = yield all(response.data.map((producer) => call(getAvatar, producer.businessId)));
+    // const images = yield all(response.data.map((producer) => call(getAvatar, producer.businessId)));
 
     const responseWithImages = response.data.map((producer, index) => ({
       ...producer,
-      avatarSource: images[index],
+      /* avatarSource: images[index]  */
     }));
 
     if (response.data) {

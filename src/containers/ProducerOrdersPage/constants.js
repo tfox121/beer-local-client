@@ -12,4 +12,7 @@
 export const FETCH_ORDERS = 'beerlocal/ProducerOrdersPage/FETCH_ORDERS';
 export const FETCH_ORDERS_SUCCESS = 'beerlocal/ProducerOrdersPage/FETCH_ORDERS_SUCCESS';
 export const FETCH_ORDERS_ERROR = 'beerlocal/ProducerOrdersPage/FETCH_ORDERS_ERROR';
+export const EDIT_ORDER = 'beerlocal/ProducerOrdersPage/EDIT_ORDER';
+export const EDIT_ORDER_SUCCESS = 'beerlocal/ProducerOrdersPage/EDIT_ORDER_SUCCESS';
+export const EDIT_ORDER_ERROR = 'beerlocal/ProducerOrdersPage/EDIT_ORDER_ERROR';
 export const CLEAR_ORDERS = 'beerlocal/ProducerOrdersPage/CLEAR_ORDERS';

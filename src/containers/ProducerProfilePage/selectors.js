@@ -35,7 +35,22 @@ const makeSelectOrderSending = () => createSelector(
   (substate) => substate.sendingOrder,
 );
 
+const makeSelectBlogPosting = () => createSelector(
+  selectProducerProfilePageDomain,
+  (substate) => substate.postingBlog,
+);
+
+const makeSelectStockUpdating = () => createSelector(
+  selectProducerProfilePageDomain,
+  (substate) => substate.updatingStock,
+);
+
 export default makeSelectProducerProfilePage;
 export {
-  selectProducerProfilePageDomain, makeSelectUser, makeSelectProducerProfile, makeSelectOrderSending,
+  selectProducerProfilePageDomain,
+  makeSelectUser,
+  makeSelectProducerProfile,
+  makeSelectOrderSending,
+  makeSelectBlogPosting,
+  makeSelectStockUpdating,
 };

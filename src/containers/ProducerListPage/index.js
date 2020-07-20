@@ -5,14 +5,13 @@ import { compose } from 'redux';
 import { push } from 'connected-react-router';
 
 import {
-  Header, Segment, Table, Image, Checkbox, Dropdown, Grid,
+  Header, Segment, Table, Image, Dropdown, Grid,
 } from 'semantic-ui-react';
 import { createStructuredSelector } from 'reselect';
 import { Map, TileLayer } from 'react-leaflet';
 import { Link } from 'react-router-dom';
-import * as d3 from 'd3';
-import rewind from '@mapbox/geojson-rewind';
 
+import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
 import PageWrapper from '../../components/PageWrapper';
@@ -34,24 +33,17 @@ const ProducerListPage = ({
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
-  const [areaFilterToggle, setareaFilterToggle] = useState(true);
-  const [followedFilterToggle, setfollowedFilterToggle] = useState(false);
-  const [filter, setFilter] = useState([]);
-
-  const checkPolygonsContainCoords = (polygonsObj, latlng) => {
-    if (!polygonsObj) {
-      return false;
-    }
-    const { lat, lng } = latlng;
-    const rwGeoJson = rewind(polygonsObj, true);
-    return d3.geoContains(rwGeoJson, [lng, lat]);
-  };
+  // const [areaFilterToggle, setareaFilterToggle] = useState(true);
+  // const [followedFilterToggle, setfollowedFilterToggle] = useState(false);
+  const [filter, setFilter] = useState(['area']);
 
   const followedProducers = !!user && user.followedProducers.map((producer) => producer.sub);
 
   const followedFilter = (producer) => followedProducers.includes(producer.sub);
 
-  const areaFilter = (producer) => checkPolygonsContainCoords(producer.distributionAreas, user.location);
+  const areaFilter = (producer) => geoJsonContainsCoords(producer.distributionAreas, user.location);
+
+  const distantPurchasingFilter = (producer) => (producer.profileOptions.distantPurchasing || geoJsonContainsCoords(producer.distributionAreas, user.location));
 
   // const filteredProducers = !!producers && !!user && producers.filter();
 
@@ -62,6 +54,9 @@ const ProducerListPage = ({
     }
     if (filter.includes('followed')) {
       filteredProducers = filteredProducers.filter(followedFilter);
+    }
+    if (filter.includes('distantPurchasing')) {
+      filteredProducers = filteredProducers.filter(distantPurchasingFilter);
     }
     return filteredProducers;
   };
@@ -93,6 +88,7 @@ const ProducerListPage = ({
   const filterOptions = [
     { key: 'area', text: 'In my area', value: 'area' },
     { key: 'followed', text: 'Followed breweries', value: 'followed' },
+    { key: 'distantPurchasing', text: 'Can ship to me', value: 'distantPurchasing' },
   ];
 
   return (
@@ -104,7 +100,7 @@ const ProducerListPage = ({
               <Header as="h1" floated="left">Breweries</Header>
             </Grid.Column>
             <Grid.Column width={10} textAlign="right">
-              <Dropdown compact value={filter} onChange={handleChange} placeholder="Filter" multiple selection options={filterOptions} />
+              <Dropdown value={filter} onChange={handleChange} placeholder="Filter" multiple selection options={filterOptions} />
               {/* <Checkbox label="In my area" toggle checked={areaFilterToggle} onClick={() => setareaFilterToggle(!areaFilterToggle)} />
               {' '}
               <Checkbox label="Followed" toggle checked={followedFilterToggle} onClick={() => setfollowedFilterToggle(!followedFilterToggle)} /> */}

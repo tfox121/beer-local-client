@@ -12,6 +12,9 @@ import {
   UPDATE_USER_SUCCESS,
   UPDATE_USER_ERROR,
   CLEAR_USER,
+  FOLLOW_PRODUCER,
+  FOLLOW_PRODUCER_SUCCESS,
+  FOLLOW_PRODUCER_ERROR,
 } from './constants';
 
 export const initialState = {
@@ -20,6 +23,8 @@ export const initialState = {
   updatingUser: false,
   updatingUserError: false,
   user: false,
+  followingProducer: false,
+  followProducerError: false,
 };
 
 /* eslint-disable default-case, no-param-reassign */
@@ -33,7 +38,7 @@ const appReducer = (state = initialState, action) => produce(state, (draftState)
       break;
     case FETCH_USER_SUCCESS:
       if (action.user) {
-        draftState.user = action.user;
+        draftState.user = { ...action.user };
         draftState.fetchUserError = false;
       }
       draftState.fetchingUser = false;
@@ -59,6 +64,20 @@ const appReducer = (state = initialState, action) => produce(state, (draftState)
     case UPDATE_USER_ERROR:
       draftState.updatingUserError = true;
       draftState.updatingUser = false;
+      break;
+    case FOLLOW_PRODUCER:
+      draftState.followProducerError = false;
+      draftState.followingProducer = true;
+      break;
+    case FOLLOW_PRODUCER_SUCCESS:
+      if (action.followedProducers) {
+        draftState.user.followedProducers = [...action.followedProducers];
+        draftState.followingProducer = false;
+      }
+      break;
+    case FOLLOW_PRODUCER_ERROR:
+      draftState.followProducerError = true;
+      draftState.followingProducer = false;
       break;
       // case CLOSE_SESSION_SUCCESS:
       //   draftState.session = false;

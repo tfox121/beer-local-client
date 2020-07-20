@@ -20,6 +20,11 @@ const makeSelectUserFetchError = () => createSelector(
   (globalState) => globalState.sessionError,
 );
 
+const makeSelectProducerFollowing = () => createSelector(
+  selectGlobal,
+  (substate) => substate.followingProducer,
+);
+
 const makeSelectLocation = () => createSelector(
   selectRouter,
   (routerState) => routerState.location,
@@ -30,4 +35,5 @@ export {
   makeSelectFetchingUser,
   makeSelectUserFetchError,
   makeSelectLocation,
+  makeSelectProducerFollowing,
 };
