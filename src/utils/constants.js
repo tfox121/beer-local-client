@@ -26,12 +26,20 @@ export const PACK_SIZES = {
   '24x440': '24x440ml',
 };
 
-export const BLOG_ITEMS_PER_PAGE = 2;
+export const BLOG_ITEMS_PER_PAGE = 1;
 export const INTRO_CHARACTER_LIMIT = 350;
 export const BLOG_CHARACTER_LIMIT = 1500;
 
-export const notificationTypes = {
+export const NOTIFICATION_TYPES = {
   newOrder: 'new_order',
   orderStatusChange: 'order_status_change',
   newOrderMessage: 'new_order_message',
+};
+
+export const BLOG_EDITOR_TOOLBAR = {
+  options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'colorPicker', 'link', 'emoji', 'image', 'remove', 'history'],
+  inline: { options: ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript'] },
+  list: { inDropdown: true },
+  textAlign: { inDropdown: true },
+  link: { inDropdown: true },
 };

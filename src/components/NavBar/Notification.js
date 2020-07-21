@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 // import messages from './messages';
 import { makeSelectUser } from './selectors';
-import { notificationTypes } from '../../utils/constants';
+import { NOTIFICATION_TYPES } from '../../utils/constants';
 import timeAgo from '../../utils/timeAgo';
 
 function Notification({ notification }) {
@@ -43,7 +43,7 @@ function Notification({ notification }) {
   const notificationCopy = (notificationType, author) => {
     let message;
     switch (notificationType) {
-      case notificationTypes.newOrder:
+      case NOTIFICATION_TYPES.newOrder:
         message = (
           <>
             You have a new order from
@@ -53,7 +53,7 @@ function Notification({ notification }) {
           </>
         );
         break;
-      case notificationTypes.orderStatusChange:
+      case NOTIFICATION_TYPES.orderStatusChange:
         message = (
           <>
             The status of your order from
@@ -64,7 +64,7 @@ function Notification({ notification }) {
           </>
         );
         break;
-      case notificationTypes.newOrderMessage:
+      case NOTIFICATION_TYPES.newOrderMessage:
         message = (
           <>
             Your order with

@@ -58,10 +58,6 @@ const GlobalStyle = createGlobalStyle`
 
   }
 
-  .blogpost-display-checkbox {
-    margin-top: 1em
-  }
-
   .blogpost-modal-actions {
     display: flex;
   }
@@ -72,8 +68,8 @@ const GlobalStyle = createGlobalStyle`
     align-items: center;
   }
 
-  .blogpost-display-checkbox > div.checkbox > input:checked~label:after {
-    top: -2px;
+  div.checkbox > input:checked~label:after {
+    top: -2px !important;
   }
 
   div.image-resizer.ui.modal {
@@ -85,6 +81,13 @@ const GlobalStyle = createGlobalStyle`
     @media only screen and (max-width: 425px) {
       left: 0px;
       min-width: 800px;
+    }
+  }
+
+  /* Pagination Style */
+  div.ui.pagination {
+    a {
+      justify-content: center;
     }
   }
 `;

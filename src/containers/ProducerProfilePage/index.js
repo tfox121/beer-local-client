@@ -27,6 +27,7 @@ import {
   Button,
   Modal,
   Card,
+  Icon,
 } from 'semantic-ui-react';
 import { Map, TileLayer } from 'react-leaflet';
 
@@ -225,12 +226,13 @@ export function ProducerProfilePage({
             </Grid.Row>
           </Grid>
         </Segment>
+        {/* ---------------------- Blog ---------------------- */}
         {producerProfile.profileOptions.activeModules.includes('blog') && (
           <Segment basic className="wrapper">
             <BlogStyle>
               <Grid columns={2} style={{ marginBottom: '0.05em' }}>
                 <Grid.Column textAlign="left">
-                  <Header as="h2">Updates</Header>
+                  <Header as="h2">News</Header>
                 </Grid.Column>
                 <Grid.Column textAlign="right">
                   {(user && user.businessId === businessId)
@@ -239,7 +241,7 @@ export function ProducerProfilePage({
                   )}
                 </Grid.Column>
               </Grid>
-              <Item.Group divided>
+              <>
                 {blog && blog.length
                   ? blogRender(blog, blogPage)
                   : <Segment>No posts yet!</Segment>}
@@ -247,16 +249,24 @@ export function ProducerProfilePage({
                   <Segment basic textAlign="center">
                     <Pagination
                       secondary
+                      size="tiny"
+                      firstItem={null}
+                      lastItem={null}
                       activePage={blogPage}
                       onPageChange={(e, { activePage }) => setBlogPage(activePage)}
-                      totalPages={blog ? Math.ceil(blog.length / BLOG_ITEMS_PER_PAGE) : 0}
+                      totalPages={
+                        blog
+                          ? Math.ceil(blog.filter((blogPost) => blogPost.display === true || (user && user.businessId === businessId)).length / BLOG_ITEMS_PER_PAGE)
+                          : 0
+                      }
                     />
                   </Segment>
                 )}
-              </Item.Group>
+              </>
             </BlogStyle>
           </Segment>
         )}
+        {/* ---------------------- Promotions ---------------------- */}
         {producerProfile.profileOptions.activeModules.includes('promotions') && (
           <Segment basic className="wrapper">
             <Grid columns={2} style={{ marginBottom: '0.05em' }}>
@@ -274,27 +284,37 @@ export function ProducerProfilePage({
             </Grid>
             <Segment>
               {(producerProfile.promotions && producerProfile.promotions.length) ? (
-                <ul>
-                  {producerProfile.promotions.map((promotion) => (
-                    <li key={promotion._id}>
-                      <Grid>
-                        <Grid.Column width={14}>
-                          {promotionCopySelection(promotion, producerProfile.stock
-                            .filter((stockItem) => stockItem.display === 'Show')
-                            .map((stockItem) => ({
-                              key: stockItem.id, value: stockItem.id, text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]}`,
-                            })))}
-                        </Grid.Column>
-                        <Grid.Column width={2}>
-                          {(user && user.businessId === businessId)
+                <Item.Group divided>
+                  {producerProfile.promotions.map((promotion) => {
+                    const promotionCopy = promotionCopySelection(promotion, producerProfile.stock
+                      .filter((stockItem) => stockItem.display === 'Show')
+                      .map((stockItem) => ({
+                        key: stockItem.id, value: stockItem.id, text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]}`,
+                      })));
+                    if (!promotionCopy) {
+                      return null;
+                    }
+                    return (
+                      <Item key={promotion._id}>
+                        <Item.Content>
+                          <Grid verticalAlign="middle">
+                            <Grid.Column width={14}>
+                              <Icon circular name="pound sign" size="small" />
+                              {' '}
+                              {promotionCopy}
+                            </Grid.Column>
+                            <Grid.Column width={2}>
+                              {(user && user.businessId === businessId)
                           && (
                             <Button negative compact basic size="small" icon="cancel" onClick={() => handleDeletePromo(promotion._id)} />
                           )}
-                        </Grid.Column>
-                      </Grid>
-                    </li>
-                  ))}
-                </ul>
+                            </Grid.Column>
+                          </Grid>
+                        </Item.Content>
+                      </Item>
+                    );
+                  })}
+                </Item.Group>
               ) : (
                 <>
                   No promotions currently available.
@@ -304,6 +324,7 @@ export function ProducerProfilePage({
             </Segment>
           </Segment>
         )}
+        {/* ---------------------- Availability ---------------------- */}
         {producerProfile.profileOptions.activeModules.includes('availability') && (
           <Segment basic className="wrapper">
             <Grid columns={2} style={{ marginBottom: '0.05em' }}>

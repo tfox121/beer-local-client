@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const DistroMapMapStyle = styled.div`
+const DistroMapStyle = styled.div`
   height: 100%;
   width: 100%;
 
@@ -13,4 +13,4 @@ const DistroMapMapStyle = styled.div`
   }
 `;
 
-export default DistroMapMapStyle;
+export default DistroMapStyle;

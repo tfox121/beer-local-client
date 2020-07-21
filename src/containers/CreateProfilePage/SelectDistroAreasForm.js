@@ -129,6 +129,7 @@ SelectDistroAreasForm.propTypes = {
   formValues: PropTypes.object,
   setFormValues: PropTypes.func,
   mapCentre: PropTypes.array,
+  formErrors: PropTypes.object,
 };
 
 export default SelectDistroAreasForm;

@@ -6,7 +6,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { postBlog } from './actions';
-import { BLOG_CHARACTER_LIMIT } from '../../utils/constants';
+import { BLOG_CHARACTER_LIMIT, BLOG_EDITOR_TOOLBAR } from '../../utils/constants';
 
 const ProducerBlogEditor = ({ blogPost }) => {
   const [blogEditor, setBlogEditor] = useState(EditorState.createEmpty());
@@ -39,13 +39,7 @@ const ProducerBlogEditor = ({ blogPost }) => {
             wrapperClassName="blog-editor-wrapper"
             editorClassName="blog-editor"
             onEditorStateChange={(editorState) => setBlogEditor(editorState)}
-            toolbar={{
-              options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'colorPicker', 'link', 'emoji', 'image', 'remove', 'history'],
-              inline: { options: ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript'] },
-              list: { inDropdown: true },
-              textAlign: { inDropdown: true },
-              link: { inDropdown: true },
-            }}
+            toolbar={BLOG_EDITOR_TOOLBAR}
             handleBeforeInput={(val) => {
               const textLength = blogEditor.getCurrentContent().getPlainText().length;
               if (val && textLength >= BLOG_CHARACTER_LIMIT) {

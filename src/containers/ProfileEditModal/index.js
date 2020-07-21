@@ -1,8 +1,10 @@
 /* eslint-disable no-nested-ternary */
-import React, { useState, createRef, useEffect } from 'react';
+import React, {
+  useState, createRef, useEffect, useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import {
-  Grid, Image, Button, Modal, Form, Header,
+  Grid, Image, Button, Modal, Form, Header, Message,
 } from 'semantic-ui-react';
 import AvatarEditor from 'react-avatar-editor';
 import { Slider } from 'react-semantic-ui-range';
@@ -14,6 +16,10 @@ import PhoneNumber from 'awesome-phonenumber';
 // import { useInjectSaga } from '../../utils/injectSaga';
 // import { useInjectReducer } from '../../utils/injectReducer';
 import NumberFormat from 'react-number-format';
+import Geosuggest from 'react-geosuggest';
+import L from 'leaflet';
+import { Map, TileLayer, FeatureGroup } from 'react-leaflet';
+import { EditControl } from 'react-leaflet-draw';
 import { makeSelectProducerProfile, makeSelectUser, makeSelectUpdatingUser } from './selectors';
 // import saga from './saga';
 import ayt from '../../utils/phoneNumberValidation';
@@ -22,6 +28,9 @@ import EditProfileStyle from './EditProfileStyle';
 import { updateProfile } from '../ProducerProfilePage/actions';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
+import SuggestBlockStyle from '../CreateProfilePage/SuggestBlockStyle';
+import DistroMapStyle from '../CreateProfilePage/DistroMapStyle';
+import MapMarker from '../../components/MapMarker';
 // import { fetchUser } from '../App/actions';
 
 const ProfileEditModal = ({
@@ -41,6 +50,7 @@ const ProfileEditModal = ({
   const [avatarSaved, setAvatarSaved] = useState(undefined);
   const [bannerRoute, setBannerRoute] = useState({});
   const [avatarRoute, setAvatarRoute] = useState({});
+  const [savedPolygons, setSavedPolygons] = useState({});
   const [imageResizeModalOpen, setImageResizeModalOpen] = useState(false);
   const [unformattedTel, setUnformattedTel] = useState(user.salesContactNumber);
   const [zoom, setZoom] = useState(1);
@@ -48,6 +58,7 @@ const ProfileEditModal = ({
   const bannerRef = createRef();
   const avatarRef = createRef();
   const editorRef = createRef();
+  const geosuggestEl = useRef(null);
 
   const sliderSettings = {
     start: 1,
@@ -60,7 +71,7 @@ const ProfileEditModal = ({
   };
 
   const {
-    businessName, website, salesEmail, salesContactNumber, intro, profileOptions, bannerSource, avatarSource,
+    businessName, website, salesEmail, salesContactNumber, address, location, distributionAreas, intro, profileOptions, bannerSource, avatarSource,
   } = user;
 
   const handleUserInfoChange = (e, { name, value }) => {
@@ -101,6 +112,13 @@ const ProfileEditModal = ({
       setProducerFormValues({ profileOptions });
     }
   }, [user, profileOptions]);
+
+  useEffect(() => {
+    if (distributionAreas) {
+      console.log('SETTING POLYS');
+      setSavedPolygons({ ...distributionAreas });
+    }
+  }, [distributionAreas]);
 
   // useEffect(() => {
   //   if (profileOptions.distantPurchasing) {
@@ -183,6 +201,54 @@ const ProfileEditModal = ({
     setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, distantPurchasingConditions: { [name]: value } } });
   };
 
+  const handleSuggestSelect = (suggestion) => {
+    if (suggestion) {
+      const newErrors = { ...formErrors };
+      delete newErrors.location;
+      setFormErrors({ ...newErrors });
+      setUserFormValues({ ...userFormValues, location: suggestion.location, address: suggestion.gmaps.formatted_address });
+    }
+  };
+
+  let editableFG = null;
+
+  const onFeatureGroupReady = (reactFGref) => {
+    if (reactFGref) {
+      // if (savedPolygons.features && savedPolygons.features.length > 0) {
+      const customGeoJSON = new L.GeoJSON(savedPolygons);
+
+      const leafletFG = reactFGref.leafletElement;
+
+      leafletFG.eachLayer((layer) => {
+        leafletFG.removeLayer(layer);
+      });
+
+      customGeoJSON.eachLayer((layer) => {
+        leafletFG.addLayer(layer);
+      });
+      // }
+      editableFG = reactFGref;
+    }
+  };
+
+  const onChange = () => {
+    if (!editableFG || !onChange) {
+      return;
+    }
+    const geojsonData = editableFG.leafletElement.toGeoJSON();
+
+    const newErrors = { ...formErrors };
+    delete newErrors.distributionAreas;
+    setFormErrors({ ...newErrors });
+    setSavedPolygons(geojsonData);
+  };
+
+  const onEdited = () => onChange();
+
+  const onCreated = () => onChange();
+
+  const onDeleted = () => onChange();
+
   const handleSubmit = async () => {
     const errors = {};
 
@@ -198,7 +264,9 @@ const ProfileEditModal = ({
     if (producerFormValues.profileOptions.distantPurchasing && (!producerFormValues.profileOptions.distantPurchasingConditions || !producerFormValues.profileOptions.distantPurchasingConditions.minSpend)) {
       errors.minSpend = 'If you wish to enable ordering from outside your distribution area, you must enter a minimum order value.';
     }
-
+    if (savedPolygons && (!savedPolygons.features || !savedPolygons.features.length)) {
+      errors.distributionAreas = 'You need to save at least one distribution area. If you have already drawn a shape, make sure you click \'Finish\' in order to proceed';
+    }
     if (!Object.keys(errors).length) {
       const imagesObj = {};
       if (bannerSaved) {
@@ -214,7 +282,7 @@ const ProfileEditModal = ({
         }
       }
       userUpdate({ ...userFormValues, ...imagesObj });
-      profileUpdate({ ...producerFormValues, ...userFormValues });
+      profileUpdate({ ...producerFormValues, ...userFormValues, distributionAreas: savedPolygons });
       setTimeout(() => {
         if (bannerSaved || avatarSaved) {
           window.location.reload();
@@ -331,13 +399,87 @@ const ProfileEditModal = ({
                 value={producerFormValues.intro || intro}
                 onChange={handleProducerInfoChange}
               />
+
+              <div
+                className={`${formErrors.location && 'error'} required field`}
+              >
+                <SuggestBlockStyle>
+                  <Geosuggest
+                    ref={geosuggestEl}
+                    label="Location"
+                    id="breweryLocation"
+                    initialValue={userFormValues.address || address}
+                    // eslint-disable-next-line no-undef
+                    location={
+                      // eslint-disable-next-line no-undef
+                      new google.maps.LatLng(location[0], location[1])
+                    }
+                    radius="1500"
+                    minlegnth="3"
+                    country="gb"
+                    onSuggestSelect={handleSuggestSelect}
+                    onBlur={() => geosuggestEl.current.selectSuggest()}
+                    required
+                    autoActivateFirstSuggest
+                  />
+                </SuggestBlockStyle>
+                {formErrors.location && (
+                  <div
+                    className="ui pointing above prompt label"
+                    role="alert"
+                    aria-atomic="true"
+                  >
+                    This field is required
+                  </div>
+                )}
+              </div>
+              {savedPolygons && (
+                <DistroMapStyle>
+                  <Map center={userFormValues.location || location} zoom={10} zoomControl={false}>
+                    <TileLayer
+                      url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+                    />
+                    <MapMarker location={userFormValues.location || location} />
+                    <FeatureGroup
+                      ref={(reactFGref) => {
+                        onFeatureGroupReady(reactFGref);
+                      }}
+                    >
+                      <EditControl
+                        position="topright"
+                        onEdited={onEdited}
+                        onCreated={onCreated}
+                        onDeleted={onDeleted}
+                        draw={{
+                          rectangle: false,
+                          circle: false,
+                          circlemarker: false,
+                          polyline: false,
+                          marker: false,
+                          polygon: {
+                            allowIntersection: false,
+                            drawError: {
+                              color: '#e1e100',
+                              message:
+                              "<strong>Oh snap!<strong> you can't draw that!",
+                            },
+                            shapeOptions: {
+                              color: '#009dd6',
+                            },
+                          },
+                        }}
+                      />
+                    </FeatureGroup>
+                  </Map>
+                </DistroMapStyle>
+              )}
               <Header as="h4">
                 Profile Modules
               </Header>
               <Form.Group>
                 <Form.Checkbox checked={producerFormValues.profileOptions.activeModules.includes('availability')} onClick={handleModuleToggle} toggle label="Availability" name="availability" />
                 <Form.Checkbox checked={producerFormValues.profileOptions.activeModules.includes('promotions')} onClick={handleModuleToggle} toggle label="Promotions" name="promotions" />
-                <Form.Checkbox checked={producerFormValues.profileOptions.activeModules.includes('blog')} onClick={handleModuleToggle} toggle label="Blog" name="blog" />
+                <Form.Checkbox checked={producerFormValues.profileOptions.activeModules.includes('blog')} onClick={handleModuleToggle} toggle label="News" name="blog" />
               </Form.Group>
               <Header as="h4">
                 Allow orders from beyond distribution area
@@ -348,7 +490,6 @@ const ProfileEditModal = ({
                 <Form.Group style={{ alignItems: 'center', height: '2em' }}>
                   <Form.Checkbox checked={producerFormValues.profileOptions.distantPurchasing} onClick={handleProfileOptionsToggle} toggle label="Allow" name="distantPurchasing" />
                   {producerFormValues.profileOptions.distantPurchasing && (
-
                     <NumberFormat
                       style={{ width: '50%', marginLeft: '1em' }}
                       thousandSeparator
@@ -373,6 +514,12 @@ const ProfileEditModal = ({
                 )}
               </div>
             </Form>
+            {formErrors.distributionAreas && (
+              <Message warning>
+                <Message.Header>Error</Message.Header>
+                <p>{formErrors && formErrors.distributionAreas}</p>
+              </Message>
+            )}
           </Modal.Description>
           <Modal className="image-resizer" open={imageResizeModalOpen} onClose={handleModalClose}>
             <Modal.Header>

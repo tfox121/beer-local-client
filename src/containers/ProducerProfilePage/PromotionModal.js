@@ -26,6 +26,7 @@ import saga from './saga';
 
 import { makeSelectProducerProfile, makeSelectUser } from './selectors';
 import { PACK_SIZES } from '../../utils/constants';
+import PromotionModalStyle from './PromotionModalStyle';
 
 const PromotionModal = ({
   producerProfile, userProfile, profileFetch, location,
@@ -101,7 +102,11 @@ const PromotionModal = ({
     },
   ];
 
-  const handleModalClose = () => setModalOpen(false);
+  const handleModalClose = () => {
+    setPromotionSelectedValues({});
+    setModalOpen(false);
+    setPromotionSaved(false);
+  };
 
   const handleChange = (e, { name, value }) => {
     setPromotionSelectedValues({ ...promotionSelectedValues, [name]: value });
@@ -128,7 +133,7 @@ const PromotionModal = ({
       </Modal.Header>
       <Modal.Content>
         {!promotionSaved ? (
-          <>
+          <PromotionModalStyle>
             <Dropdown
               placeholder="Condition"
               name="condition"
@@ -136,6 +141,8 @@ const PromotionModal = ({
               options={promotionOptions}
               onChange={handleChange}
               value={promotionSelectedValues.condition || undefined}
+              fluid
+              className="condition-dropdown"
             />
             <div>
 
@@ -152,6 +159,7 @@ const PromotionModal = ({
                     onValueChange={(values) => { handleChange(null, { name: 'minSpend', value: values.floatValue }); setConditionsComplete(true); }}
                     allowNegative={false}
                     value={promotionSelectedValues.minSpend || undefined}
+                    className="spend-input"
                   />
                 </>
               )}
@@ -159,11 +167,13 @@ const PromotionModal = ({
                 <>
                   If you buy
                   {' '}
-                  <Input name="multibuyQuantity" placeholder="Quantity" onChange={handleChange} value={promotionSelectedValues.multibuyQuantity || ''} />
+                  <Input name="multibuyQuantity" className="multibuy-quantity" placeholder="Quantity" onChange={handleChange} value={promotionSelectedValues.multibuyQuantity || ''} />
+                  {' '}
                   <Dropdown
                     placeholder="Type"
                     name="multibuyType"
                     selection
+                    inline
                     options={typeOptions}
                     onChange={handleChange}
                     value={promotionSelectedValues.multibuyType || undefined}
@@ -192,8 +202,6 @@ const PromotionModal = ({
               )}
             </div>
             <Divider />
-            You will get...
-            <Divider />
             <Dropdown
               placeholder="Discount type"
               name="discountType"
@@ -201,9 +209,15 @@ const PromotionModal = ({
               options={discountTypeOptions}
               onChange={handleChange}
               value={promotionSelectedValues.discountType || undefined}
+              fluid
+              className="discount-dropdown"
             />
+            <Divider />
+
             {promotionSelectedValues.discountType === 'moneyOff' && (
               <>
+                You will get
+                {' '}
                 <NumberFormat
                   thousandSeparator
                   decimalScale={2}
@@ -213,14 +227,16 @@ const PromotionModal = ({
                   onValueChange={(values) => { handleChange(null, { name: 'moneyOff', value: values.floatValue }); setDiscountsComplete(true); }}
                   allowNegative={false}
                   value={promotionSelectedValues.moneyOff || undefined}
-
+                  className="discount-value-input"
                 />
                 {' '}
-                off the total order
+                off the total order.
               </>
             )}
             {promotionSelectedValues.discountType === 'percentageOff' && (
               <>
+                You will get
+                {' '}
                 <NumberFormat
                   decimalScale={1}
                   fixedDecimalScale
@@ -229,14 +245,17 @@ const PromotionModal = ({
                   onValueChange={(values) => { handleChange(null, { name: 'percentageOff', value: values.floatValue }); setDiscountsComplete(true); }}
                   allowNegative={false}
                   value={promotionSelectedValues.percentageOff || undefined}
+                  className="discount-percentage-input"
                 />
                 {' '}
-                off the total order
+                off the total order.
               </>
             )}
             {promotionSelectedValues.discountType === 'freeItems' && (
               <>
-                <Input name="freeItemQuantity" placeholder="Quantity" onChange={handleChange} value={promotionSelectedValues.freeItemQuantity || ''} />
+                You will get
+                {' '}
+                <Input className="free-item-quantity" name="freeItemQuantity" placeholder="Quantity" onChange={handleChange} value={promotionSelectedValues.freeItemQuantity || ''} />
                 {' '}
                 free
                 {' '}
@@ -252,16 +271,18 @@ const PromotionModal = ({
                 )}
               </>
             )}
+            {conditionsComplete && discountsComplete && !promotionSaved && (
+              <Button primary floated="right" icon="check" basic size="tiny" onClick={() => setPromotionSaved(true)} />
+            )}
 
-          </>
+          </PromotionModalStyle>
         ) : (
-          promotionCopySelection(promotionSelectedValues, availableStock)
-        )}
-        {conditionsComplete && discountsComplete && !promotionSaved && (
-          <Button primary icon="check" onClick={() => setPromotionSaved(true)} />
-        )}
-        {promotionSaved && (
-          <Button primary icon="edit" onClick={() => setPromotionSaved(false)} />
+          <>
+            {promotionCopySelection(promotionSelectedValues, availableStock)}
+            {promotionSaved && (
+              <Button primary floated="right" icon="edit" basic size="tiny" onClick={() => setPromotionSaved(false)} />
+            )}
+          </>
         )}
 
       </Modal.Content>

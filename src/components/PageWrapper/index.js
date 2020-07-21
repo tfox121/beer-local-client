@@ -30,7 +30,7 @@ const PageWrapperStyle = styled(Container)`
       border-left: 1px solid rgb(230, 236, 240);
       border-right: 1px solid rgb(230, 236, 240);
       margin: 0;
-      padding-bottom: 28px;
+      /* padding-bottom: 28px; */
       padding-left: 2em;
       padding-right: 2em;
     }

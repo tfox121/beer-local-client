@@ -17,10 +17,6 @@ const BlogStyle = styled.div`
     rgba(255, 255, 255, 1) 100%
     );
   }
-
-  div.display-checkbox {
-    margin-top: 1em;
-  }
 `;
 
 export default BlogStyle;
