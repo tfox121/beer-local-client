@@ -17,7 +17,7 @@ const makeSelectFetchingUser = () => createSelector(
 
 const makeSelectUserFetchError = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.sessionError,
+  (globalState) => globalState.fetchUserError,
 );
 
 const makeSelectProducerFollowing = () => createSelector(

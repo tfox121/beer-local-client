@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /**
  *
  * StockModal
@@ -126,10 +127,15 @@ export function StockModal({
   const copyStockItems = async () => {
     const rows = Object.keys(selected);
     const filteredData = stockData.filter((row, index) => rows.includes(index.toString()));
-    const duplicateRows = filteredData.map((row) => ({
-      ...row,
-      id: shortid.generate(),
-    }));
+    const duplicateRows = filteredData.map((row) => {
+      const newRow = {
+        ...row,
+        id: shortid.generate(),
+      };
+      delete newRow._id;
+      return newRow;
+    });
+    console.log(duplicateRows);
     setStockData([...duplicateRows, ...stockData]);
   };
 

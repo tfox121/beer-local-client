@@ -26,6 +26,7 @@ function* fetchUser() {
         ...response.data.business, ...response.data.user,
       }));
     } else {
+      console.log('NO USER FOUND');
       // yield put(push('/create'));
     }
   } catch (err) {

@@ -44,7 +44,11 @@ const appReducer = (state = initialState, action) => produce(state, (draftState)
       draftState.fetchingUser = false;
       break;
     case FETCH_USER_ERROR:
-      draftState.fetchUserError = true;
+      if (action.error) {
+        draftState.fetchUserError = action.error;
+      } else {
+        draftState.fetchUserError = true;
+      }
       draftState.fetchingUser = false;
       break;
     case CLEAR_USER:

@@ -26,6 +26,7 @@ const HomePage = ({ userProfile, userFetch }) => {
   // if (!userProfile.sub) {
   //   userFetch();
   // }
+  console.log('HOME');
 
   return (
     <PageWrapper>

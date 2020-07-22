@@ -114,7 +114,7 @@ const PromotionModal = ({
 
   const handleSave = async () => {
     const privateRoute = await getPrivateRoute();
-    const response = await privateRoute.post('/producer/promotions', promotionSelectedValues);
+    const response = await privateRoute.post('/producer/promotion', promotionSelectedValues);
     setModalOpen(false);
     console.log(response.data);
   };

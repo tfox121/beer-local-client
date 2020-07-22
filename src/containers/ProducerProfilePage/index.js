@@ -28,6 +28,7 @@ import {
   Modal,
   Card,
   Icon,
+  Label,
 } from 'semantic-ui-react';
 import { Map, TileLayer } from 'react-leaflet';
 
@@ -129,7 +130,7 @@ export function ProducerProfilePage({
 
   const handleDeletePromo = async (id) => {
     const privateRoute = await getPrivateRoute();
-    const response = await privateRoute.delete(`/producer/promotions/${id}`);
+    const response = await privateRoute.delete(`/producer/promotion/${id}`);
     console.log(response);
   };
 
@@ -191,17 +192,9 @@ export function ProducerProfilePage({
                     <Card.Description>{intro}</Card.Description>
                   </Card.Content>
                   <Card.Content extra>
-                    <a href={website} target="_blank" rel="noopener noreferrer">
-                      {website}
-                    </a>
-                    {' '}
-                    //
-                    {' '}
-                    <a href={`mailto:${salesEmail}`} target="_blank" rel="noopener noreferrer">{salesEmail}</a>
-                    {' '}
-                    //
-                    {' '}
-                    {new PhoneNumber(salesContactNumber, 'GB').getNumber('national')}
+                    <Label basic color="blue" as="a" href={website} target="_blank" rel="noopener noreferrer" content={website} icon="globe" />
+                    <Label basic color="blue" as="a" href={`mailto:${salesEmail}`} target="_blank" rel="noopener noreferrer" content="email" icon="mail" />
+                    <Label basic content={new PhoneNumber(salesContactNumber, 'GB').getNumber('national')} icon="phone" />
                   </Card.Content>
                 </Card>
               </Grid.Column>

@@ -8,7 +8,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -19,6 +19,9 @@ import styled from 'styled-components';
 
 import { push } from 'connected-react-router';
 import {
+  Dimmer, Loader, Button, Segment, Header,
+} from 'semantic-ui-react';
+import {
   makeSelectUser,
   makeSelectFetchingUser,
   makeSelectUserFetchError,
@@ -26,6 +29,7 @@ import {
 } from './selectors';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
+import checkUserStatus from '../../utils/checkUserStatus';
 import HomePage from '../HomePage/Loadable';
 import CreateProfilePage from '../CreateProfilePage/Loadable';
 import ProducerProfilePage from '../ProducerProfilePage/Loadable';
@@ -41,6 +45,7 @@ import saga from './saga';
 
 import GlobalStyle from '../../global-styles';
 import { fetchUser, clearUser } from './actions';
+import RetailerDashboardPage from '../RetailerDashboardPage';
 
 const key = 'global';
 const AppWrapper = styled.div`
@@ -54,41 +59,66 @@ const AppWrapper = styled.div`
 `;
 
 const App = ({
-  userProfile, userFetch, userClear, pushRoute, location,
+  userProfile, userFetch, userClear, pushRoute, location, fetchingUser, userFetchError,
 }) => {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading, error } = useAuth0();
+
+  const userStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
+
+  console.log(userStatus);
 
   useEffect(() => {
-    console.log('AUTHENTICATED', isAuthenticated, isLoading);
-    if (isAuthenticated && !userProfile.businessName) {
+    if (userStatus.authenticated && !userStatus.registered) {
+      console.log('FECHING');
       userFetch();
     }
-    if (!isAuthenticated && !isLoading && userProfile.businessName) {
+    if (!userStatus.authenticated && !userStatus.loading && userStatus.registered) {
       console.log('CLEARING USER');
       userClear();
-      // pushRoute('/');
     }
     return () => {
-      if (!isAuthenticated && !isLoading && userProfile.businessName) {
+      if (!userStatus.authenticated && !userStatus.loading && userStatus.registered) {
         console.log('CLEARING USER');
         userClear();
-        // pushRoute('/');
       }
     };
   }, [userProfile, location.pathname, isAuthenticated, userFetch, userClear]);
+
+  if (userStatus.error) {
+    console.log('User fetch error', userStatus.error);
+    return (
+      <Dimmer active page>
+        <Segment padded="very">
+          <Header as="h2">There has been an error.</Header>
+          <Button as="a" href="/">Return to home</Button>
+        </Segment>
+      </Dimmer>
+    );
+  }
+
+  if (userStatus.loading) {
+    return (
+      <Dimmer active inverted page>
+        <Loader />
+      </Dimmer>
+    );
+  }
+
+  console.log('RENDER APP');
 
   return (
     <AppWrapper>
       <NavBar />
       <Switch>
         <Route exact path="/" component={HomePage} />
-        <ProtectedRoute exact path="/create" isEnabled={isAuthenticated && !userProfile.businessName} component={CreateProfilePage} />
+        <ProtectedRoute exact path="/create" isEnabled={userStatus.authenticated && !userStatus.registered} component={CreateProfilePage} />
         <Route exact path="/brewery/:id" component={ProducerProfilePage} />
-        <ProtectedRoute exact path="/sales/orders" isEnabled={userProfile.businessName} component={ProducerOrdersPage} />
-        <ProtectedRoute exact path="/breweries" isEnabled={userProfile.businessName} component={ProducerListPage} />
-        <ProtectedRoute exact path="/order/:id" isEnabled={userProfile.businessName} component={OrderPage} />
+        <ProtectedRoute exact path="/sales/orders" isEnabled={userStatus.registered} component={ProducerOrdersPage} />
+        <ProtectedRoute exact path="/breweries" isEnabled={userStatus.registered} component={ProducerListPage} />
+        <ProtectedRoute exact path="/order/:id" isEnabled={userStatus.registered} component={OrderPage} />
+        <ProtectedRoute exact path="/retailerdash" isEnabled={userProfile.role === 'retailer'} component={RetailerDashboardPage} />
         <Route component={NotFoundPage} />
       </Switch>
       <GlobalStyle />
@@ -102,12 +132,14 @@ App.propTypes = {
   userClear: PropTypes.func,
   location: PropTypes.object,
   pushRoute: PropTypes.func,
+  fetchingUser: PropTypes.bool,
+  userFetchError: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 };
 
 const mapStateToProps = createStructuredSelector({
   userProfile: makeSelectUser(),
-  loading: makeSelectFetchingUser(),
-  error: makeSelectUserFetchError(),
+  fetchingUser: makeSelectFetchingUser(),
+  userFetchError: makeSelectUserFetchError(),
   location: makeSelectLocation(),
 });
 
