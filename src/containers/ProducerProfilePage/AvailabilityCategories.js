@@ -19,6 +19,7 @@ import { makeSelectProducerProfile, makeSelectUser, makeSelectOrderSending } fro
 import OrderModalContent from '../../components/OrderModalContent';
 import { updateProfileOptions, sendOrder } from './actions';
 import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
+import calcOrderTotal from '../../utils/calcOrderTotal';
 
 const TableRows = ({
   rows, prepareRow, storedCategory, index, categories, handleCategoryChange, handleRemoveCategory, producerProfile, user,
@@ -327,7 +328,7 @@ const AvailibilityTable = ({
                       <Button
                         primary
                         content="Confirm"
-                        disabled={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location) && producerProfile.profileOptions.distantPurchasingConditions && data.reduce((acc, val) => { acc += (val.orderChange !== 'delete' && val.price * val.orderQuant); return acc; }, 0) < producerProfile.profileOptions.distantPurchasingConditions.minSpend}
+                        disabled={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location) && producerProfile.profileOptions.distantPurchasingConditions && calcOrderTotal(data) < producerProfile.profileOptions.distantPurchasingConditions.minSpend}
                         onClick={handleSendOrder}
                       />
                     </Modal.Actions>

@@ -19,6 +19,7 @@ import messages from './messages';
 import PageWrapper from '../../components/PageWrapper';
 import { makeSelectUser } from '../App/selectors';
 import { fetchUser } from '../App/actions';
+import RetailerDashboardPage from '../RetailerDashboardPage';
 
 const HomePage = ({ userProfile, userFetch }) => {
   const { isAuthenticated } = useAuth0();
@@ -28,28 +29,48 @@ const HomePage = ({ userProfile, userFetch }) => {
   // }
   console.log('HOME');
 
+  const homeDisplay = (authenticated, user) => {
+    if (authenticated && !user) {
+      return (
+        <PageWrapper>
+          <Segment basic className="primary wrapper">
+            <Header as="h1">
+              <FormattedMessage {...messages.header} />
+            </Header>
+            <Message>
+              <Message.Header>Create your profile</Message.Header>
+              <p>
+                Click
+                {' '}
+                <strong>
+                  <Link to="/create">here</Link>
+                </strong>
+                {' '}
+                to get started.
+              </p>
+            </Message>
+          </Segment>
+        </PageWrapper>
+      );
+    }
+    if (user && user.role === 'retailer') {
+      return <RetailerDashboardPage />;
+    }
+    return (
+      <PageWrapper>
+        <Segment basic className="primary wrapper">
+          <Header as="h1">
+            <FormattedMessage {...messages.header} />
+          </Header>
+        </Segment>
+      </PageWrapper>
+    );
+  };
+
   return (
-    <PageWrapper>
-      <Segment basic className="primary wrapper">
-        <Header as="h1">
-          <FormattedMessage {...messages.header} />
-        </Header>
-        {isAuthenticated && !userProfile && (
-          <Message>
-            <Message.Header>Create your profile</Message.Header>
-            <p>
-              Click
-              {' '}
-              <strong>
-                <Link to="/create">here</Link>
-              </strong>
-              {' '}
-              to get started.
-            </p>
-          </Message>
-        )}
-      </Segment>
-    </PageWrapper>
+    <>
+      {homeDisplay(isAuthenticated, userProfile)}
+    </>
   );
 };
 

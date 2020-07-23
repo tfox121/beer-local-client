@@ -45,7 +45,7 @@ import saga from './saga';
 
 import GlobalStyle from '../../global-styles';
 import { fetchUser, clearUser } from './actions';
-import RetailerDashboardPage from '../RetailerDashboardPage';
+import ProducerDashboardPage from '../ProducerDashboardPage';
 
 const key = 'global';
 const AppWrapper = styled.div`
@@ -118,7 +118,7 @@ const App = ({
         <ProtectedRoute exact path="/sales/orders" isEnabled={userStatus.registered} component={ProducerOrdersPage} />
         <ProtectedRoute exact path="/breweries" isEnabled={userStatus.registered} component={ProducerListPage} />
         <ProtectedRoute exact path="/order/:id" isEnabled={userStatus.registered} component={OrderPage} />
-        <ProtectedRoute exact path="/retailerdash" isEnabled={userProfile.role === 'retailer'} component={RetailerDashboardPage} />
+        <ProtectedRoute exact path="/producerdash" isEnabled={userProfile.role === 'producer'} component={ProducerDashboardPage} />
         <Route component={NotFoundPage} />
       </Switch>
       <GlobalStyle />

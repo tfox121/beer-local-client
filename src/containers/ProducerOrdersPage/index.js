@@ -62,8 +62,8 @@ const ProducerOrdersPage = ({
         <meta name="description" content="Your orders" />
       </Helmet>
       <PageWrapper>
-        <Segment basic padded="very" className="primary wrapper">
-          <Header as="h1">Order History:</Header>
+        <Segment basic className="primary wrapper">
+          <Header as="h1">Order History</Header>
           <Table unstackable basic="very">
             <Table.Header>
               <Table.Row>

@@ -10,6 +10,8 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router-dom';
+
+import calcOrderTotal from '../../utils/calcOrderTotal';
 import OrderModalContent from '../../components/OrderModalContent';
 import Can from '../../components/Can';
 import { editOrder } from './actions';
@@ -97,7 +99,7 @@ const OrderItem = ({
       trigger={(
         <Table.Row warning={userProfile.role === 'producer' ? orderData.producerNotification : orderData.retailerNotification} style={{ color: (order.status === 'Rejected' || order.status === 'Cancelled') && 'lightgray' }}>
           <Table.Cell>{`SO-${order.orderNumber.toString().padStart(6, '0')}`}</Table.Cell>
-          <Table.Cell>{moment(order.received).format('DD/MM/YYYY')}</Table.Cell>
+          <Table.Cell>{moment(order.createdAt).format('DD/MM/YYYY')}</Table.Cell>
           <Table.Cell>
             <Image style={{ marginLeft: '0.5em' }} src={ordersInfo.businesses[index].avatarSource || '/images/avatars/blank-avatar.webp'} alt="user avatar" avatar />
             {userProfile.role === 'retailer'
@@ -112,7 +114,7 @@ const OrderItem = ({
               fixedDecimalScale
               prefix="£"
               // eslint-disable-next-line no-param-reassign
-              value={order.items.reduce((acc, val) => { acc += (val.orderChange !== 'delete' && val.price * val.orderQuant); return acc; }, 0)}
+              value={calcOrderTotal(order.items)}
             />
           </Table.Cell>
           <Table.Cell style={{ fontWeight: order.status === 'Confirmed' && 'bold' }}>{order.status}</Table.Cell>
