@@ -174,11 +174,12 @@ const ProducerForm = ({
                 value={formValues.intro}
                 name="intro"
                 onChange={handleChange}
-                maxlength={INTRO_CHARACTER_LIMIT}
+                maxLength={INTRO_CHARACTER_LIMIT}
               />
               <p style={{ textAlign: 'right', fontSize: '10px' }}>
                 {formValues.intro.length}
-                /350
+                /
+                {INTRO_CHARACTER_LIMIT}
               </p>
               <Form.Checkbox
                 label="I agree to the Terms and Conditions"

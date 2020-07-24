@@ -10,27 +10,28 @@ import {
 } from './actions';
 import { makeSelectUserProfile } from './selectors';
 import { getPrivateRoute } from '../../utils/api';
+import { fetchUser } from '../App/actions';
 // import { getOwnAvatar, getOwnBanner } from '../../utils/getImages';
 
-function* saveProfile() {
+function* saveProfile({ profileData }) {
   try {
     // Call our request helper (see 'utils/request')
-    const newProfileData = yield select(makeSelectUserProfile());
     const privateRoute = yield call(getPrivateRoute);
 
-    console.log(newProfileData);
+    console.log(profileData);
 
-    const saveUserData = (formValues, type) => privateRoute.post(
+    const saveUserData = (formValues) => privateRoute.post(
       '/user', formValues,
     );
 
-    const response = yield call(saveUserData, newProfileData, newProfileData.type);
+    const response = yield call(saveUserData, profileData);
 
     if (response.data.user && response.data.business) {
       yield put(profileSaved({
         ...response.data.business, ...response.data.user,
       }));
-      if (newProfileData.type === 'producer') {
+      yield call(fetchUser);
+      if (profileData.type === 'producer') {
         yield put(push(`/brewery/${response.data.user.businessId}`));
       } else {
         yield put(push('/'));

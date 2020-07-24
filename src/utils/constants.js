@@ -27,6 +27,7 @@ export const PACK_SIZES = {
 };
 
 export const BLOG_ITEMS_PER_PAGE = 1;
+export const DELIVERY_INSTRUCTION_CHARACTER_LIMIT = 200;
 export const INTRO_CHARACTER_LIMIT = 350;
 export const BLOG_CHARACTER_LIMIT = 1500;
 

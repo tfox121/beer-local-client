@@ -10,7 +10,7 @@ import {
   SAVE_PROFILE_ERROR,
 } from './constants';
 
-export const saveProfile = profileData => ({
+export const saveProfile = (profileData) => ({
   type: SAVE_PROFILE,
   profileData,
 });

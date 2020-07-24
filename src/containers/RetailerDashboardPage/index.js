@@ -227,7 +227,7 @@ const RetailerDashboardPage = ({
     <>
       <Helmet>
         <title>beerLocal - Updates</title>
-        <meta name="description" content="Retailer dashboard" />
+        <meta name="description" content="Retailer news feed" />
       </Helmet>
       <PageWrapper>
         <Segment basic className="primary wrapper">

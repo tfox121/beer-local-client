@@ -35,8 +35,8 @@ import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
 
 export function CreateProfilePage({ profileSave, createProfilePage }) {
-  useInjectReducer({ key: 'global', reducer });
-  useInjectSaga({ key: 'global', saga });
+  useInjectReducer({ key: 'createProfilePage', reducer });
+  useInjectSaga({ key: 'createProfilePage', saga });
 
   const { user } = useAuth0();
 
@@ -63,8 +63,10 @@ export function CreateProfilePage({ profileSave, createProfilePage }) {
   };
 
   const retailerFormTemplate = {
+    primaryContactName: '',
     purchasingEmail: '',
     purchasingContactNumber: '',
+    deliveryInstruction: '',
     contactOptions: {},
   };
 
@@ -184,6 +186,7 @@ export function CreateProfilePage({ profileSave, createProfilePage }) {
           avatarSource = getImageUrl(user.sub, 'avatar');
         }
       }
+      console.log('SAVING', { ...formValues, avatarSource });
       profileSave({ ...formValues, avatarSource });
     } else {
       setFormErrors(errors);

@@ -11,6 +11,7 @@ import MapMarker from '../../components/MapMarker';
 import MarkerMapStyle from './MarkerMapStyle';
 import SuggestBlockStyle from './SuggestBlockStyle';
 import ImageSelect from './ImageSelect';
+import { DELIVERY_INSTRUCTION_CHARACTER_LIMIT } from '../../utils/constants';
 
 const RetailerForm = ({
   formValues,
@@ -168,6 +169,19 @@ const RetailerForm = ({
                 )}
               </div>
               <br />
+              <Form.TextArea
+                label="Delivery Instruction"
+                placeholder="Any delivery restrictions or instructions..."
+                value={formValues.deliveryInstruction}
+                name="deliveryInstruction"
+                onChange={handleChange}
+                maxLength={DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
+              />
+              <p style={{ textAlign: 'right', fontSize: '10px' }}>
+                {formValues.deliveryInstruction.length}
+                /
+                {DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
+              </p>
               <Form.Checkbox
                 label="I agree to the Terms and Conditions"
                 name="terms"

@@ -71,7 +71,7 @@ const App = ({
 
   useEffect(() => {
     if (userStatus.authenticated && !userStatus.registered) {
-      console.log('FECHING');
+      console.log('FETCHING');
       userFetch();
     }
     if (!userStatus.authenticated && !userStatus.loading && userStatus.registered) {
