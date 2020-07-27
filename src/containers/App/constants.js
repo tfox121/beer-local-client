@@ -19,3 +19,6 @@ export const CLEAR_USER = 'beerlocal/App/CLEAR_USER';
 export const FOLLOW_PRODUCER = 'beerlocal/App/FOLLOW_PRODUCER';
 export const FOLLOW_PRODUCER_SUCCESS = 'beerlocal/App/FOLLOW_PRODUCER_SUCCESS';
 export const FOLLOW_PRODUCER_ERROR = 'beerlocal/App/FOLLOW_PRODUCER_ERROR';
+export const SAVE_USER = 'beerlocal/App/SAVE_USER';
+export const SAVE_USER_SUCCESS = 'beerlocal/App/SAVE_USER_SUCCESS';
+export const SAVE_USER_ERROR = 'beerlocal/App/SAVE_USER_ERROR';

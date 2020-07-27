@@ -13,7 +13,7 @@ import shortid from 'shortid';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import {
-  Modal, Button, Confirm, Loader, Icon,
+  Modal, Button, Confirm, Loader, Icon, Message,
 } from 'semantic-ui-react';
 import { withRouter } from 'react-router';
 
@@ -46,7 +46,7 @@ export function StockModal({
     style: '',
     category: '',
     abv: 0.0,
-    packSize: '',
+    packSize: null,
     price: 0.0,
     availability: '',
     display: 'Hide',
@@ -59,6 +59,7 @@ export function StockModal({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [incompleteStockItem, setIncompleteStockItem] = useState(false);
 
   useEffect(() => {
     if (fetchingProfile && !loadingData) {
@@ -140,18 +141,36 @@ export function StockModal({
   };
 
   const handleStockSave = async () => {
-    stockUpdate(stockData);
-    setStockEditPending(false);
-    while (updatingStock) {
-      console.log('Updating stock');
+    let complete = true;
+
+    stockData.forEach((stockItem) => {
+      const {
+        name, abv, packSize, price,
+      } = stockItem;
+      if (!name || !abv || !packSize || !price) {
+        complete = false;
+      }
+    });
+    if (complete) {
+      if (incompleteStockItem) {
+        setIncompleteStockItem(false);
+      }
+      stockUpdate(stockData);
+      setStockEditPending(false);
+      while (updatingStock) {
+        console.log('Updating stock');
+      }
+      setModalOpen(false);
+    } else if (!incompleteStockItem) {
+      setIncompleteStockItem(true);
     }
-    setModalOpen(false);
   };
 
   const handleModalClose = () => {
     if (stockEditPending) {
       return setConfirmOpen(true);
     }
+    setIncompleteStockItem(false);
     return setModalOpen(false);
   };
 
@@ -162,6 +181,7 @@ export function StockModal({
   const handleCloseConfirm = () => {
     setConfirmOpen(false);
     setModalOpen(false);
+    setIncompleteStockItem(false);
     setStockEditPending(false);
     if (stock && stock.length) {
       return setStockData(stock);
@@ -197,8 +217,16 @@ export function StockModal({
               setStockEditPending={setStockEditPending}
             />
           </Modal.Content>
+          <Message style={{ width: '97%', margin: '1.5%' }} icon error compact hidden={!incompleteStockItem}>
+            <Icon name="warning sign" />
+            <Message.Content>
+              <Message.Header>A stock item is missing required fields.</Message.Header>
+              <p>Please complete them or delete the item.</p>
+            </Message.Content>
+          </Message>
         </StockModalStyle>
         <Modal.Actions>
+
           <Button onClick={handleModalClose} content="Close" />
           <Button
             loading={updatingStock}

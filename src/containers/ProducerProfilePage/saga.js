@@ -1,6 +1,7 @@
 import {
   call, debounce, put, spawn, takeLatest,
 } from 'redux-saga/effects';
+import { push } from 'connected-react-router';
 import {
   FETCH_PROFILE, UPDATE_PROFILE, UPDATE_PROFILE_OPTIONS, SEND_ORDER, BLOG_POST, BLOG_EDIT, UPDATE_STOCK,
 } from './constants';
@@ -88,6 +89,8 @@ function* sendOrder({ orderInfo }) {
 
     if (response.data) {
       yield put(orderSent());
+      // eslint-disable-next-line no-underscore-dangle
+      yield put(push(`/order/${response.data.order._id}`));
     }
   } catch (err) {
     console.log('ERROR', err);
@@ -174,7 +177,7 @@ function* updateProfileOptionsSaga() {
 }
 
 function* sendOrderSaga() {
-  yield takeLatest(SEND_ORDER, sendOrder);
+  yield debounce(2000, SEND_ORDER, sendOrder);
 }
 
 function* followProducerSaga() {

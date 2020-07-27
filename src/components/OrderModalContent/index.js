@@ -15,7 +15,7 @@ import Select from 'react-select';
 import OrderLine from '../OrderLine';
 
 function OrderModalContent({
-  editingOrder, businessName, orderItems, distancePurchase, distantPurchasingConditions, availableStock, handleAddItem, handleDeleteItem, handleDecreaseQuant, handleIncreaseQuant, type,
+  editingOrder, businessName, orderItems, distancePurchase, deliveryInstruction, distantPurchasingConditions, distantPurchasingMinimumMet, availableStock, handleAddItem, handleDeleteItem, handleDecreaseQuant, handleIncreaseQuant, type,
 }) {
   const [newItem, setNewItem] = useState({});
   const [addingItem, setAddingItem] = useState(false);
@@ -98,13 +98,21 @@ function OrderModalContent({
           </Table.Row>
         </Table.Footer>
       </Table>
-      {distancePurchase && distantPurchasingConditions.minSpend && (
+      {distancePurchase && !distantPurchasingMinimumMet && (
         <Message warning>
           <Message.Header>You are outside this brewery&apos;s distribution area</Message.Header>
           <p>
             To process your order, you must spent at least £
             {Number(distantPurchasingConditions.minSpend).toFixed(2)}
             .
+          </p>
+        </Message>
+      )}
+      {deliveryInstruction && (
+        <Message info>
+          <Message.Header>The following delivery instructions will be passed along with your order:</Message.Header>
+          <p>
+            {deliveryInstruction}
           </p>
         </Message>
       )}
@@ -117,6 +125,15 @@ OrderModalContent.propTypes = {
   businessName: PropTypes.string,
   orderItems: PropTypes.array,
   type: PropTypes.string,
+  distantPurchasingConditions: PropTypes.object,
+  distancePurchase: PropTypes.bool,
+  deliveryInstruction: PropTypes.string,
+  distantPurchasingMinimumMet: PropTypes.bool,
+  availableStock: PropTypes.array,
+  handleAddItem: PropTypes.func,
+  handleDeleteItem: PropTypes.func,
+  handleDecreaseQuant: PropTypes.func,
+  handleIncreaseQuant: PropTypes.func,
 };
 
 export default OrderModalContent;

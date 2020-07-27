@@ -11,6 +11,9 @@ import {
   UPDATE_USER,
   UPDATE_USER_SUCCESS,
   UPDATE_USER_ERROR,
+  SAVE_USER,
+  SAVE_USER_SUCCESS,
+  SAVE_USER_ERROR,
   CLEAR_USER,
   FOLLOW_PRODUCER,
   FOLLOW_PRODUCER_SUCCESS,
@@ -21,25 +24,34 @@ export const fetchUser = () => ({
   type: FETCH_USER,
 });
 
-export function userFetched(user) {
-  return {
-    type: FETCH_USER_SUCCESS,
-    user,
-  };
-}
+export const userFetched = (user) => ({
+  type: FETCH_USER_SUCCESS,
+  user,
+});
 
-export function userFetchError(error) {
-  return {
-    type: FETCH_USER_ERROR,
-    error,
-  };
-}
+export const userFetchError = (error) => ({
+  type: FETCH_USER_ERROR,
+  error,
+});
 
-export function clearUser() {
-  return {
-    type: CLEAR_USER,
-  };
-}
+export const saveUser = (profileData) => ({
+  type: SAVE_USER,
+  profileData,
+});
+
+export const userSaved = (profile) => ({
+  type: SAVE_USER_SUCCESS,
+  profile,
+});
+
+export const userSaveError = (error) => ({
+  type: SAVE_USER_ERROR,
+  error,
+});
+
+export const clearUser = () => ({
+  type: CLEAR_USER,
+});
 
 export const updateUser = (updateObj, pathname) => ({
   type: UPDATE_USER,
@@ -47,19 +59,15 @@ export const updateUser = (updateObj, pathname) => ({
   pathname,
 });
 
-export function userUpdated(user) {
-  return {
-    type: UPDATE_USER_SUCCESS,
-    user,
-  };
-}
+export const userUpdated = (user) => ({
+  type: UPDATE_USER_SUCCESS,
+  user,
+});
 
-export function userUpdateError(error) {
-  return {
-    type: UPDATE_USER_ERROR,
-    error,
-  };
-}
+export const userUpdateError = (error) => ({
+  type: UPDATE_USER_ERROR,
+  error,
+});
 
 export const followProducer = (producerSub) => ({
   type: FOLLOW_PRODUCER,

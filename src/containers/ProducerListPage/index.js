@@ -11,6 +11,7 @@ import { createStructuredSelector } from 'reselect';
 import { Map, TileLayer } from 'react-leaflet';
 import { Link } from 'react-router-dom';
 
+import { Helmet } from 'react-helmet';
 import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
@@ -24,6 +25,7 @@ import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
 import ProducerListPageStyle from './ProducerListPageStyle';
 import { makeSelectUser } from '../App/selectors';
+import ProducerListItem from './ProducerListItem';
 
 const key = 'ProducerListPage';
 
@@ -92,47 +94,37 @@ const ProducerListPage = ({
   ];
 
   return (
-    <PageWrapper>
-      <ProducerListPageStyle>
-        <Segment basic className="primary wrapper">
-          <Grid width={16}>
-            <Grid.Column width={6}>
-              <Header as="h1" floated="left">Breweries</Header>
-            </Grid.Column>
-            <Grid.Column width={10} textAlign="right">
-              <Dropdown value={filter} onChange={handleChange} placeholder="Filter" multiple selection options={filterOptions} />
-              {/* <Checkbox label="In my area" toggle checked={areaFilterToggle} onClick={() => setareaFilterToggle(!areaFilterToggle)} />
+    <>
+      <Helmet>
+        <title>beerLocal - Breweries</title>
+        <meta name="description" content="A list of breweries" />
+      </Helmet>
+      <PageWrapper>
+        <ProducerListPageStyle>
+          <Segment basic className="primary wrapper">
+            <Grid width={16}>
+              <Grid.Column width={6}>
+                <Header as="h1" floated="left">Breweries</Header>
+              </Grid.Column>
+              <Grid.Column width={10} textAlign="right">
+                <Dropdown value={filter} onChange={handleChange} placeholder="Filter" multiple selection options={filterOptions} />
+                {/* <Checkbox label="In my area" toggle checked={areaFilterToggle} onClick={() => setareaFilterToggle(!areaFilterToggle)} />
               {' '}
               <Checkbox label="Followed" toggle checked={followedFilterToggle} onClick={() => setfollowedFilterToggle(!followedFilterToggle)} /> */}
-            </Grid.Column>
-          </Grid>
-          <Table basic unstackable>
-            <Table.Body>
-              {producers && filterCombine(producers).map((producer) => (
-              // eslint-disable-next-line no-underscore-dangle
-                <Table.Row key={producer._id}>
-                  <Table.Cell width={5}><Image className="image-link" onClick={() => handleClick(producer.businessId)} src={producer.avatarSource || '/images/avatars/blank-avatar.webp'} size="small" bordered centered circular /></Table.Cell>
-                  <Table.Cell width={6}>
-                    <Link to={`/brewery/${producer.businessId}`}><h2>{producer.businessName}</h2></Link>
-                    <p>{producer.intro}</p>
-                  </Table.Cell>
-                  <Table.Cell width={5}>
-                    <Map center={producer.location} zoom={6} zoomControl={false}>
-                      <TileLayer
-                        url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
-                      />
-                      <DistributionAreaDisplay distributionAreas={producer.distributionAreas} />
-                      <MapMarker location={producer.location} />
-                      <MapMarker type="user" location={user.location} />
-                    </Map>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
-        </Segment>
-      </ProducerListPageStyle>
-    </PageWrapper>
+              </Grid.Column>
+            </Grid>
+            <Table basic unstackable>
+              <Table.Body>
+                {producers && filterCombine(producers).map((producer) => (
+                  // eslint-disable-next-line no-underscore-dangle
+                  <ProducerListItem user={user} producer={producer} />
+                ))}
+              </Table.Body>
+            </Table>
+          </Segment>
+        </ProducerListPageStyle>
+      </PageWrapper>
+    </>
   );
 };
 

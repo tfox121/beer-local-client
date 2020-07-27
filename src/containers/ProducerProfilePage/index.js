@@ -122,10 +122,7 @@ export function ProducerProfilePage({
   TimeAgo.addLocale(en);
 
   const handleFollowClick = async () => {
-    // const privateRoute = await getPrivateRoute();
-    // await privateRoute.patch('/user/follow', { follow: producerProfile.sub });
     producerFollow(producerProfile.sub);
-    // setProducerFollowed(!producerFollowed);
   };
 
   const handleDeletePromo = async (id) => {
@@ -175,7 +172,7 @@ export function ProducerProfilePage({
                     </Modal>
                   )}
                   {(user && user.role === 'retailer') && (
-                    <Button loading={producerFollowing} positive={!followedProducers.map((producer) => producer.sub).includes(sub)} icon={followedProducers.map((producer) => producer.sub).includes(sub) ? 'check' : 'plus'} content={producerFollowed ? 'Following' : 'Follow'} onClick={handleFollowClick} />
+                    <Button loading={producerFollowing} positive={followedProducers.map((producer) => producer.sub).includes(sub)} icon={followedProducers.map((producer) => producer.sub).includes(sub) ? 'check' : 'plus'} content={producerFollowed ? 'Following' : 'Follow'} onClick={handleFollowClick} />
                   )}
                 </Grid.Column>
               </Grid.Row>

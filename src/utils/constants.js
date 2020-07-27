@@ -27,9 +27,11 @@ export const PACK_SIZES = {
 };
 
 export const BLOG_ITEMS_PER_PAGE = 1;
-export const DELIVERY_INSTRUCTION_CHARACTER_LIMIT = 200;
-export const INTRO_CHARACTER_LIMIT = 350;
+export const DELIVERY_INSTRUCTION_CHARACTER_LIMIT = 300;
+export const INTRO_CHARACTER_LIMIT = 600;
 export const BLOG_CHARACTER_LIMIT = 1500;
+export const ORDER_MESSAGE_CHARACTER_LIMIT = 450;
+export const PRODUCT_DESCRIPTION_CHARACTER_LIMIT = 600;
 
 export const NOTIFICATION_TYPES = {
   newOrder: 'new_order',

@@ -32,13 +32,21 @@ const ProducerDashboardStyle = styled.div`
 
   .sales-summary {
     .ui.dividing.header {
+      margin-top: 0.75em;
       margin-bottom: 10px;
     }
   }
 
   .sales-averages {
     .ui.header {
+      margin-top: 0;
       margin-bottom: 5px;
+    }
+    .ui.header.top-level {
+      margin-top: 1.5em;
+    }
+    .ui.header.top-level:first-child {
+      margin-top: 0;
     }
   }
 `;

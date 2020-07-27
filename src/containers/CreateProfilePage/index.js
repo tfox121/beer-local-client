@@ -16,13 +16,9 @@ import {
 import PhoneNumber from 'awesome-phonenumber';
 import { useAuth0 } from '@auth0/auth0-react';
 
-import { useInjectSaga } from '../../utils/injectSaga';
-import { useInjectReducer } from '../../utils/injectReducer';
-import makeSelectCreateProfilePage from './selectors';
-import reducer from './reducer';
-import saga from './saga';
+import { Helmet } from 'react-helmet';
 // import messages from './messages';
-import { saveProfile } from './actions';
+import { saveUser } from '../App/actions';
 
 import CreateProfileNav from './CreateProfileNav';
 import BusinessTypeSelection from './BusinessTypeSelection';
@@ -33,18 +29,18 @@ import CommsOptionsForm from './CommsOptionsForm';
 import PageWrapper from '../../components/PageWrapper';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
+import { makeSelectSavingUser } from '../App/selectors';
 
-export function CreateProfilePage({ profileSave, createProfilePage }) {
-  useInjectReducer({ key: 'createProfilePage', reducer });
-  useInjectSaga({ key: 'createProfilePage', saga });
+export function CreateProfilePage({ userSave, savingUser }) {
+  // useInjectReducer({ key: 'createProfilePage', reducer });
+  // useInjectSaga({ key: 'createProfilePage', saga });
 
   const { user } = useAuth0();
-
-  const { savingUser } = createProfilePage;
 
   const formTemplate = {
     type: '',
     businessName: '',
+    primaryContactName: '',
     location: {},
     address: '',
     avatar: false,
@@ -63,7 +59,6 @@ export function CreateProfilePage({ profileSave, createProfilePage }) {
   };
 
   const retailerFormTemplate = {
-    primaryContactName: '',
     purchasingEmail: '',
     purchasingContactNumber: '',
     deliveryInstruction: '',
@@ -187,85 +182,91 @@ export function CreateProfilePage({ profileSave, createProfilePage }) {
         }
       }
       console.log('SAVING', { ...formValues, avatarSource });
-      profileSave({ ...formValues, avatarSource });
+      userSave({ ...formValues, avatarSource });
     } else {
       setFormErrors(errors);
     }
   };
 
   return (
-    <PageWrapper>
-      <Segment basic textAlign="center" className="primary wrapper">
-        <Header as="h1">Complete your profile</Header>
-        <BusinessTypeSelection
-          profileStage={profileStage}
-          setProfileStage={setProfileStage}
-          formValues={formValues}
-          setFormValues={setFormValues}
-        />
-        <ProducerForm
-          formValues={formValues}
-          setFormValues={setFormValues}
-          formErrors={formErrors}
-          setFormErrors={setFormErrors}
-          profileStage={profileStage}
-          mapCentre={mapCentre}
-          setMapCentre={setMapCentre}
-          avatarSaved={avatarSaved}
-          setAvatarSaved={setAvatarSaved}
-        />
-        <SelectDistroAreasForm
-          formValues={formValues}
-          setFormValues={setFormValues}
-          profileStage={profileStage}
-          mapCentre={mapCentre}
-          formErrors={formErrors}
-          setFormErrors={setFormErrors}
-        />
-        <RetailerForm
-          formValues={formValues}
-          setFormValues={setFormValues}
-          formErrors={formErrors}
-          setFormErrors={setFormErrors}
-          profileStage={profileStage}
-          mapCentre={mapCentre}
-          setMapCentre={setMapCentre}
-          avatarSaved={avatarSaved}
-          setAvatarSaved={setAvatarSaved}
-        />
-        <CommsOptionsForm
-          formValues={formValues}
-          setFormValues={setFormValues}
-          profileStage={profileStage}
-        />
-        <CreateProfileNav
-          backClickHandler={backClickHandler}
-          forwardClickHandler={forwardClickHandler}
-          profileStage={profileStage}
-          handleSubmit={handleSubmit}
-        />
-      </Segment>
-      {savingUser && (
-        <Dimmer inverted active page>
-          <Loader inverted />
-        </Dimmer>
-      )}
-    </PageWrapper>
+    <>
+      <Helmet>
+        <title>beerLocal - Create your profile</title>
+        <meta name="description" content="Profile creation form" />
+      </Helmet>
+      <PageWrapper>
+        <Segment basic textAlign="center" className="primary wrapper">
+          <Header as="h1">Complete your profile</Header>
+          <BusinessTypeSelection
+            profileStage={profileStage}
+            setProfileStage={setProfileStage}
+            formValues={formValues}
+            setFormValues={setFormValues}
+          />
+          <ProducerForm
+            formValues={formValues}
+            setFormValues={setFormValues}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
+            profileStage={profileStage}
+            mapCentre={mapCentre}
+            setMapCentre={setMapCentre}
+            avatarSaved={avatarSaved}
+            setAvatarSaved={setAvatarSaved}
+          />
+          <SelectDistroAreasForm
+            formValues={formValues}
+            setFormValues={setFormValues}
+            profileStage={profileStage}
+            mapCentre={mapCentre}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
+          />
+          <RetailerForm
+            formValues={formValues}
+            setFormValues={setFormValues}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
+            profileStage={profileStage}
+            mapCentre={mapCentre}
+            setMapCentre={setMapCentre}
+            avatarSaved={avatarSaved}
+            setAvatarSaved={setAvatarSaved}
+          />
+          <CommsOptionsForm
+            formValues={formValues}
+            setFormValues={setFormValues}
+            profileStage={profileStage}
+          />
+          <CreateProfileNav
+            backClickHandler={backClickHandler}
+            forwardClickHandler={forwardClickHandler}
+            profileStage={profileStage}
+            handleSubmit={handleSubmit}
+          />
+        </Segment>
+        {savingUser && (
+          <Dimmer inverted active page>
+            <Loader inverted />
+          </Dimmer>
+        )}
+      </PageWrapper>
+    </>
   );
 }
 
 CreateProfilePage.propTypes = {
-  profileSave: PropTypes.func,
-  createProfilePage: PropTypes.object,
+  userSave: PropTypes.func,
+  savingUser: PropTypes.bool,
 };
 
 const mapStateToProps = createStructuredSelector({
-  createProfilePage: makeSelectCreateProfilePage(),
+  savingUser: makeSelectSavingUser(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    profileSave: (profileData) => dispatch(saveProfile(profileData)),
+    userSave: (profileData) => dispatch(saveUser(profileData)),
   };
 }
 

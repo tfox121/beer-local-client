@@ -71,7 +71,7 @@ const ProfileEditModal = ({
   };
 
   const {
-    businessName, website, salesEmail, salesContactNumber, address, location, distributionAreas, intro, profileOptions, bannerSource, avatarSource,
+    businessName, website, primaryContactName, salesEmail, salesContactNumber, address, location, distributionAreas, intro, profileOptions, bannerSource, avatarSource,
   } = user;
 
   const handleUserInfoChange = (e, { name, value }) => {
@@ -352,6 +352,7 @@ const ProfileEditModal = ({
                 label="Brewery name"
                 name="businessName"
                 value={userFormValues.businessName || businessName}
+                required
                 onChange={handleUserInfoChange}
                 error={
                   formErrors.businessName && {
@@ -361,9 +362,23 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
+                label="Sales contact name"
+                name="primaryContactName"
+                value={userFormValues.primaryContactName || primaryContactName}
+                required
+                onChange={handleUserInfoChange}
+                error={
+                  formErrors.primaryContactName && {
+                    content: formErrors.primaryContactName,
+                    pointing: 'above',
+                  }
+                }
+              />
+              <Form.Input
                 label="Sales email address"
                 name="salesEmail"
                 value={producerFormValues.salesEmail || salesEmail}
+                required
                 type="email"
                 onChange={handleProducerInfoChange}
                 error={

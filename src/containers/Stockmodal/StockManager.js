@@ -133,7 +133,7 @@ const EditableCell = ({
       <Select
         options={packSizeArr}
         onChange={onSelectChange}
-        value={packSizeArr.filter((option) => option.value === value)[0]}
+        value={packSizeArr.filter((option) => option.value === value)[0] || ''}
         placeholder="Select size"
         menuPortalTarget={document.body}
         styles={customStyles}

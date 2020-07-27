@@ -102,6 +102,19 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
+                label="Sales contact name"
+                name="primaryContactName"
+                value={formValues.primaryContactName}
+                required
+                onChange={handleChange}
+                error={
+                  formErrors.primaryContactName && {
+                    content: formErrors.primaryContactName,
+                    pointing: 'above',
+                  }
+                }
+              />
+              <Form.Input
                 label="Sales email address"
                 name="salesEmail"
                 type="email"
@@ -143,7 +156,6 @@ const ProducerForm = ({
                     ref={geosuggestEl}
                     label="Location"
                     id="breweryLocation"
-                    // eslint-disable-next-line no-undef
                     location={
                       // eslint-disable-next-line no-undef
                       new google.maps.LatLng(mapCentre[0], mapCentre[1])
@@ -153,8 +165,8 @@ const ProducerForm = ({
                     country="gb"
                     onSuggestSelect={handleSuggestSelect}
                     onBlur={() => geosuggestEl.current.selectSuggest()}
-                    required
                     autoActivateFirstSuggest
+                    required
                   />
                 </SuggestBlockStyle>
                 {formErrors.location && (
@@ -176,11 +188,13 @@ const ProducerForm = ({
                 onChange={handleChange}
                 maxLength={INTRO_CHARACTER_LIMIT}
               />
-              <p style={{ textAlign: 'right', fontSize: '10px' }}>
-                {formValues.intro.length}
-                /
-                {INTRO_CHARACTER_LIMIT}
-              </p>
+              {!!formValues.intro.length && (
+                <p style={{ textAlign: 'right', fontSize: '10px' }}>
+                  {formValues.intro.length}
+                  /
+                  {INTRO_CHARACTER_LIMIT}
+                </p>
+              )}
               <Form.Checkbox
                 label="I agree to the Terms and Conditions"
                 name="terms"

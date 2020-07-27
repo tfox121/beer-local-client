@@ -20,6 +20,7 @@ import PageWrapper from '../../components/PageWrapper';
 import { makeSelectUser } from '../App/selectors';
 import { fetchUser } from '../App/actions';
 import RetailerDashboardPage from '../RetailerDashboardPage';
+import ProducerDashboardPage from '../ProducerDashboardPage';
 
 const HomePage = ({ userProfile, userFetch }) => {
   const { isAuthenticated } = useAuth0();
@@ -55,6 +56,9 @@ const HomePage = ({ userProfile, userFetch }) => {
     }
     if (user && user.role === 'retailer') {
       return <RetailerDashboardPage />;
+    }
+    if (user && user.role === 'producer') {
+      return <ProducerDashboardPage />;
     }
     return (
       <PageWrapper>

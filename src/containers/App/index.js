@@ -70,21 +70,30 @@ const App = ({
   console.log(userStatus);
 
   useEffect(() => {
-    if (userStatus.authenticated && !userStatus.registered) {
+    const checkStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
+    if (checkStatus.authenticated && !userStatus.registered && !userStatus.notFound) {
       console.log('FETCHING');
       userFetch();
     }
-    if (!userStatus.authenticated && !userStatus.loading && userStatus.registered) {
+    if (!checkStatus.authenticated && !checkStatus.loading && checkStatus.registered) {
       console.log('CLEARING USER');
       userClear();
     }
     return () => {
-      if (!userStatus.authenticated && !userStatus.loading && userStatus.registered) {
+      if (!checkStatus.authenticated && !checkStatus.loading && checkStatus.registered) {
         console.log('CLEARING USER');
         userClear();
       }
     };
-  }, [userProfile, location.pathname, isAuthenticated, userFetch, userClear]);
+  }, [userProfile, isAuthenticated, userFetch, userClear, isLoading, fetchingUser]);
+
+  useEffect(() => {
+    const checkStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
+    if (checkStatus.authenticated && userStatus.registered) {
+      console.log('FETCHING');
+      userFetch();
+    }
+  }, [location.pathname]);
 
   if (userStatus.error) {
     console.log('User fetch error', userStatus.error);
@@ -118,7 +127,6 @@ const App = ({
         <ProtectedRoute exact path="/sales/orders" isEnabled={userStatus.registered} component={ProducerOrdersPage} />
         <ProtectedRoute exact path="/breweries" isEnabled={userStatus.registered} component={ProducerListPage} />
         <ProtectedRoute exact path="/order/:id" isEnabled={userStatus.registered} component={OrderPage} />
-        <ProtectedRoute exact path="/producerdash" isEnabled={userProfile.role === 'producer'} component={ProducerDashboardPage} />
         <Route component={NotFoundPage} />
       </Switch>
       <GlobalStyle />

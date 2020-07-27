@@ -9,7 +9,7 @@ import { Map, TileLayer } from 'react-leaflet';
 
 import { createStructuredSelector } from 'reselect';
 import {
-  Header, Segment, Button, Modal, Form, Grid, Message,
+  Header, Segment, Button, Modal, Form, Grid, Message, TextArea,
 } from 'semantic-ui-react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
@@ -29,8 +29,10 @@ import OrderModalContent from '../../components/OrderModalContent';
 import { getPrivateRoute } from '../../utils/api';
 import MessageFeed from '../../components/MessageFeed';
 import Can from '../../components/Can';
-import MapStyle from '../ProducerProfilePage/MapStyle';
+import MapStyle from './MapStyle';
 import MapMarker from '../../components/MapMarker';
+import MessageBoxStyle from './MessageBoxStyle';
+import { ORDER_MESSAGE_CHARACTER_LIMIT } from '../../utils/constants';
 
 const OrderPage = ({
   orderInfo, orderFetch, orderClear, userProfile, routerLocation, orderEdit, orderEditing, messageSend, messageSending,
@@ -298,6 +300,12 @@ const OrderPage = ({
               <Message.Header>Awaiting order confirmation from the brewery.</Message.Header>
             </Message>
           )}
+          {((orderData.status === 'Pending' || orderData.status === 'Confirmed') && role === 'producer' && orderInfo.business.deliveryInstruction) && (
+            <Message warning>
+              <Message.Header>This customer has specific requirements for delivery.</Message.Header>
+              <p>{orderInfo.business.deliveryInstruction}</p>
+            </Message>
+          )}
           <Button.Group>
             <Can
               role={role}
@@ -348,7 +356,7 @@ const OrderPage = ({
                       <TileLayer
                         url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
                       />
-                      <MapMarker location={orderInfo.business.location} />
+                      <MapMarker type="customer" location={orderInfo.business.location} name={orderInfo.business.businessName} />
                     </Map>
                   </MapStyle>
                 </Grid.Column>
@@ -384,7 +392,26 @@ const OrderPage = ({
               />
             )}
           <MessageFeed messages={orderData.messages} user={userProfile} business={orderInfo.business} businessAvatar={orderInfo.image} />
-          <Modal basic size="tiny" open={messageModalOpen} trigger={<Button size="large" loading={messageSending} onClick={() => setMessageModalOpen(true)}>Add Message</Button>}>
+          <MessageBoxStyle>
+            <TextArea maxLength={ORDER_MESSAGE_CHARACTER_LIMIT} value={messageContent} onChange={(e) => setMessageContent(e.target.value)} placeholder={`Write your message to ${orderInfo.business.primaryContactName} at ${orderInfo.business.businessName}...`} />
+            <Button attached="right" primary content="Send" onClick={handleMessageSend} loading={messageSending} />
+          </MessageBoxStyle>
+          {!!messageContent.length && (
+            <p style={{ textAlign: 'right', fontSize: '10px' }}>
+              {messageContent.length}
+              /
+              {ORDER_MESSAGE_CHARACTER_LIMIT}
+            </p>
+          )}
+          {/* {messageModalOpen
+            ? (
+              <Button.Group>
+                <Button content="Cancel" onClick={() => setMessageModalOpen(false)} />
+                <Button primary content="Send" onClick={handleMessageSend} />
+              </Button.Group>
+            )
+            : <Button size="large" loading={messageSending} onClick={() => setMessageModalOpen(true)}>Add Message</Button> } */}
+          {/* <Modal basic size="tiny" open={messageModalOpen}>
             <Modal.Content>
               <Modal.Description>
                 <Header>Add Message</Header>
@@ -397,7 +424,8 @@ const OrderPage = ({
               <Button color="red" inverted content="Cancel" onClick={() => setMessageModalOpen(false)} />
               <Button primary inverted content="Submit" onClick={handleMessageSend} />
             </Modal.Actions>
-          </Modal>
+          </Modal> */}
+
         </Segment>
       </PageWrapper>
     </>

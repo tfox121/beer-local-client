@@ -8,10 +8,13 @@ const StockModalStyle = styled.div`
     justify-content: center;
     align-items: center;
 
+    .ui.icon.message>.icon:not(.close) {
+      vertical-align: unset;
+    }
+
     span > input {
       margin: 0 !important;
       text-align: center;
-      width
       height: 100%;
       padding-top: 5.5px;
       padding-bottom: 5.5px;

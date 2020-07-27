@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
@@ -6,7 +6,6 @@ import Geosuggest from 'react-geosuggest';
 
 import ayt from '../../utils/phoneNumberValidation';
 
-import ImageUpload from '../../components/ImageUpload';
 import MapMarker from '../../components/MapMarker';
 import MarkerMapStyle from './MarkerMapStyle';
 import SuggestBlockStyle from './SuggestBlockStyle';
@@ -27,6 +26,7 @@ const RetailerForm = ({
   const [zoomLevel, setZoomLevel] = useState(5);
   const [visible, setVisible] = useState(false);
   const [unformattedTel, setUnformattedTel] = useState('');
+  const geosuggestEl = useRef(null);
 
   useEffect(() => {
     if (profileStage === 1 && formValues.type === 'retailer') {
@@ -144,9 +144,9 @@ const RetailerForm = ({
               >
                 <SuggestBlockStyle>
                   <Geosuggest
+                    ref={geosuggestEl}
                     label="Location"
                     id="Location"
-                    // eslint-disable-next-line no-undef
                     location={
                       // eslint-disable-next-line no-undef
                       new google.maps.LatLng(mapCentre[0], mapCentre[1])
@@ -155,6 +155,8 @@ const RetailerForm = ({
                     minlegnth="3"
                     country="gb"
                     onSuggestSelect={handleSuggestSelect}
+                    onBlur={() => geosuggestEl.current.selectSuggest()}
+                    autoActivateFirstSuggest
                     required
                   />
                 </SuggestBlockStyle>
@@ -177,11 +179,13 @@ const RetailerForm = ({
                 onChange={handleChange}
                 maxLength={DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
               />
-              <p style={{ textAlign: 'right', fontSize: '10px' }}>
-                {formValues.deliveryInstruction.length}
-                /
-                {DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
-              </p>
+              {!!formValues.deliveryInstruction.length && (
+                <p style={{ textAlign: 'right', fontSize: '10px' }}>
+                  {formValues.deliveryInstruction.length}
+                  /
+                  {DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
+                </p>
+              )}
               <Form.Checkbox
                 label="I agree to the Terms and Conditions"
                 name="terms"

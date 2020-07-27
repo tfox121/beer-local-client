@@ -11,6 +11,9 @@ import {
   UPDATE_USER,
   UPDATE_USER_SUCCESS,
   UPDATE_USER_ERROR,
+  SAVE_USER,
+  SAVE_USER_SUCCESS,
+  SAVE_USER_ERROR,
   CLEAR_USER,
   FOLLOW_PRODUCER,
   FOLLOW_PRODUCER_SUCCESS,
@@ -22,6 +25,8 @@ export const initialState = {
   fetchUserError: false,
   updatingUser: false,
   updatingUserError: false,
+  savingUser: false,
+  userSaveError: false,
   user: false,
   followingProducer: false,
   followProducerError: false,
@@ -68,6 +73,21 @@ const appReducer = (state = initialState, action) => produce(state, (draftState)
     case UPDATE_USER_ERROR:
       draftState.updatingUserError = true;
       draftState.updatingUser = false;
+      break;
+    case SAVE_USER:
+      draftState.userSaveError = false;
+      draftState.savingUser = true;
+      break;
+    case SAVE_USER_SUCCESS:
+      if (action.profile) {
+        draftState.user = action.profile;
+        draftState.userSaveError = false;
+      }
+      draftState.savingUser = false;
+      break;
+    case SAVE_USER_ERROR:
+      draftState.savingUser = false;
+      draftState.userSaveError = true;
       break;
     case FOLLOW_PRODUCER:
       draftState.followProducerError = false;

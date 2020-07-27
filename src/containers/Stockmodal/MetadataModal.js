@@ -10,6 +10,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import MetadataModalStyle from './MetadataModalStyle';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
+import { PRODUCT_DESCRIPTION_CHARACTER_LIMIT } from '../../utils/constants';
 
 const MetadataModal = ({ cell, updateMyData }) => {
   const { user } = useAuth0();
@@ -126,7 +127,14 @@ const MetadataModal = ({ cell, updateMyData }) => {
             </Grid.Column>
             <Grid.Column width={10}>
               <Form style={{ height: '100%' }}>
-                <TextArea style={{ height: '100%' }} name="description" label="Description" value={itemMetadata.description || ''} onChange={handleChange} />
+                <TextArea maxLength={PRODUCT_DESCRIPTION_CHARACTER_LIMIT} style={{ height: '100%' }} name="description" label="Description" value={itemMetadata.description || ''} onChange={handleChange} />
+                {!!itemMetadata.description && !!itemMetadata.description.length && (
+                  <p style={{ textAlign: 'right', fontSize: '10px', marginTop: '0.5em' }}>
+                    {itemMetadata.description && itemMetadata.description.length}
+                    /
+                    {PRODUCT_DESCRIPTION_CHARACTER_LIMIT}
+                  </p>
+                )}
               </Form>
             </Grid.Column>
           </Grid>

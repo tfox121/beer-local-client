@@ -28,6 +28,7 @@ import timeAgo from '../../utils/timeAgo';
 import { PACK_SIZES } from '../../utils/constants';
 import numToWords from '../../utils/numToWords';
 import RetailerDashboardStyle from './RetailerDashboardStyle';
+import FeedItem from './FeedItem';
 
 const RetailerDashboardPage = ({
   userProfile,
@@ -50,9 +51,9 @@ const RetailerDashboardPage = ({
           })))
         .flat()
         .sort((a, b) => (a.createdAt > b.createdAt) ? -1 : ((a.createdAt < b.createdAt) ? 1 : 0));
-      const grouped = withProducerProps.reduce((groups, producerItem) => {
-        const date = producerItem.createdAt.split('T')[0];
+      const groupedBeers = withProducerProps.reduce((groups, producerItem) => {
         if (producerItem.price && producerItem.display === 'Show') {
+          const date = producerItem.firstDisplayed.split('T')[0];
           if (!groups[`${date}:${producerItem.producerId}`]) {
             groups[`${date}:${producerItem.producerId}`] = [];
           }
@@ -60,13 +61,17 @@ const RetailerDashboardPage = ({
         }
         return groups;
       }, {});
-      const groupedArray = Object.keys(grouped).map((date) => ({
+      const groupedBeersArray = Object.keys(groupedBeers).map((date) => ({
         createdAt: date.split(':')[0],
-        producerItems: grouped[date],
+        producerItems: groupedBeers[date],
       }));
 
-      const fullArrayWithBeerGrouped = [...withProducerProps.filter((producerItem) => !producerItem.price), ...groupedArray, ...nearbyProducers];
-      const dateSorted = fullArrayWithBeerGrouped.sort((a, b) => (a.createdAt > b.createdAt) ? -1 : ((a.createdAt < b.createdAt) ? 1 : 0));
+      const fullArrayWithBeerGrouped = [...withProducerProps.filter((producerItem) => !producerItem.price), ...groupedBeersArray, ...nearbyProducers];
+      const dateSorted = fullArrayWithBeerGrouped.sort((a, b) => {
+        if (a.createdAt > b.createdAt) return -1;
+        if (a.createdAt < b.createdAt) return 1;
+        return 0;
+      });
       console.log('SORTED', dateSorted);
 
       setProducerFeed(dateSorted);
@@ -78,179 +83,21 @@ const RetailerDashboardPage = ({
     return null;
   }
 
-  const multiNewItemRender = (itemGroup) => {
-    const vowelRegex = '^[aieouAIEOU].*';
-    if (itemGroup.producerItems.length === 1) {
-      return (
-        <Feed.Event key={`${itemGroup.createdAt}${itemGroup.producerItems[0].producerId}`}>
-          <Feed.Label>
-            <img src={itemGroup.producerItems[0].avatarSource || '/images/avatars/blank-avatar.webp'} alt="producer avatar" />
-          </Feed.Label>
-          <Feed.Content>
-            <Feed.Summary>
-              <Feed.User as="p"><Link to={`/brewery/${itemGroup.producerItems[0].producerId}`}>{itemGroup.producerItems[0].producer}</Link></Feed.User>
-              {' '}
-              added a new beer
-              <Feed.Date>{timeAgo.format(Date.parse(itemGroup.producerItems[0].createdAt))}</Feed.Date>
-            </Feed.Summary>
-            <Segment>
-              <Feed.Extra text>
-                {itemGroup.producerItems[0].name}
-                {' - '}
-                {numToWords(Math.floor(itemGroup.producerItems[0].abv)).match(vowelRegex) ? ' an ' : ' a '}
-                {itemGroup.producerItems[0].abv}
-                {'% '}
-                {itemGroup.producerItems[0].style}
-                {' '}
-                in
-                {' '}
-                {PACK_SIZES[itemGroup.producerItems[0].packSize]}
-                .
-              </Feed.Extra>
-              {itemGroup.producerItems[0].imageSource && (
-                <Feed.Extra images>
-                  <Image className="product-image" size="tiny" bordered centered circular src={itemGroup.producerItems[0].imageSource} alt="product" />
-                  <p>{itemGroup.producerItems[0].description}</p>
-                </Feed.Extra>
-              )}
-            </Segment>
-          </Feed.Content>
-        </Feed.Event>
-      );
-    }
-    return (
-      <Feed.Event key={`${itemGroup.createdAt}${itemGroup.producerItems[0].producerId}`}>
-        <Feed.Label>
-          <img src={itemGroup.producerItems[0].avatarSource || '/images/avatars/blank-avatar.webp'} alt="producer avatar" />
-        </Feed.Label>
-        <Feed.Content>
-          <Feed.Summary>
-            <Feed.User as="p"><Link to={`/brewery/${itemGroup.producerItems[0].producerId}`}>{itemGroup.producerItems[0].producer}</Link></Feed.User>
-            {' '}
-            added
-            {' '}
-            {itemGroup.producerItems.length}
-            {' '}
-            new beers
-            <Feed.Date>{timeAgo.format(Date.parse(itemGroup.producerItems[0].createdAt))}</Feed.Date>
-          </Feed.Summary>
-          <Segment>
-            {itemGroup.producerItems.map((producerItem, index) => (
+  return (
+    <PageWrapper>
+      <Segment basic className="primary wrapper">
+        <Header as="h1">Updates</Header>
+        <RetailerDashboardStyle>
+          <Feed size="large">
+            {producerFeed.map((producerItem) => (
               <React.Fragment key={producerItem._id}>
-                <Feed.Extra text>
-                  {producerItem.name}
-                  {' - '}
-                  {numToWords(Math.floor(producerItem.abv)).match(vowelRegex) ? ' an ' : ' a '}
-                  {producerItem.abv}
-                  {'% '}
-                  {producerItem.style}
-                  {' '}
-                  in
-                  {' '}
-                  {PACK_SIZES[producerItem.packSize]}
-                  .
-                </Feed.Extra>
-                {
-                  producerItem.imageSource && (
-                    <Feed.Extra images>
-                      <Image className="product-image" size="tiny" bordered centered circular src={producerItem.imageSource} alt="product" />
-                      <p>{producerItem.description}</p>
-                    </Feed.Extra>
-                  )
-                }
-                {index !== itemGroup.producerItems.length - 1 && (
-                  <Divider />
-                )}
+                <FeedItem producerItem={producerItem} userProfile={userProfile} />
               </React.Fragment>
             ))}
-          </Segment>
-        </Feed.Content>
-      </Feed.Event>
-    );
-  };
-
-  const newBlogRender = (item) => (
-    <Feed.Event key={item._id}>
-      <Feed.Label>
-        <img src={item.avatarSource || '/images/avatars/blank-avatar.webp'} alt="producer avatar" />
-      </Feed.Label>
-      <Feed.Content>
-        <Feed.Summary>
-          <Feed.User>{item.producer}</Feed.User>
-          {' '}
-          posted some news
-          <Feed.Date>{timeAgo.format(Date.parse(item.createdAt))}</Feed.Date>
-        </Feed.Summary>
-        <Feed.Extra text>
-          <Segment>
-            <Header><i>{item.title}</i></Header>
-            <div className="blog-text" dangerouslySetInnerHTML={{ __html: stateToHTML(EditorState.createWithContent(convertFromRaw(JSON.parse(item.blogData))).getCurrentContent()) }} />
-          </Segment>
-        </Feed.Extra>
-        {/* <Feed.Meta>
-            <Feed.Like>
-              <Icon name='like' />4 Likes
-          </Feed.Like>
-          </Feed.Meta> */}
-      </Feed.Content>
-    </Feed.Event>
-  );
-
-  const newProducerRender = (producer) => (
-    <Feed.Event key={producer.businessId}>
-      <Feed.Label>
-        <img src="/images/site-logo.png" alt="producer avatar" />
-      </Feed.Label>
-      <Feed.Content>
-        <Feed.Summary>
-          <Feed.User>{producer.businessName}</Feed.User>
-          {' '}
-          has joined beerLocal, and they deliver to your area!
-          <Feed.Date>{timeAgo.format(Date.parse(producer.createdAt))}</Feed.Date>
-        </Feed.Summary>
-        <Segment>
-          <Feed.Extra images>
-            <Image size="small" centered src={producer.avatarSource || '/images/avatars/blank-avatar.webp'} alt="product" />
-            <p>{producer.intro}</p>
-          </Feed.Extra>
-        </Segment>
-        {/* <Feed.Meta>
-            <Feed.Like>
-              <Icon name='like' />4 Likes
-          </Feed.Like>
-          </Feed.Meta> */}
-      </Feed.Content>
-    </Feed.Event>
-  );
-
-  return (
-    <>
-      <Helmet>
-        <title>beerLocal - Updates</title>
-        <meta name="description" content="Retailer news feed" />
-      </Helmet>
-      <PageWrapper>
-        <Segment basic className="primary wrapper">
-          <Header as="h1">Updates</Header>
-          <RetailerDashboardStyle>
-            <Feed size="large">
-              {producerFeed.map((producerItem) => {
-                if (producerItem.blogData) {
-                  return newBlogRender(producerItem);
-                }
-                if (producerItem.producerItems && producerItem.producerItems.length) {
-                  return multiNewItemRender(producerItem);
-                }
-                if (producerItem.role) {
-                  return newProducerRender(producerItem);
-                }
-                return null;
-              })}
-            </Feed>
-          </RetailerDashboardStyle>
-        </Segment>
-      </PageWrapper>
-    </>
+          </Feed>
+        </RetailerDashboardStyle>
+      </Segment>
+    </PageWrapper>
   );
 };
 

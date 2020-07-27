@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTable, useSortBy } from 'react-table';
 import {
-  Table, Input, Menu, Modal, Header, Button, Icon, Popup, Image, Grid,
+  Table, Input, Menu, Modal, Header, Button, Icon, Popup, Image, Grid, Dimmer, Loader,
 } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
@@ -261,87 +261,96 @@ const AvailibilityTable = ({
   };
 
   return (
-    <Table {...getTableProps()} unstackable>
-      <Table.Header>
-        {headerGroups.map((headerGroup) => (
-          <Table.Row {...headerGroup.getHeaderGroupProps()}>
-            <Table.HeaderCell />
-            {headerGroup.headers.map((column, index) => {
-              if (column.Header === 'Order #' && ((user && user.role !== 'retailer') || !user)) {
-                return null;
-              }
-              return (
+    <>
+      { orderSending && (
+        <Dimmer inverted active page>
+          <Loader inverted />
+        </Dimmer>
+      )}
+      <Table {...getTableProps()} unstackable>
+        <Table.Header>
+          {headerGroups.map((headerGroup) => (
+            <Table.Row {...headerGroup.getHeaderGroupProps()}>
+              <Table.HeaderCell />
+              {headerGroup.headers.map((column, index) => {
+                if (column.Header === 'Order #' && ((user && user.role !== 'retailer') || !user)) {
+                  return null;
+                }
+                return (
                 // Add the sorting props to control sorting. For this example
                 // we can add them into the header props
-                <Table.HeaderCell className={`data-header-${index}`} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render('Header')}
-                  {/* Add a sort direction indicator */}
-                  <span>
-                    {column.isSorted
-                      ? column.isSortedDesc
-                        ? <Icon name="triangle down" />
-                        : <Icon name="triangle up" />
-                      : ''}
-                  </span>
-                </Table.HeaderCell>
-              );
-            })}
-          </Table.Row>
-        ))}
-      </Table.Header>
-      <Table.Body {...getTableBodyProps()}>
-        {stockCategories.map((storedCategory, index) => (
+                  <Table.HeaderCell className={`data-header-${index}`} {...column.getHeaderProps(column.getSortByToggleProps())}>
+                    {column.render('Header')}
+                    {/* Add a sort direction indicator */}
+                    <span>
+                      {column.isSorted
+                        ? column.isSortedDesc
+                          ? <Icon name="triangle down" />
+                          : <Icon name="triangle up" />
+                        : ''}
+                    </span>
+                  </Table.HeaderCell>
+                );
+              })}
+            </Table.Row>
+          ))}
+        </Table.Header>
+        <Table.Body {...getTableBodyProps()}>
+          {stockCategories.map((storedCategory, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <React.Fragment key={index}>
-            <TableRows rows={rows} prepareRow={prepareRow} producerProfile={producerProfile} user={user} storedCategory={storedCategory} index={index} categories={categories} handleCategoryChange={handleCategoryChange} handleRemoveCategory={handleRemoveCategory} />
-          </React.Fragment>
-        ))}
-      </Table.Body>
-      <Table.Footer>
-        {user && user.businessId === producerProfile.businessId && (
-          <Table.Row>
-            <Table.HeaderCell colSpan="16">
-              <Button attached basic icon="plus" content="Add category section" onClick={handleAddCategory} />
-            </Table.HeaderCell>
-          </Table.Row>
-        )}
-        {user && user.role === 'retailer' && (
-          <Table.Row>
-            <Table.HeaderCell colSpan="16">
-              <Menu floated="right">
-                {geoJsonContainsCoords(producerProfile.distributionAreas, user.location) || producerProfile.profileOptions.distantPurchasing ? (
-                  <Modal
-                    trigger={<Menu.Item name="Place Order" onClick={handleModalOpen} />}
-                    open={modalOpen}
-                    size="large"
-                  >
-                    <Modal.Header>Confirm Order</Modal.Header>
-                    <OrderModalContent
-                      orderItems={data}
-                      businessName={producerProfile.businessName}
-                      type="draftOrder"
-                      distancePurchase={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)}
-                      distantPurchasingConditions={producerProfile.profileOptions.distantPurchasingConditions}
-                    />
-                    <Modal.Actions>
-                      <Button content="Cancel" onClick={() => setModalOpen(false)} />
-                      <Button
-                        primary
-                        content="Confirm"
-                        disabled={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location) && producerProfile.profileOptions.distantPurchasingConditions && calcOrderTotal(data) < producerProfile.profileOptions.distantPurchasingConditions.minSpend}
-                        onClick={handleSendOrder}
+            <React.Fragment key={index}>
+              <TableRows rows={rows} prepareRow={prepareRow} producerProfile={producerProfile} user={user} storedCategory={storedCategory} index={index} categories={categories} handleCategoryChange={handleCategoryChange} handleRemoveCategory={handleRemoveCategory} />
+            </React.Fragment>
+          ))}
+        </Table.Body>
+        <Table.Footer>
+          {user && user.businessId === producerProfile.businessId && (
+            <Table.Row>
+              <Table.HeaderCell colSpan="16">
+                <Button attached basic icon="plus" content="Add category section" onClick={handleAddCategory} />
+              </Table.HeaderCell>
+            </Table.Row>
+          )}
+          {user && user.role === 'retailer' && (
+            <Table.Row>
+              <Table.HeaderCell colSpan="16">
+                <Menu floated="right">
+                  {geoJsonContainsCoords(producerProfile.distributionAreas, user.location) || producerProfile.profileOptions.distantPurchasing ? (
+                    <Modal
+                      trigger={<Menu.Item name="Place Order" onClick={handleModalOpen} />}
+                      open={modalOpen}
+                      size="large"
+                    >
+                      <Modal.Header>Confirm Order</Modal.Header>
+                      <OrderModalContent
+                        orderItems={data}
+                        businessName={producerProfile.businessName}
+                        type="draftOrder"
+                        distancePurchase={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)}
+                        distantPurchasingConditions={producerProfile.profileOptions.distantPurchasingConditions}
+                        distantPurchasingMinimumMet={calcOrderTotal(data) >= producerProfile.profileOptions.distantPurchasingConditions.minSpend}
+                        deliveryInstruction={user.deliveryInstruction}
                       />
-                    </Modal.Actions>
-                  </Modal>
-                ) : (
-                  <Menu.Item disabled name="Not available in your area" />
-                )}
-              </Menu>
-            </Table.HeaderCell>
-          </Table.Row>
-        )}
-      </Table.Footer>
-    </Table>
+                      <Modal.Actions>
+                        <Button content="Cancel" onClick={() => setModalOpen(false)} />
+                        <Button
+                          primary
+                          content="Confirm"
+                          disabled={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location) && producerProfile.profileOptions.distantPurchasingConditions && calcOrderTotal(data) < producerProfile.profileOptions.distantPurchasingConditions.minSpend}
+                          onClick={handleSendOrder}
+                        />
+                      </Modal.Actions>
+                    </Modal>
+                  ) : (
+                    <Menu.Item disabled name="Not available in your area" />
+                  )}
+                </Menu>
+              </Table.HeaderCell>
+            </Table.Row>
+          )}
+        </Table.Footer>
+      </Table>
+    </>
   );
 };
 

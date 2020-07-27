@@ -20,6 +20,15 @@ const makeSelectUserFetchError = () => createSelector(
   (globalState) => globalState.fetchUserError,
 );
 
+const makeSelectSavingUser = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.savingUser,
+);
+
+const makeSelectUserSaveError = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.userSaveError,
+);
 const makeSelectProducerFollowing = () => createSelector(
   selectGlobal,
   (substate) => substate.followingProducer,
@@ -34,6 +43,8 @@ export {
   makeSelectUser,
   makeSelectFetchingUser,
   makeSelectUserFetchError,
+  makeSelectSavingUser,
+  makeSelectUserSaveError,
   makeSelectLocation,
   makeSelectProducerFollowing,
 };

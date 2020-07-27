@@ -69,7 +69,13 @@ const ProducerDashboardPage = ({
     let itemCount = 0;
 
     ordersArr.forEach((order) => {
-      if (order.status === status && moment(order.createdAt).isSame(previous ? moment().subtract(1, period) : moment(), period)) {
+      if (previous && order.status === status && moment(order.createdAt).isBetween(moment().subtract(2, period), moment().subtract(1, period))) {
+        total += calcOrderTotal(order.items);
+        orderCount += 1;
+        order.items.forEach((orderItem) => {
+          itemCount += orderItem.orderQuant;
+        });
+      } else if (!previous && order.status === status && moment(order.createdAt).isAfter(moment().subtract(1, period))) {
         total += calcOrderTotal(order.items);
         orderCount += 1;
         order.items.forEach((orderItem) => {
@@ -86,7 +92,7 @@ const ProducerDashboardPage = ({
 
   const topCustomersArr = (ordersArr, period) => {
     const customerList = ordersArr.reduce((customers, order) => {
-      if (order.status === status && moment(order.createdAt).isSame(moment(), period)) {
+      if (order.status === status && moment(order.createdAt).isAfter(moment().subtract(1, period))) {
         if (!customers[order.businessName]) {
           customers[order.businessName] = {
             businessName: order.businessName,
@@ -105,7 +111,7 @@ const ProducerDashboardPage = ({
 
   const topItemsArr = (ordersArr, period) => {
     const itemList = ordersArr.reduce((items, order) => {
-      if (order.status === status && moment(order.createdAt).isSame(moment(), period)) {
+      if (order.status === status && moment(order.createdAt).isAfter(moment().subtract(1, period))) {
         order.items.forEach((item) => {
           if (!items[item.id]) {
             items[item.id] = {
@@ -117,6 +123,9 @@ const ProducerDashboardPage = ({
             };
           }
           items[item.id].salesTotal += (item.orderQuant * item.price);
+          // if (item.imageSource) {
+          //   items[item.id].imageSource = item.imageSource;
+          // }
         });
       }
       return items;
@@ -157,243 +166,234 @@ const ProducerDashboardPage = ({
   // ];
 
   return (
-    <>
-      <Helmet>
-        <title>beerLocal - Dashboard</title>
-        <meta name="description" content="Producer dashboard" />
-      </Helmet>
-      <PageWrapper>
-        <Segment basic className="primary wrapper">
-          <ProducerDashboardStyle>
-            <Grid columns={2} verticalAlign="middle">
-              <Grid.Column width="10">
-                <Header as="h1">
-                  Hi
+    <PageWrapper>
+      <Segment basic className="primary wrapper">
+        <ProducerDashboardStyle>
+          <Grid columns={2} verticalAlign="middle">
+            <Grid.Column width="10">
+              <Header as="h1">
+                Hi
+                {' '}
+                {userProfile.businessName}
+                {', '}
+                here&apos;s how things are going.
+              </Header>
+            </Grid.Column>
+            <Grid.Column width="6" textAlign="right">
+              <Button.Group>
+                <Button active={salesPeriod === 'week'} onClick={() => setSalesPeriod('week')}>Week</Button>
+                <Button active={salesPeriod === 'month'} onClick={() => setSalesPeriod('month')}>Month</Button>
+                <Button active={salesPeriod === 'year'} onClick={() => setSalesPeriod('year')}>Year</Button>
+              </Button.Group>
+            </Grid.Column>
+          </Grid>
+          <Segment basic>
+            <Grid columns={3}>
+              <Grid.Column className="sales-summary" width={6}>
+                <Header>
+                  This
                   {' '}
-                  {userProfile.businessName}
-                  {', '}
-                  here&apos;s how things are going.
+                  {salesPeriod}
+                  {' '}
+                  you&apos;ve sold
                 </Header>
+                <Header as="h1" dividing>
+                  £
+                  {periodSales.total.toFixed(2)}
+                </Header>
+                That&apos;s
+                {' '}
+                {periodSalesDiff === 0 ? 'exactly the same as' : (
+                  <>
+                    £
+                    {Math.abs(periodSalesDiff).toFixed(2)}
+                    {' '}
+                    {periodSalesDiff > 0 ? 'more' : 'less'}
+                    {' '}
+                    than
+                  </>
+                )}
+                {' '}
+                last
+                {' '}
+                {salesPeriod}
+                {periodSalesDiff >= 0 ? '!' : '.'}
+                <Header as="h3" dividing>
+                  {periodSales.orderCount}
+                  {' '}
+                  orders
+                </Header>
+                That&apos;s
+                {' '}
+                {periodSalesOrderCountDiff === 0 ? 'exactly the same as' : (
+                  <>
+                    {Math.abs(periodSalesOrderCountDiff)}
+                    {' '}
+                    {periodSalesOrderCountDiff > 0 ? 'more' : 'fewer'}
+                    {' '}
+                    than
+                  </>
+                )}
+                {' '}
+                last
+                {' '}
+                {salesPeriod}
+                {periodSalesOrderCountDiff >= 0 ? '!' : '.'}
+                <Header as="h3" dividing>
+                  {periodSales.itemCount}
+                  {' '}
+                  items
+                </Header>
+                That&apos;s
+                {' '}
+                {periodSalesItemCountDiff === 0 ? 'exactly the same as' : (
+                  <>
+                    {Math.abs(periodSalesItemCountDiff)}
+                    {' '}
+                    {periodSalesItemCountDiff > 0 ? 'more' : 'fewer'}
+                    {' '}
+                    than
+                  </>
+                )}
+                {' '}
+                last
+                {' '}
+                {salesPeriod}
+                {periodSalesItemCountDiff >= 0 ? '!' : '.'}
               </Grid.Column>
-              <Grid.Column width="6" textAlign="right">
-                <Button.Group>
-                  <Button active={salesPeriod === 'week'} onClick={() => setSalesPeriod('week')}>Week</Button>
-                  <Button active={salesPeriod === 'month'} onClick={() => setSalesPeriod('month')}>Month</Button>
-                  <Button active={salesPeriod === 'year'} onClick={() => setSalesPeriod('year')}>Year</Button>
-                </Button.Group>
+              <Grid.Column width={7}>
+                <Segment>
+                  <LineChart data={orders} period={salesPeriod} step={step[salesPeriod]} status={status} />
+                </Segment>
               </Grid.Column>
-            </Grid>
-            <Segment basic padded>
-              <Grid columns={3}>
-                <Grid.Column className="sales-summary" width={6}>
-                  <Header>
-                    This
+              <Grid.Column className="sales-averages" width={3}>
+                <Header as="h5" className="top-level">
+                  Average Sale Value
+                </Header>
+                <Header>
+                  £
+                  {periodSales.average.toFixed(2)}
+                </Header>
+                {!Number.isNaN(periodSalesAverageDiff) && (
+                  <>
+                    {periodSalesAverageDiff === 0 ? 'Exactly the same as' : (
+                      <>
+                        £
+                        {Math.abs(periodSalesAverageDiff).toFixed(2)}
+                        {' '}
+                        {periodSalesAverageDiff > 0 ? 'more' : 'less'}
+                        {' '}
+                        than
+                      </>
+                    )}
+                    {' '}
+                    last
                     {' '}
                     {salesPeriod}
+                    {periodSalesAverageDiff >= 0 ? '!' : '.'}
+                  </>
+                )}
+                <Header as="h5" className="top-level">
+                  Average Items per Sale
+                </Header>
+                <Header>
+                  {periodSales.averageItems.toFixed(1)}
+                </Header>
+                {!Number.isNaN(periodSalesAverageItemsDiff) && (
+                  <>
+                    {periodSalesAverageItemsDiff === 0 ? 'Exactly the same as' : (
+                      <>
+                        {Math.abs(periodSalesAverageItemsDiff).toFixed(1)}
+                        {' '}
+                        {periodSalesAverageItemsDiff > 0 ? 'more' : 'fewer'}
+                        {' '}
+                        than
+                      </>
+                    )}
                     {' '}
-                    you&apos;ve sold
-                  </Header>
-                  <Header as="h1" dividing>
+                    last
+                    {' '}
+                    {salesPeriod}
+                    {periodSalesAverageItemsDiff >= 0 ? '!' : '.'}
+                  </>
+                )}
+              </Grid.Column>
+            </Grid>
+          </Segment>
+          <Segment>
+            <Header dividing>
+              Top Customers
+            </Header>
+            <Grid columns={2}>
+              {topCustomers.map((customer) => (
+                <Grid.Row key={customer.businessId}>
+                  <Grid.Column width={12}>
+                    <Image style={{ marginRight: '0.5em' }} avatar bordered centered src={customer.avatarSource || '/images/avatars/blank-avatar.webp'} alt="user avatar" />
+                    <Link to={`/brewery/${customer.businessId}`}>{customer.businessName}</Link>
+                  </Grid.Column>
+                  <Grid.Column width={4}>
                     £
-                    {periodSales.total.toFixed(2)}
-                  </Header>
-                  That&apos;s
-                  {' '}
-                  {periodSalesDiff === 0 ? 'exactly the same as' : (
-                    <>
-                      £
-                      {Math.abs(periodSalesDiff).toFixed(2)}
-                      {' '}
-                      {periodSalesDiff > 0 ? 'more' : 'less'}
-                      {' '}
-                      than
-                    </>
-                  )}
-                  {' '}
-                  last
-                  {' '}
-                  {salesPeriod}
-                  {periodSalesDiff >= 0 ? '!' : '.'}
-                  <Header as="h3" dividing>
-                    {periodSales.orderCount}
-                    {' '}
-                    orders
-                  </Header>
-                  That&apos;s
-                  {' '}
-                  {periodSalesOrderCountDiff === 0 ? 'exactly the same as' : (
-                    <>
-                      {Math.abs(periodSalesOrderCountDiff)}
-                      {' '}
-                      {periodSalesOrderCountDiff > 0 ? 'more' : 'less'}
-                      {' '}
-                      than
-                    </>
-                  )}
-                  {' '}
-                  last
-                  {' '}
-                  {salesPeriod}
-                  {periodSalesOrderCountDiff >= 0 ? '!' : '.'}
-                  <Header as="h3" dividing>
-                    {periodSales.itemCount}
-                    {' '}
-                    items
-                  </Header>
-                  That&apos;s
-                  {' '}
-                  {periodSalesItemCountDiff === 0 ? 'exactly the same as' : (
-                    <>
-                      {Math.abs(periodSalesItemCountDiff)}
-                      {' '}
-                      {periodSalesItemCountDiff > 0 ? 'more' : 'less'}
-                      {' '}
-                      than
-                    </>
-                  )}
-                  {' '}
-                  last
-                  {' '}
-                  {salesPeriod}
-                  {periodSalesItemCountDiff >= 0 ? '!' : '.'}
-                </Grid.Column>
-                <Grid.Column width={7}>
-                  <Segment>
-                    {/* <Header>
-                      <Dropdown inline options={periodOptions} value={salesPeriod} onChange={(e, { value }) => setSalesPeriod(value)} />
-                    </Header> */}
-                    <LineChart data={orders} period={salesPeriod} step={step[salesPeriod]} status={status} />
-                  </Segment>
-                </Grid.Column>
-                <Grid.Column className="sales-averages" width={3}>
-                  <Header as="h5">
-                    Average Sale Value
-                  </Header>
-                  <Header>
+                    {customer.salesTotal.toFixed(2)}
+                  </Grid.Column>
+                </Grid.Row>
+              ))}
+            </Grid>
+          </Segment>
+          <Segment>
+            <Header dividing>
+              Top Items
+            </Header>
+            <Grid columns={2} verticalAlign="middle">
+              {topItemsArr(orders, salesPeriod).map((item) => (
+                <Grid.Row key={item.id}>
+                  <Grid.Column width={8}>
+                    <Image style={{ marginRight: '0.5em' }} avatar bordered centered src={item.imageSource || '/images/products/blank-product.png'} alt="product" />
+                    {item.name}
+                  </Grid.Column>
+                  <Grid.Column width={4}>
+                    {PACK_SIZES[item.packSize]}
+                  </Grid.Column>
+                  <Grid.Column width={4}>
                     £
-                    {periodSales.average.toFixed(2)}
-                  </Header>
-                  {!Number.isNaN(periodSalesAverageDiff) && (
-                    <>
-                      {periodSalesAverageDiff === 0 ? 'Exactly the same as' : (
-                        <>
-                          £
-                          {Math.abs(periodSalesAverageDiff).toFixed(2)}
-                          {' '}
-                          {periodSalesAverageDiff > 0 ? 'more' : 'less'}
-                          {' '}
-                          than
-                        </>
-                      )}
-                      {' '}
-                      last
-                      {' '}
-                      {salesPeriod}
-                      {periodSalesAverageDiff >= 0 ? '!' : '.'}
-                    </>
-                  )}
-                  <Header as="h5">
-                    Average Items per Sale
-                  </Header>
-                  <Header>
-                    {periodSales.averageItems}
-                  </Header>
-                  {!Number.isNaN(periodSalesAverageItemsDiff) && (
-                    <>
-                      {periodSalesAverageItemsDiff === 0 ? 'Exactly the same as' : (
-                        <>
-                          {Math.abs(periodSalesAverageItemsDiff)}
-                          {' '}
-                          {periodSalesAverageItemsDiff > 0 ? 'more' : 'less'}
-                          {' '}
-                          than
-                        </>
-                      )}
-                      {' '}
-                      last
-                      {' '}
-                      {salesPeriod}
-                      {periodSalesAverageItemsDiff >= 0 ? '!' : '.'}
-                    </>
-                  )}
-                </Grid.Column>
-              </Grid>
-            </Segment>
-            <Segment>
-              <Header dividing>
-                Top Customers
-              </Header>
-              <Grid columns={2}>
-                {topCustomers.map((customer) => (
-                  <Grid.Row key={customer.businessId}>
-                    <Grid.Column width={12}>
-                      <Image style={{ marginRight: '0.5em' }} avatar bordered centered src={customer.avatarSource || '/images/avatars/blank-avatar.webp'} alt="user avatar" />
-                      <Link to={`/brewery/${customer.businessId}`}>{customer.businessName}</Link>
-                    </Grid.Column>
-                    <Grid.Column width={4}>
-                      £
-                      {customer.salesTotal.toFixed(2)}
-                    </Grid.Column>
-                  </Grid.Row>
-                ))}
-              </Grid>
-            </Segment>
-            <Segment>
-              <Header dividing>
-                Top Items
-              </Header>
-              <Grid columns={2} verticalAlign="middle">
-                {topItemsArr(orders, salesPeriod).map((item) => (
-                  <Grid.Row key={item.id}>
-                    <Grid.Column width={8}>
-                      <Image style={{ marginRight: '0.5em' }} avatar bordered centered src={item.imageSource || '/images/products/blank-product.png'} alt="product" />
-                      {item.name}
-                    </Grid.Column>
-                    <Grid.Column width={4}>
-                      {PACK_SIZES[item.packSize]}
-                    </Grid.Column>
-                    <Grid.Column width={4}>
-                      £
-                      {item.salesTotal.toFixed(2)}
-                    </Grid.Column>
-                  </Grid.Row>
-                ))}
-              </Grid>
-            </Segment>
-            <Segment>
-              <Map
-                className="profileViewMap"
-                center={userProfile.location}
-                zoom={6}
-                zoomControl={false}
-                style={{
-                  height: '400px',
-                }}
-              >
-                <TileLayer
-                  url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
-                />
-                <DistributionAreaDisplay
-                  distributionAreas={userProfile.distributionAreas}
-                />
-                <MapMarker location={userProfile.location} />
-                {topCustomers.map((customer) => (
-                  <MapMarker type="customer" location={customer.location} name={customer.businessName} />
-                ))}
-                {potentialCustomers.filter((customer) => !topCustomers.map((customerObj) => customerObj.businessName).includes(customer.businessName)).map((customer) => (
-                  <MapMarker type="not-customer" location={customer.location} name={customer.businessName} />
-                ))}
-              </Map>
-              <Icon color="blue" name="map marker alternate" />
-              - current customers
-              {' '}
-              <Icon color="red" name="map marker alternate" />
-              - potential customers
-            </Segment>
-          </ProducerDashboardStyle>
-        </Segment>
-      </PageWrapper>
-    </>
+                    {item.salesTotal.toFixed(2)}
+                  </Grid.Column>
+                </Grid.Row>
+              ))}
+            </Grid>
+          </Segment>
+          <Segment>
+            <Map
+              className="profileViewMap"
+              center={userProfile.location}
+              zoom={6}
+              zoomControl={false}
+              style={{
+                height: '400px',
+              }}
+            >
+              <TileLayer
+                url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+              />
+              <DistributionAreaDisplay
+                distributionAreas={userProfile.distributionAreas}
+              />
+              <MapMarker location={userProfile.location} />
+              {topCustomers.map((customer) => (
+                <MapMarker key={customer.businessName} type="customer" location={customer.location} name={customer.businessName} />
+              ))}
+              {potentialCustomers.filter((customer) => !topCustomers.map((customerObj) => customerObj.businessName).includes(customer.businessName)).map((customer) => (
+                <MapMarker key={customer.businessName} type="not-customer" location={customer.location} name={customer.businessName} />
+              ))}
+            </Map>
+            <Icon style={{ marginTop: '1em' }} color="blue" name="map marker alternate" />
+            - current customers
+            {' '}
+            <Icon color="red" name="map marker alternate" />
+            - potential customers
+          </Segment>
+        </ProducerDashboardStyle>
+      </Segment>
+    </PageWrapper>
   );
 };
 

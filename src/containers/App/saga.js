@@ -3,12 +3,12 @@
  */
 
 import {
-  call, put, spawn, debounce,
+  call, put, spawn, debounce, takeLatest,
 } from 'redux-saga/effects';
 import { push } from 'connected-react-router';
-import { FETCH_USER, UPDATE_USER } from './constants';
+import { FETCH_USER, UPDATE_USER, SAVE_USER } from './constants';
 import {
-  userFetched, userFetchError, userUpdated, userUpdateError,
+  userFetched, userFetchError, userUpdated, userUpdateError, userSaved, userSaveError,
 } from './actions';
 import { getPrivateRoute } from '../../utils/api';
 import { getOwnAvatar, getOwnBanner } from '../../utils/getImages';
@@ -56,6 +56,34 @@ function* updateUser({ updateObj, pathname }) {
   }
 }
 
+function* saveUser({ profileData }) {
+  try {
+    // Call our request helper (see 'utils/request')
+    const privateRoute = yield call(getPrivateRoute);
+
+    console.log(profileData);
+
+    const saveUserData = (formValues) => privateRoute.post(
+      '/user', formValues,
+    );
+
+    const response = yield call(saveUserData, profileData);
+
+    if (response.data.user && response.data.business) {
+      yield put(userSaved({
+        ...response.data.business, ...response.data.user,
+      }));
+      if (profileData.type === 'producer') {
+        yield put(push(`/brewery/${response.data.user.businessId}`));
+      } else {
+        yield put(push('/'));
+      }
+    }
+  } catch (err) {
+    yield put(userSaveError(err));
+  }
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -72,7 +100,12 @@ function* updateUserSaga() {
   yield debounce(1000, UPDATE_USER, updateUser);
 }
 
+function* saveUserSaga() {
+  yield takeLatest(SAVE_USER, saveUser);
+}
+
 export default function* rootSaga() {
   yield spawn(fetchUserSaga);
   yield spawn(updateUserSaga);
+  yield spawn(saveUserSaga);
 }

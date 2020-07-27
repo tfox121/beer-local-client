@@ -29,7 +29,10 @@ function MessageFeed({
               </Feed.Label>
               <Feed.Content>
                 <Feed.Summary>
+                  {message.author === user.sub ? user.primaryContactName : business.primaryContactName}
+                  {' ('}
                   <Feed.User>{message.author === user.sub ? user.businessName : business.businessName}</Feed.User>
+                  )
                   <Feed.Date>{timeAgo.format(Date.parse(message.createdAt))}</Feed.Date>
                 </Feed.Summary>
                 <Feed.Extra text>{message.content}</Feed.Extra>
