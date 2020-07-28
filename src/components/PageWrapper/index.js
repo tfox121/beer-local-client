@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 
 const PageWrapperStyle = styled(Container)`
   &&& {
+    background-color: white;
     min-height: calc(100vh - 49px);
     min-width: 800px;
 

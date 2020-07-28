@@ -19,6 +19,7 @@ import Can from '../Can';
 
 import messages from './messages';
 import { makeSelectUser } from './selectors';
+import NavBarStyle from './NavBarStyle';
 
 function NavBar({ userProfile, pushRoute }) {
   const [activeItem, setActiveItem] = useState('');
@@ -45,133 +46,133 @@ function NavBar({ userProfile, pushRoute }) {
   };
 
   return (
-    <>
-      <header>
-        <Menu fixed="top">
-          {userProfile ? (
-            <Responsive as={Dropdown} header trigger={<FormattedMessage {...messages.home} />} item maxWidth={425}>
-              <Dropdown.Menu>
-                <Dropdown.Item
-                  content="Home"
-                  name="/"
-                  active={activeItem === '/'}
-                  onClick={handleItemClick}
-                />
-                <Can
-                  role={userProfile.role}
-                  perform="producer-menu:visit"
-                  yes={() => (
-                    <>
-                      <Dropdown.Item
-                        content="Your Store"
-                        active={activeItem === '/brewery/profile'}
-                        onClick={handleItemClick}
-                        name="/brewery/profile"
-                      />
-                      <Dropdown.Item
-                        content="Orders"
-                        active={activeItem === '/sales/orders'}
-                        onClick={handleItemClick}
-                        name="/sales/orders"
-                      />
-                    </>
-                  )}
-                />
-                <Can
-                  role={userProfile.role}
-                  perform="retailer-menu:visit"
-                  yes={() => (
-                    <>
-                      <Dropdown.Item
-                        name="/breweries"
-                        content="Breweries"
-                        active={activeItem === '/breweries'}
-                        onClick={handleItemClick}
-                      />
-                      <Dropdown.Item
-                        content="Orders"
-                        active={activeItem === '/sales/orders'}
-                        onClick={handleItemClick}
-                        name="/sales/orders"
-                      />
-                    </>
-                  )}
-                />
-              </Dropdown.Menu>
-            </Responsive>
-          )
-            : (
-              <Responsive
-                as={Menu.Item}
+    <NavBarStyle>
+      <Menu fixed="top">
+        {userProfile ? (
+          <Responsive as={Dropdown} header text="BeerLocal" item maxWidth={425}>
+            <Dropdown.Menu>
+              <Dropdown.Item
+                content="Home"
                 name="/"
                 active={activeItem === '/'}
                 onClick={handleItemClick}
-                maxWidth={425}
-              >
-                <FormattedMessage {...messages.home} />
-              </Responsive>
+              />
+              <Can
+                role={userProfile.role}
+                perform="producer-menu:visit"
+                yes={() => (
+                  <>
+                    <Dropdown.Item
+                      content="Your Store"
+                      active={activeItem === '/brewery/profile'}
+                      onClick={handleItemClick}
+                      name="/brewery/profile"
+                    />
+                    <Dropdown.Item
+                      content="Orders"
+                      active={activeItem === '/sales/orders'}
+                      onClick={handleItemClick}
+                      name="/sales/orders"
+                    />
+                  </>
+                )}
+              />
+              <Can
+                role={userProfile.role}
+                perform="retailer-menu:visit"
+                yes={() => (
+                  <>
+                    <Dropdown.Item
+                      name="/breweries"
+                      content="Breweries"
+                      active={activeItem === '/breweries'}
+                      onClick={handleItemClick}
+                    />
+                    <Dropdown.Item
+                      content="Orders"
+                      active={activeItem === '/sales/orders'}
+                      onClick={handleItemClick}
+                      name="/sales/orders"
+                    />
+                  </>
+                )}
+              />
+            </Dropdown.Menu>
+          </Responsive>
+        )
+          : (
+            <Responsive
+              as={Menu.Item}
+              name="/"
+              active={activeItem === '/'}
+              onClick={handleItemClick}
+              maxWidth={425}
+              className="home-button"
+            >
+              BeerLocal
+            </Responsive>
+          )}
+        <Responsive
+          as={Menu.Item}
+          name="/"
+          active={activeItem === '/'}
+          onClick={handleItemClick}
+          minWidth={426}
+          className="home-button"
+        >
+          BeerLocal
+        </Responsive>
+        <Responsive as={React.Fragment} minWidth={426}>
+          <Can
+            role={userProfile.role}
+            perform="producer-menu:visit"
+            yes={() => (
+              <>
+                <Menu.Item
+                  content="Your Store"
+                  active={activeItem === '/brewery/profile'}
+                  onClick={handleItemClick}
+                  name="/brewery/profile"
+                />
+                <Menu.Item
+                  content="Orders"
+                  active={activeItem === '/sales/orders'}
+                  onClick={handleItemClick}
+                  name="/sales/orders"
+                />
+              </>
             )}
-          <Responsive
-            as={Menu.Item}
-            name="/"
-            active={activeItem === '/'}
-            onClick={handleItemClick}
-            minWidth={426}
-          >
-            <FormattedMessage {...messages.home} />
-          </Responsive>
-          <Responsive as={React.Fragment} minWidth={426}>
-            <Can
-              role={userProfile.role}
-              perform="producer-menu:visit"
-              yes={() => (
-                <>
-                  <Menu.Item
-                    content="Your Store"
-                    active={activeItem === '/brewery/profile'}
-                    onClick={handleItemClick}
-                    name="/brewery/profile"
-                  />
-                  <Menu.Item
-                    content="Orders"
-                    active={activeItem === '/sales/orders'}
-                    onClick={handleItemClick}
-                    name="/sales/orders"
-                  />
-                </>
-              )}
-            />
-            <Can
-              role={userProfile.role}
-              perform="retailer-menu:visit"
-              yes={() => (
-                <>
-                  <Menu.Item
-                    name="/breweries"
-                    content="Breweries"
-                    active={activeItem === '/breweries'}
-                    onClick={handleItemClick}
-                  />
-                  <Menu.Item
-                    content="Orders"
-                    active={activeItem === '/sales/orders'}
-                    onClick={handleItemClick}
-                    name="/sales/orders"
-                  />
-                </>
-              )}
-            />
-          </Responsive>
-          <Menu.Menu position="right">
-            <UserMenuItems
-              notifications={userProfile.notifications}
-              avatarSource={userProfile.avatarSource}
-              businessName={userProfile.businessName}
-            />
-          </Menu.Menu>
-        </Menu>
-      </header>
-    </>
+          />
+          <Can
+            role={userProfile.role}
+            perform="retailer-menu:visit"
+            yes={() => (
+              <>
+                <Menu.Item
+                  name="/breweries"
+                  content="Breweries"
+                  active={activeItem === '/breweries'}
+                  onClick={handleItemClick}
+                />
+                <Menu.Item
+                  content="Orders"
+                  active={activeItem === '/sales/orders'}
+                  onClick={handleItemClick}
+                  name="/sales/orders"
+                />
+              </>
+            )}
+          />
+        </Responsive>
+        <Menu.Menu position="right">
+          <UserMenuItems
+            notifications={userProfile.notifications}
+            avatarSource={userProfile.avatarSource}
+            businessName={userProfile.businessName}
+          />
+        </Menu.Menu>
+      </Menu>
+    </NavBarStyle>
   );
 }
 

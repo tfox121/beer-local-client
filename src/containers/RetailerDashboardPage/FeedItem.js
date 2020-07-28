@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -19,19 +18,17 @@ import { makeSelectProducerFollowing } from '../App/selectors';
 const FeedItem = ({
   producerItem, userProfile, producerFollow, producerFollowing,
 }) => {
-  const [producerFollowed, setProducerFollowed] = useState(false);
+  const [followButtonClicked, setFollowButtonClicked] = useState(false);
 
   useEffect(() => {
-    if (userProfile.followedProducers && producerItem) {
-      const followedProducerList = userProfile.followedProducers.map((producer) => producer.sub);
-      if (followedProducerList.includes(producerItem.sub)) {
-        setProducerFollowed(true);
-      }
+    if (!producerFollowing) {
+      setFollowButtonClicked(false);
     }
-  }, [userProfile, producerItem]);
+  }, [producerFollowing]);
 
   const handleFollowClick = async () => {
     producerFollow(producerItem.sub);
+    setFollowButtonClicked(true);
   };
 
   const multiNewItemRender = (itemGroup) => {
@@ -170,7 +167,7 @@ const FeedItem = ({
               <Image size="small" centered src={producer.avatarSource || '/images/avatars/blank-avatar.webp'} alt="product" />
               <p style={{ marginBottom: '0', paddingTop: '0' }}>{producer.intro}</p>
             </div>
-            <Button style={{ maxWidth: '100px', maxHeight: '30px', alignSelf: 'flex-end' }} size="mini" loading={producerFollowing} positive={userProfile.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub)} icon={userProfile.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub) ? 'check' : 'plus'} content={producerFollowed ? 'Following' : 'Follow'} onClick={handleFollowClick} />
+            <Button style={{ maxWidth: '100px', maxHeight: '30px', alignSelf: 'flex-end' }} size="mini" loading={followButtonClicked} positive={userProfile.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub)} icon={userProfile.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub) ? 'check' : 'plus'} content={userProfile.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub) ? 'Following' : 'Follow'} onClick={handleFollowClick} />
           </Feed.Extra>
         </Segment>
         {/* <Feed.Meta>

@@ -7,7 +7,9 @@
 
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Header, Segment, Message } from 'semantic-ui-react';
+import {
+  Header, Segment, Message, Button,
+} from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import PropTypes from 'prop-types';
@@ -21,6 +23,7 @@ import { makeSelectUser } from '../App/selectors';
 import { fetchUser } from '../App/actions';
 import RetailerDashboardPage from '../RetailerDashboardPage';
 import ProducerDashboardPage from '../ProducerDashboardPage';
+import HomepageStyle from './HomepageStyle';
 
 const HomePage = ({ userProfile, userFetch }) => {
   const { isAuthenticated } = useAuth0();
@@ -62,11 +65,18 @@ const HomePage = ({ userProfile, userFetch }) => {
     }
     return (
       <PageWrapper>
-        <Segment basic className="primary wrapper">
-          <Header as="h1">
-            <FormattedMessage {...messages.header} />
-          </Header>
-        </Segment>
+        <HomepageStyle>
+          <div className="full-page" />
+          <Segment basic textAlign="center">
+            <Header className="primary">
+              BeerLocal
+            </Header>
+            <Header as="h5" className="sub-header">
+              Buy local. Sell local.
+            </Header>
+            <Button size="large" inverted icon="angle right" labelPosition="right" content="Get Started" />
+          </Segment>
+        </HomepageStyle>
       </PageWrapper>
     );
   };

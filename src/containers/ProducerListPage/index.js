@@ -3,13 +3,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { push } from 'connected-react-router';
-
 import {
-  Header, Segment, Table, Image, Dropdown, Grid,
+  Header, Segment, Table, Dropdown, Grid,
 } from 'semantic-ui-react';
 import { createStructuredSelector } from 'reselect';
-import { Map, TileLayer } from 'react-leaflet';
-import { Link } from 'react-router-dom';
 
 import { Helmet } from 'react-helmet';
 import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
@@ -21,8 +18,6 @@ import reducer from './reducer';
 import saga from './saga';
 import { makeSelectProducerList } from './selectors';
 import { fetchProducers, clearProducers } from './actions';
-import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
-import MapMarker from '../../components/MapMarker';
 import ProducerListPageStyle from './ProducerListPageStyle';
 import { makeSelectUser } from '../App/selectors';
 import ProducerListItem from './ProducerListItem';
@@ -116,8 +111,9 @@ const ProducerListPage = ({
             <Table basic unstackable>
               <Table.Body>
                 {producers && filterCombine(producers).map((producer) => (
-                  // eslint-disable-next-line no-underscore-dangle
-                  <ProducerListItem user={user} producer={producer} />
+                  <React.Fragment key={producer._id}>
+                    <ProducerListItem user={user} producer={producer} />
+                  </React.Fragment>
                 ))}
               </Table.Body>
             </Table>

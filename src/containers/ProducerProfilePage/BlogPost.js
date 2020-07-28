@@ -1,5 +1,5 @@
 /* eslint-disable react/no-danger */
-/* eslint-disable no-underscore-dangle */
+
 import React, { useState } from 'react';
 import {
   convertFromRaw, EditorState, convertToRaw,

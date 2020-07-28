@@ -20,7 +20,7 @@ import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { getPrivateRoute } from '../../utils/api';
 import promotionCopySelection from '../../utils/promotionCopy';
-import { fetchProfile } from './actions';
+import { fetchProfile, addPromotion } from './actions';
 import reducer from './reducer';
 import saga from './saga';
 
@@ -29,7 +29,7 @@ import { PACK_SIZES } from '../../utils/constants';
 import PromotionModalStyle from './PromotionModalStyle';
 
 const PromotionModal = ({
-  producerProfile, userProfile, profileFetch, location,
+  producerProfile, userProfile, profileFetch, location, promotionAdd,
 }) => {
   useInjectReducer({ key: 'producerProfilePage', reducer });
   useInjectSaga({ key: 'producerProfilePage', saga });
@@ -113,10 +113,11 @@ const PromotionModal = ({
   };
 
   const handleSave = async () => {
-    const privateRoute = await getPrivateRoute();
-    const response = await privateRoute.post('/producer/promotion', promotionSelectedValues);
+    // const privateRoute = await getPrivateRoute();
+    // const response = await privateRoute.post('/producer/promotion', promotionSelectedValues);
+    promotionAdd(promotionSelectedValues);
     setModalOpen(false);
-    console.log(response.data);
+    // console.log(response.data);
   };
 
   return (
@@ -305,6 +306,8 @@ PromotionModal.propTypes = {
   producerProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   profileFetch: PropTypes.func,
+  promotionAdd: PropTypes.func,
+
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -315,6 +318,7 @@ const mapStateToProps = createStructuredSelector({
 function mapDispatchToProps(dispatch) {
   return {
     profileFetch: (location) => dispatch(fetchProfile(location.pathname)),
+    promotionAdd: (promotionAddData) => dispatch(addPromotion(promotionAddData)),
   };
 }
 

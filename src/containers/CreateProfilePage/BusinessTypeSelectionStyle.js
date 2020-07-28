@@ -43,11 +43,11 @@ div.two.column.grid > div.row {
 }
 
 .two.column.grid >  .row > button.column.typeSelector.producer::after {
-  background-image: url("./images/profileCreation/breweryBackground.jpg")
+  background-image: url("./images/profileCreation/breweryBackground.jpg");
 }
 
 .two.column.grid >  .row > button.column.typeSelector.retailer::after {
-  background-image: url("./images/profileCreation/retailerBackground.jpg")
+  background-image: url("./images/profileCreation/retailerBackground.jpg");
 }
 `;
 

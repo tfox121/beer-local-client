@@ -49,6 +49,7 @@ import ProducerDashboardPage from '../ProducerDashboardPage';
 
 const key = 'global';
 const AppWrapper = styled.div`
+  background-color: #FDFDF0;
   min-width: 100%;
   // max-width: calc(768px + 16px * 2);
   margin: 49px auto 0;

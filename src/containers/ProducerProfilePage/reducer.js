@@ -25,6 +25,12 @@ import {
   UPDATE_STOCK,
   UPDATE_STOCK_SUCCESS,
   UPDATE_STOCK_ERROR,
+  ADD_PROMOTION,
+  ADD_PROMOTION_SUCCESS,
+  ADD_PROMOTION_ERROR,
+  DELETE_PROMOTION,
+  DELETE_PROMOTION_SUCCESS,
+  DELETE_PROMOTION_ERROR,
 } from './constants';
 
 export const initialState = {
@@ -41,6 +47,10 @@ export const initialState = {
   editBlogError: false,
   updatingStock: false,
   updatingStockError: false,
+  addingPromotion: false,
+  addingPromotionError: false,
+  deletingPromotion: false,
+  deletingPromotionError: false,
 };
 
 /* eslint-disable default-case, no-param-reassign */
@@ -55,7 +65,6 @@ const producerProfilePageReducer = (state = initialState, action) => produce(sta
     case FETCH_PROFILE_SUCCESS:
       if (action.profile) {
         draftState.profile = action.profile;
-        draftState.fetchProfileError = false;
         draftState.fetchProfileError = false;
       }
       draftState.fetchingProfile = false;
@@ -80,6 +89,7 @@ const producerProfilePageReducer = (state = initialState, action) => produce(sta
         draftState.profile = action.profile;
         draftState.updateProfileError = false;
       }
+      draftState.updatingProfile = false;
       break;
     case UPDATE_PROFILE_ERROR:
       if (action.error) {
@@ -105,9 +115,9 @@ const producerProfilePageReducer = (state = initialState, action) => produce(sta
     case BLOG_POST_SUCCESS:
       if (action.blogPosts) {
         draftState.profile.blog = [...action.blogPosts];
+        draftState.postBlogError = false;
       }
       draftState.postingBlog = false;
-      draftState.postBlogError = false;
       break;
     case BLOG_POST_ERROR:
       draftState.postBlogError = true;
@@ -120,9 +130,9 @@ const producerProfilePageReducer = (state = initialState, action) => produce(sta
     case BLOG_EDIT_SUCCESS:
       if (action.blogPosts) {
         draftState.profile.blog = [...action.blogPosts];
+        draftState.editBlogError = false;
       }
       draftState.editingBlog = false;
-      draftState.editBlogError = false;
       break;
     case BLOG_EDIT_ERROR:
       draftState.editBlogError = true;
@@ -135,13 +145,43 @@ const producerProfilePageReducer = (state = initialState, action) => produce(sta
     case UPDATE_STOCK_SUCCESS:
       if (action.stock) {
         draftState.profile.stock = [...action.stock];
+        draftState.updatingStockError = false;
       }
-      draftState.updatingStockError = false;
       draftState.updatingStock = false;
       break;
     case UPDATE_STOCK_ERROR:
       draftState.updatingStockError = true;
       draftState.updatingStock = false;
+      break;
+    case ADD_PROMOTION:
+      draftState.addingPromotionError = false;
+      draftState.addingPromotion = true;
+      break;
+    case ADD_PROMOTION_SUCCESS:
+      if (action.promotions) {
+        draftState.profile.promotions = [...action.promotions];
+        draftState.addingPromotionError = false;
+      }
+      draftState.addingPromotion = false;
+      break;
+    case ADD_PROMOTION_ERROR:
+      draftState.addingPromotionError = true;
+      draftState.addingPromotion = false;
+      break;
+    case DELETE_PROMOTION:
+      draftState.deletingPromotionError = false;
+      draftState.deletingPromotion = true;
+      break;
+    case DELETE_PROMOTION_SUCCESS:
+      if (action.promotions) {
+        draftState.profile.promotions = [...action.promotions];
+        draftState.deletingPromotionError = false;
+      }
+      draftState.deletingPromotion = false;
+      break;
+    case DELETE_PROMOTION_ERROR:
+      draftState.deletingPromotionError = true;
+      draftState.deletingPromotion = false;
       break;
   }
 });

@@ -1,35 +1,35 @@
-/* eslint-disable no-underscore-dangle */
 import {
   call, put, debounce, spawn,
 } from 'redux-saga/effects';
-import { FETCH_ORDER } from './constants';
+import { FETCH_PRODUCER_DASHBOARD } from './constants';
 import {
-  orderFetched, orderFetchError,
+  producerDashboardFetched, producerDashboardFetchError,
 } from './actions';
 import { getPrivateRoute } from '../../utils/api';
 
-function* fetchOrder({ pathName }) {
+function* fetchProducerDashboard() {
   try {
-    const orderId = pathName.split('/')[2];
-
     const privateRoute = yield call(getPrivateRoute);
-    const fetchOrderData = () => privateRoute.get(`/orders/${orderId}`);
-    const response = yield call(fetchOrderData);
+    const fetchOrderData = () => privateRoute.get('/orders');
+    const orderResponse = yield call(fetchOrderData);
 
-    console.log('ORDER RETRIEVED', response.data);
+    const fetchRetailersData = () => privateRoute.get('/producer/retailers');
+    const retailersResponse = yield call(fetchRetailersData);
 
-    if (response.data) {
-      yield put(orderFetched(response.data));
+    console.log('PRODUCER DASHBOARD DATA RETRIEVED');
+
+    if (orderResponse.data && retailersResponse.data) {
+      yield put(producerDashboardFetched({ orders: orderResponse.data, retailers: retailersResponse.data }));
     }
   } catch (err) {
-    yield put(orderFetchError(err));
+    yield put(producerDashboardFetchError(err));
   }
 }
 
-function* fetchOrderSaga() {
-  yield debounce(2000, FETCH_ORDER, fetchOrder);
+function* fetchProducerDashboardSaga() {
+  yield debounce(2000, FETCH_PRODUCER_DASHBOARD, fetchProducerDashboard);
 }
 
 export default function* rootSaga() {
-  yield spawn(fetchOrderSaga);
+  yield spawn(fetchProducerDashboardSaga);
 }

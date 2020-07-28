@@ -1,35 +1,32 @@
-/* eslint-disable no-underscore-dangle */
 import {
   call, put, debounce, spawn,
 } from 'redux-saga/effects';
-import { FETCH_ORDER } from './constants';
+import { FETCH_PRODUCER_FEED } from './constants';
 import {
-  orderFetched, orderFetchError,
+  producerFeedFetched, producerFeedFetchError,
 } from './actions';
 import { getPrivateRoute } from '../../utils/api';
 
-function* fetchOrder({ pathName }) {
+function* fetchProducerFeed() {
   try {
-    const orderId = pathName.split('/')[2];
-
     const privateRoute = yield call(getPrivateRoute);
-    const fetchOrderData = () => privateRoute.get(`/orders/${orderId}`);
-    const response = yield call(fetchOrderData);
+    const fetchProducerFeedData = () => privateRoute.get('/retailer/producers');
+    const response = yield call(fetchProducerFeedData);
 
-    console.log('ORDER RETRIEVED', response.data);
+    console.log('PRODUCER FEED RETRIEVED', response.data);
 
     if (response.data) {
-      yield put(orderFetched(response.data));
+      yield put(producerFeedFetched(response.data));
     }
   } catch (err) {
-    yield put(orderFetchError(err));
+    yield put(producerFeedFetchError(err));
   }
 }
 
-function* fetchOrderSaga() {
-  yield debounce(2000, FETCH_ORDER, fetchOrder);
+function* fetchProducerFeedSaga() {
+  yield debounce(2000, FETCH_PRODUCER_FEED, fetchProducerFeed);
 }
 
 export default function* rootSaga() {
-  yield spawn(fetchOrderSaga);
+  yield spawn(fetchProducerFeedSaga);
 }

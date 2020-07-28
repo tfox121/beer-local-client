@@ -47,7 +47,7 @@ const producerOrdersPageReducer = (state = initialState, action) => produce(stat
     case EDIT_ORDER_SUCCESS:
       if (action.order) {
         draftState.orders.orders = draftState.orders.orders.map((order) => {
-          // eslint-disable-next-line no-underscore-dangle
+
           if (order._id === action.order._id) {
             return action.order;
           }

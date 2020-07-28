@@ -11,6 +11,21 @@ const selectRetailerDashboardPageDomain = (state) => state.RetailerDashboardPage
  * Other specific selectors
  */
 
+const makeSelectProducerFeed = () => createSelector(
+  selectRetailerDashboardPageDomain,
+  (substate) => substate.producerFeed,
+);
+
+const makeSelectProducerFeedFetching = () => createSelector(
+  selectRetailerDashboardPageDomain,
+  (substate) => substate.fetchingProducerFeed,
+);
+
+const makeSelectProducerFeedFetchError = () => createSelector(
+  selectRetailerDashboardPageDomain,
+  (substate) => substate.fetchingProducerFeedError,
+);
+
 /**
  * Default selector used by RetailerDashboardPage
  */
@@ -22,5 +37,5 @@ const makeSelectRetailerDashboardPage = () => createSelector(
 
 export default makeSelectRetailerDashboardPage;
 export {
-  selectRetailerDashboardPageDomain,
+  selectRetailerDashboardPageDomain, makeSelectProducerFeed, makeSelectProducerFeedFetching, makeSelectProducerFeedFetchError,
 };

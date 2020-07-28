@@ -9,6 +9,6 @@
  * export const YOUR_ACTION_CONSTANT = 'yourproject/YourContainer/YOUR_ACTION_CONSTANT';
  */
 
-export const FETCH_ORDER = 'beerlocal/ProducerDashboardPage/FETCH_ORDER';
-export const FETCH_ORDER_SUCCESS = 'beerlocal/ProducerDashboardPage/FETCH_ORDER_SUCCESS';
-export const FETCH_ORDER_ERROR = 'beerlocal/ProducerDashboardPage/FETCH_ORDER_ERROR';
+export const FETCH_PRODUCER_DASHBOARD = 'beerlocal/ProducerDashboardPage/FETCH_PRODUCER_DASHBOARD';
+export const FETCH_PRODUCER_DASHBOARD_SUCCESS = 'beerlocal/ProducerDashboardPage/FETCH_PRODUCER_DASHBOARD_SUCCESS';
+export const FETCH_PRODUCER_DASHBOARD_ERROR = 'beerlocal/ProducerDashboardPage/FETCH_PRODUCER_DASHBOARD_ERROR';

@@ -5,22 +5,21 @@
  */
 
 import {
-  FETCH_ORDER,
-  FETCH_ORDER_SUCCESS,
-  FETCH_ORDER_ERROR,
+  FETCH_PRODUCER_DASHBOARD,
+  FETCH_PRODUCER_DASHBOARD_SUCCESS,
+  FETCH_PRODUCER_DASHBOARD_ERROR,
 } from './constants';
 
-export const fetchOrder = (pathName) => ({
-  type: FETCH_ORDER,
-  pathName,
+export const fetchProducerDashboard = () => ({
+  type: FETCH_PRODUCER_DASHBOARD,
 });
 
-export const orderFetched = (order) => ({
-  type: FETCH_ORDER_SUCCESS,
-  order,
+export const producerDashboardFetched = (producerDashboard) => ({
+  type: FETCH_PRODUCER_DASHBOARD_SUCCESS,
+  producerDashboard,
 });
 
-export const orderFetchError = (error) => ({
-  type: FETCH_ORDER_ERROR,
+export const producerDashboardFetchError = (error) => ({
+  type: FETCH_PRODUCER_DASHBOARD_ERROR,
   error,
 });

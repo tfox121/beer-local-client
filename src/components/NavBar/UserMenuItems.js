@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
@@ -45,15 +44,15 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
   const NotificationCircle = styled.div`
     position: absolute;
     display: flex;
-    right: 20px;
-    bottom: 7.5px;
+    right: 10px;
+    bottom: 8.5px;
     background-color: red;
     height: 12px;
     width: 12px;
     font-size: 10px;
     color: white;
     justify-content: center;
-    align-items: center
+    align-items: center;
     border-radius: 50%;
   `;
 
@@ -82,6 +81,7 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
           icon={(
             <>
               <Icon
+                fitted
                 size="large"
                 name={unreadNotifications ? 'bell' : 'bell outline'}
                 color={unreadNotifications ? 'blue' : 'black'}

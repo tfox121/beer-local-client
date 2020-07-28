@@ -6,13 +6,13 @@ import {
   call, put, spawn, debounce, takeLatest,
 } from 'redux-saga/effects';
 import { push } from 'connected-react-router';
-import { FETCH_USER, UPDATE_USER, SAVE_USER } from './constants';
 import {
-  userFetched, userFetchError, userUpdated, userUpdateError, userSaved, userSaveError,
+  FETCH_USER, UPDATE_USER, SAVE_USER, FOLLOW_PRODUCER,
+} from './constants';
+import {
+  userFetched, userFetchError, userUpdated, userUpdateError, userSaved, userSaveError, producerFollowed, producerFollowError,
 } from './actions';
 import { getPrivateRoute } from '../../utils/api';
-import { getOwnAvatar, getOwnBanner } from '../../utils/getImages';
-import createBlobUrl from '../../utils/createBlobUrl';
 
 function* fetchUser() {
   try {
@@ -84,6 +84,22 @@ function* saveUser({ profileData }) {
   }
 }
 
+function* followProducer({ producerSub }) {
+  try {
+    const privateRoute = yield call(getPrivateRoute);
+    const followData = () => privateRoute.patch('/user/follow', { follow: producerSub });
+
+    const response = yield call(followData);
+
+    if (response.data) {
+      yield put(producerFollowed(response.data));
+    }
+  } catch (err) {
+    console.log('ERROR', err);
+    yield put(producerFollowError(err));
+  }
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -104,8 +120,13 @@ function* saveUserSaga() {
   yield takeLatest(SAVE_USER, saveUser);
 }
 
+function* followProducerSaga() {
+  yield debounce(1000, FOLLOW_PRODUCER, followProducer);
+}
+
 export default function* rootSaga() {
   yield spawn(fetchUserSaga);
   yield spawn(updateUserSaga);
   yield spawn(saveUserSaga);
+  yield spawn(followProducerSaga);
 }

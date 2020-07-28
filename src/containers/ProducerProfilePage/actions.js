@@ -25,6 +25,12 @@ import {
   UPDATE_STOCK,
   UPDATE_STOCK_SUCCESS,
   UPDATE_STOCK_ERROR,
+  ADD_PROMOTION,
+  ADD_PROMOTION_SUCCESS,
+  ADD_PROMOTION_ERROR,
+  DELETE_PROMOTION,
+  DELETE_PROMOTION_SUCCESS,
+  DELETE_PROMOTION_ERROR,
 } from './constants';
 
 export const fetchProfile = (pathName) => ({
@@ -122,5 +128,35 @@ export const stockUpdated = (stock) => ({
 
 export const stockUpdateError = (error) => ({
   type: UPDATE_STOCK_ERROR,
+  error,
+});
+
+export const addPromotion = (promotionAddData) => ({
+  type: ADD_PROMOTION,
+  promotionAddData,
+});
+
+export const promotionAdded = (promotions) => ({
+  type: ADD_PROMOTION_SUCCESS,
+  promotions,
+});
+
+export const promotionAddError = (error) => ({
+  type: ADD_PROMOTION_ERROR,
+  error,
+});
+
+export const deletePromotion = (promotionId) => ({
+  type: DELETE_PROMOTION,
+  promotionId,
+});
+
+export const promotionDeleted = (promotions) => ({
+  type: DELETE_PROMOTION_SUCCESS,
+  promotions,
+});
+
+export const promotionDeleteError = (error) => ({
+  type: DELETE_PROMOTION_ERROR,
   error,
 });

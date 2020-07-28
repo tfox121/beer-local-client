@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
-/* eslint-disable no-underscore-dangle */
+
 /**
  *
  * ProducerProfilePage
@@ -37,7 +37,9 @@ import { useInjectReducer } from '../../utils/injectReducer';
 import { BLOG_ITEMS_PER_PAGE, PACK_SIZES } from '../../utils/constants';
 import { makeSelectUser, makeSelectProducerProfile } from './selectors';
 import { makeSelectLocation, makeSelectProducerFollowing } from '../App/selectors';
-import { fetchProfile, clearProfile } from './actions';
+import {
+  fetchProfile, clearProfile, addPromotion, deletePromotion,
+} from './actions';
 import { followProducer } from '../App/actions';
 import reducer from './reducer';
 import saga from './saga';
@@ -69,6 +71,8 @@ export function ProducerProfilePage({
   routerLocation,
   producerFollow,
   producerFollowing,
+  promotionAdd,
+  promotionDelete,
 }) {
   useInjectReducer({ key: 'producerProfilePage', reducer });
   useInjectSaga({ key: 'producerProfilePage', saga });
@@ -126,9 +130,10 @@ export function ProducerProfilePage({
   };
 
   const handleDeletePromo = async (id) => {
-    const privateRoute = await getPrivateRoute();
-    const response = await privateRoute.delete(`/producer/promotion/${id}`);
-    console.log(response);
+    // const privateRoute = await getPrivateRoute();
+    // const response = await privateRoute.delete(`/producer/promotion/${id}`);
+    // console.log(response);
+    promotionDelete(id);
   };
 
   const blogRender = (blogArray, page) => blogArray.filter((blogPost) => blogPost.display === true || (user && user.businessId === businessId)).map((blogPost, index) => {
@@ -350,6 +355,7 @@ ProducerProfilePage.propTypes = {
   routerLocation: PropTypes.object,
   producerFollow: PropTypes.func,
   producerFollowing: PropTypes.bool,
+  promotionDelete: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -364,6 +370,7 @@ function mapDispatchToProps(dispatch, { location }) {
     profileFetch: () => dispatch(fetchProfile(location.pathname)),
     profileClear: () => dispatch(clearProfile()),
     producerFollow: (producerSub) => dispatch(followProducer(producerSub)),
+    promotionDelete: (promotionId) => dispatch(deletePromotion(promotionId)),
   };
 }
 

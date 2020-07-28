@@ -17,6 +17,7 @@ module.exports = {
   },
   "plugins": ['redux-saga', 'react', 'react-hooks', 'jsx-a11y'],
   rules: {
+    'no-underscore-dangle': 0,
     'arrow-body-style': [2, 'as-needed'],
     'class-methods-use-this': 0,
     'import/imports-first': 0,
@@ -27,6 +28,7 @@ module.exports = {
     'import/no-unresolved': 2,
     'import/no-webpack-loader-syntax': 0,
     'import/prefer-default-export': 0,
+
     indent: [
       2,
       2,

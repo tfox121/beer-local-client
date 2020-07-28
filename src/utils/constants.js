@@ -46,3 +46,10 @@ export const BLOG_EDITOR_TOOLBAR = {
   textAlign: { inDropdown: true },
   link: { inDropdown: true },
 };
+
+export const PRODUCER_CHART_TIME_PERIODS = {
+  year: 'quarter',
+  quarter: 'month',
+  month: 'week',
+  week: 'day',
+};

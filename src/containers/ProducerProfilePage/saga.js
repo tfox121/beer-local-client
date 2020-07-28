@@ -3,7 +3,7 @@ import {
 } from 'redux-saga/effects';
 import { push } from 'connected-react-router';
 import {
-  FETCH_PROFILE, UPDATE_PROFILE, UPDATE_PROFILE_OPTIONS, SEND_ORDER, BLOG_POST, BLOG_EDIT, UPDATE_STOCK,
+  FETCH_PROFILE, UPDATE_PROFILE, UPDATE_PROFILE_OPTIONS, SEND_ORDER, BLOG_POST, BLOG_EDIT, UPDATE_STOCK, ADD_PROMOTION, DELETE_PROMOTION,
 } from './constants';
 import {
   profileFetched,
@@ -18,12 +18,10 @@ import {
   blogEditError,
   stockUpdated,
   stockUpdateError,
-  updateStock,
+  promotionAdded,
+  promotionAddError,
 } from './actions';
 import { publicRoute, getPrivateRoute } from '../../utils/api';
-import { getBanner, getAvatar } from '../../utils/getImages';
-import { producerFollowed, producerFollowError } from '../App/actions';
-import { FOLLOW_PRODUCER } from '../App/constants';
 
 function* fetchProfile({ pathName }) {
   try {
@@ -89,28 +87,12 @@ function* sendOrder({ orderInfo }) {
 
     if (response.data) {
       yield put(orderSent());
-      // eslint-disable-next-line no-underscore-dangle
+
       yield put(push(`/order/${response.data.order._id}`));
     }
   } catch (err) {
     console.log('ERROR', err);
     yield put(orderSendError(err));
-  }
-}
-
-function* followProducer({ producerSub }) {
-  try {
-    const privateRoute = yield call(getPrivateRoute);
-    const followData = () => privateRoute.patch('/user/follow', { follow: producerSub });
-
-    const response = yield call(followData);
-
-    if (response.data) {
-      yield put(producerFollowed(response.data));
-    }
-  } catch (err) {
-    console.log('ERROR', err);
-    yield put(producerFollowError(err));
   }
 }
 
@@ -164,6 +146,40 @@ function* stockUpdate({ stockEditData }) {
   }
 }
 
+function* addPromotion({ promotionAddData }) {
+  try {
+    const privateRoute = yield call(getPrivateRoute);
+
+    const promotionData = () => privateRoute.post('/producer/promotion', promotionAddData);
+
+    const response = yield call(promotionData);
+
+    if (response.data) {
+      yield put(promotionAdded(response.data.promotions));
+    }
+  } catch (err) {
+    console.log('ERROR', err);
+    yield put(promotionAddError(err));
+  }
+}
+
+function* deletePromotion({ promotionId }) {
+  try {
+    const privateRoute = yield call(getPrivateRoute);
+
+    const promotionData = () => privateRoute.delete(`/producer/promotion/${promotionId}`);
+
+    const response = yield call(promotionData);
+
+    if (response.data) {
+      yield put(promotionAdded(response.data.promotions));
+    }
+  } catch (err) {
+    console.log('ERROR', err);
+    yield put(promotionAddError(err));
+  }
+}
+
 function* fetchProfileSaga() {
   yield debounce(500, FETCH_PROFILE, fetchProfile);
 }
@@ -180,10 +196,6 @@ function* sendOrderSaga() {
   yield debounce(2000, SEND_ORDER, sendOrder);
 }
 
-function* followProducerSaga() {
-  yield debounce(1000, FOLLOW_PRODUCER, followProducer);
-}
-
 function* blogPostSaga() {
   yield takeLatest(BLOG_POST, blogPost);
 }
@@ -196,13 +208,22 @@ function* stockUpdateSaga() {
   yield takeLatest(UPDATE_STOCK, stockUpdate);
 }
 
+function* addPromotionSaga() {
+  yield takeLatest(ADD_PROMOTION, addPromotion);
+}
+
+function* deletePromotionSaga() {
+  yield takeLatest(DELETE_PROMOTION, deletePromotion);
+}
+
 export default function* rootSaga() {
   yield spawn(fetchProfileSaga);
   yield spawn(updateProfileSaga);
   yield spawn(updateProfileOptionsSaga);
   yield spawn(sendOrderSaga);
-  yield spawn(followProducerSaga);
   yield spawn(blogPostSaga);
   yield spawn(blogEditSaga);
   yield spawn(stockUpdateSaga);
+  yield spawn(addPromotionSaga);
+  yield spawn(deletePromotionSaga);
 }

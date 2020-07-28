@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Image, Button } from 'semantic-ui-react';
@@ -17,19 +16,17 @@ import { makeSelectProducerFollowing } from '../App/selectors';
 const ProducerListItem = ({
   producer, user, producerFollow, producerFollowing, pushRoute,
 }) => {
-  const [producerFollowed, setProducerFollowed] = useState(false);
+  const [followButtonClicked, setFollowButtonClicked] = useState(false);
 
   useEffect(() => {
-    if (user.followedProducers && producer) {
-      const followedProducerList = user.followedProducers.map((producerObj) => producerObj.sub);
-      if (followedProducerList.includes(producer.sub)) {
-        setProducerFollowed(true);
-      }
+    if (!producerFollowing) {
+      setFollowButtonClicked(false);
     }
-  }, [user, producer]);
+  }, [producerFollowing]);
 
   const handleFollowClick = async () => {
     producerFollow(producer.sub);
+    setFollowButtonClicked(true);
   };
 
   const handleClick = (businessId) => {
@@ -42,8 +39,7 @@ const ProducerListItem = ({
       <Table.Cell width={6}>
         <div style={{ display: 'flex' }}>
           <Link to={`/brewery/${producer.businessId}`}><h2>{producer.businessName}</h2></Link>
-          <Button size="mini" style={{ maxWidth: '100px', maxHeight: '30px', marginLeft: '1em' }} title={`${producerFollowed ? 'Unfollow ' : 'Follow '}${producer.businessName}`} loading={producerFollowing} positive={user.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub)} icon={user.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub) ? 'check' : 'plus'} onClick={handleFollowClick} />
-          {/* content={producerFollowed ? 'Following' : 'Follow'} */}
+          <Button size="mini" style={{ maxWidth: '100px', maxHeight: '30px', marginLeft: '1em' }} title={`${user.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub) ? 'Unfollow ' : 'Follow '}${producer.businessName}`} loading={followButtonClicked} positive={user.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub)} icon={user.followedProducers.map((followedProducer) => followedProducer.sub).includes(producer.sub) ? 'check' : 'plus'} onClick={handleFollowClick} />
         </div>
         <p>{producer.intro}</p>
       </Table.Cell>

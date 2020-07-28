@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import {
   call, put, takeLatest, all, debounce, spawn,
 } from 'redux-saga/effects';
