@@ -31,6 +31,7 @@ import getImageUrl from '../../utils/getImageUrl';
 import SuggestBlockStyle from '../CreateProfilePage/SuggestBlockStyle';
 import DistroMapStyle from '../CreateProfilePage/DistroMapStyle';
 import MapMarker from '../../components/MapMarker';
+import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 // import { fetchUser } from '../App/actions';
 
 const ProfileEditModal = ({
@@ -452,7 +453,7 @@ const ProfileEditModal = ({
                 <DistroMapStyle>
                   <Map center={userFormValues.location || location} zoom={10} zoomControl={false}>
                     <TileLayer
-                      url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+                      url={MAP_TILE_PROVIDER_URL}
                     />
                     <MapMarker location={userFormValues.location || location} />
                     <FeatureGroup

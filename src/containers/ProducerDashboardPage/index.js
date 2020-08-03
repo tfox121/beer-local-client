@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -22,7 +22,7 @@ import { makeSelectUser } from '../App/selectors';
 import ProducerDashboardStyle from './ProducerDashboardStyle';
 import calcOrderTotal from '../../utils/calcOrderTotal';
 import LineChart from './LineChart';
-import { PACK_SIZES, PRODUCER_CHART_TIME_PERIODS } from '../../utils/constants';
+import { PACK_SIZES, PRODUCER_CHART_TIME_PERIODS, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
 import { fetchProducerDashboard } from './actions';
@@ -103,25 +103,27 @@ const ProducerDashboardPage = ({
   };
 
   const topItemsArr = (ordersArr, period) => {
-    const itemList = ordersArr.reduce((items, order) => {
-      const itemsObj = items;
-      if (order.status === status && moment(order.createdAt).isAfter(moment().subtract(1, period))) {
-        order.items.forEach((item) => {
-          if (!itemsObj[item.id]) {
-            itemsObj[item.id] = {
-              id: item.id,
-              name: item.name,
-              packSize: item.packSize,
-              imageSource: item.imageSource,
-              salesTotal: 0,
-            };
-          }
-          itemsObj[item.id].salesTotal += (item.orderQuant * item.price);
-        });
-      }
-      return itemsObj;
-    }, {});
-    return values(itemList).sort((a, b) => (a.salesTotal > b.salesTotal) ? -1 : ((a.salesTotal < b.salesTotal) ? 1 : 0));
+    if (ordersArr.length) {
+      const itemList = ordersArr.reduce((items, order) => {
+        const itemsObj = items;
+        if (order.status === status && moment(order.createdAt).isAfter(moment().subtract(1, period))) {
+          order.items.forEach((item) => {
+            if (!itemsObj[item.id]) {
+              itemsObj[item.id] = {
+                id: item.id,
+                name: item.name,
+                packSize: item.packSize,
+                imageSource: item.imageSource,
+                salesTotal: 0,
+              };
+            }
+            itemsObj[item.id].salesTotal += (item.orderQuant * item.price);
+          });
+        }
+        return itemsObj;
+      }, {});
+      return values(itemList).sort((a, b) => (a.salesTotal > b.salesTotal) ? -1 : ((a.salesTotal < b.salesTotal) ? 1 : 0));
+    }
   };
 
   useEffect(() => {
@@ -138,9 +140,13 @@ const ProducerDashboardPage = ({
     }
   }, [dashboardOrders, salesPeriod]);
 
+  const topItems = useMemo(() => topItemsArr(dashboardOrders, salesPeriod), [dashboardOrders, salesPeriod]);
+
   if (!Object.keys(dashboardOrders).length || !Object.keys(periodSales).length) {
     return null;
   }
+
+  console.log(Number.isNaN(periodSales.averageItems));
 
   // const periodOptions = [
   //   { text: 'week', value: 'week' },
@@ -260,8 +266,9 @@ const ProducerDashboardPage = ({
                   Average Sale Value
                 </Header>
                 <Header>
-                  £
-                  {periodSales.average.toFixed(2)}
+                  {!Number.isNaN(periodSales.average)
+                    ? `£${periodSales.average.toFixed(2)}`
+                    : 'No sales to go on!'}
                 </Header>
                 {!Number.isNaN(periodSalesAverageDiff) && (
                   <>
@@ -286,7 +293,9 @@ const ProducerDashboardPage = ({
                   Average Items per Sale
                 </Header>
                 <Header>
-                  {periodSales.averageItems.toFixed(1)}
+                  {!Number.isNaN(periodSales.averageItems)
+                    ? periodSales.averageItems.toFixed(1)
+                    : 'No sales to go on!'}
                 </Header>
                 {!Number.isNaN(periodSalesAverageItemsDiff) && (
                   <>
@@ -314,7 +323,7 @@ const ProducerDashboardPage = ({
               Top Customers
             </Header>
             <Grid columns={2}>
-              {topCustomers.map((customer) => (
+              {topCustomers.length ? topCustomers.map((customer) => (
                 <Grid.Row key={customer.businessId}>
                   <Grid.Column width={12}>
                     <Image style={{ marginRight: '0.5em' }} avatar bordered centered src={customer.avatarSource || '/images/avatars/blank-avatar.webp'} alt="user avatar" />
@@ -325,7 +334,17 @@ const ProducerDashboardPage = ({
                     {customer.salesTotal.toFixed(2)}
                   </Grid.Column>
                 </Grid.Row>
-              ))}
+              ))
+                : (
+                  <Grid.Row>
+                    <Grid.Column width={16}>
+                      No customers so far this
+                      {' '}
+                      {salesPeriod}
+                      .
+                    </Grid.Column>
+                  </Grid.Row>
+                ) }
             </Grid>
           </Segment>
           <Segment>
@@ -333,7 +352,7 @@ const ProducerDashboardPage = ({
               Top Items
             </Header>
             <Grid columns={2} verticalAlign="middle">
-              {topItemsArr(dashboardOrders, salesPeriod).map((item) => (
+              {topItems.length ? topItems.map((item) => (
                 <Grid.Row key={item.id}>
                   <Grid.Column width={8}>
                     <Image style={{ marginRight: '0.5em' }} avatar bordered centered src={item.imageSource || '/images/products/blank-product.png'} alt="product" />
@@ -347,7 +366,17 @@ const ProducerDashboardPage = ({
                     {item.salesTotal.toFixed(2)}
                   </Grid.Column>
                 </Grid.Row>
-              ))}
+              ))
+                : (
+                  <Grid.Row>
+                    <Grid.Column width={16}>
+                      No items sold so far this
+                      {' '}
+                      {salesPeriod}
+                      .
+                    </Grid.Column>
+                  </Grid.Row>
+                )}
             </Grid>
           </Segment>
           <Segment>
@@ -361,7 +390,7 @@ const ProducerDashboardPage = ({
               }}
             >
               <TileLayer
-                url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+                url={MAP_TILE_PROVIDER_URL}
               />
               <DistributionAreaDisplay
                 distributionAreas={userProfile.distributionAreas}

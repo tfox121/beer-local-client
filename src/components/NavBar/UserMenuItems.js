@@ -95,7 +95,7 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
           )}
           scrolling
         >
-          <StyledDropdownMenu direction="left">
+          <StyledDropdownMenu onClick={handleClose} direction="left">
             {notificationsArr.length ? notificationsArr.map((notification) => (
               <React.Fragment key={notification._id}>
                 <Notification notification={notification} />

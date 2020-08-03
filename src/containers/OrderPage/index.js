@@ -31,7 +31,7 @@ import Can from '../../components/Can';
 import MapStyle from './MapStyle';
 import MapMarker from '../../components/MapMarker';
 import MessageBoxStyle from './MessageBoxStyle';
-import { ORDER_MESSAGE_CHARACTER_LIMIT } from '../../utils/constants';
+import { ORDER_MESSAGE_CHARACTER_LIMIT, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 
 const OrderPage = ({
   orderInfo, orderFetch, orderClear, userProfile, routerLocation, orderEdit, orderEditing, messageSend, messageSending,
@@ -353,7 +353,7 @@ const OrderPage = ({
                       zoomControl={false}
                     >
                       <TileLayer
-                        url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+                        url={MAP_TILE_PROVIDER_URL}
                       />
                       <MapMarker type="customer" location={orderInfo.business.location} name={orderInfo.business.businessName} />
                     </Map>

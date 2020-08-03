@@ -11,7 +11,7 @@ import MapMarker from '../../components/MapMarker';
 import SuggestBlockStyle from './SuggestBlockStyle';
 import MarkerMapStyle from './MarkerMapStyle';
 import ImageSelect from './ImageSelect';
-import { INTRO_CHARACTER_LIMIT } from '../../utils/constants';
+import { INTRO_CHARACTER_LIMIT, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 
 const ProducerForm = ({
   formValues,
@@ -217,7 +217,7 @@ const ProducerForm = ({
               <MarkerMapStyle>
                 <Map center={mapCentre} zoom={zoomLevel} zoomControl={false}>
                   <TileLayer
-                    url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+                    url={MAP_TILE_PROVIDER_URL}
                   />
                   <MapMarker location={formValues.location} />
                 </Map>

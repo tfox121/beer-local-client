@@ -53,3 +53,5 @@ export const PRODUCER_CHART_TIME_PERIODS = {
   month: 'week',
   week: 'day',
 };
+
+export const MAP_TILE_PROVIDER_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';

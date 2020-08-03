@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 
 import MapMarker from '../../components/MapMarker';
 import DistroMapStyle from './DistroMapStyle';
+import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 
 const SelectDistroAreasForm = ({
   formValues,
@@ -77,7 +78,7 @@ const SelectDistroAreasForm = ({
           <DistroMapStyle>
             <Map center={mapCentre} zoom={10} zoomControl={false}>
               <TileLayer
-                url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+                url={MAP_TILE_PROVIDER_URL}
               />
               <MapMarker location={formValues.location} />
               <FeatureGroup

@@ -12,6 +12,7 @@ import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
 import { followProducer } from '../App/actions';
 import { makeSelectProducerFollowing } from '../App/selectors';
+import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 
 const ProducerListItem = ({
   producer, user, producerFollow, producerFollowing, pushRoute,
@@ -46,7 +47,7 @@ const ProducerListItem = ({
       <Table.Cell width={5}>
         <Map center={producer.location} zoom={6} zoomControl={false}>
           <TileLayer
-            url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+            url={MAP_TILE_PROVIDER_URL}
           />
           <DistributionAreaDisplay distributionAreas={producer.distributionAreas} />
           <MapMarker location={producer.location} />

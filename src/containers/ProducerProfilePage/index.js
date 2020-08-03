@@ -34,7 +34,7 @@ import { Map, TileLayer } from 'react-leaflet';
 
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
-import { BLOG_ITEMS_PER_PAGE, PACK_SIZES } from '../../utils/constants';
+import { BLOG_ITEMS_PER_PAGE, PACK_SIZES, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 import { makeSelectUser, makeSelectProducerProfile } from './selectors';
 import { makeSelectLocation, makeSelectProducerFollowing } from '../App/selectors';
 import {
@@ -196,7 +196,7 @@ export function ProducerProfilePage({
                   <Card.Content extra>
                     <Label basic color="blue" as="a" href={website} target="_blank" rel="noopener noreferrer" content={website} icon="globe" />
                     <Label basic color="blue" as="a" href={`mailto:${salesEmail}`} target="_blank" rel="noopener noreferrer" content="email" icon="mail" />
-                    <Label basic content={new PhoneNumber(salesContactNumber, 'GB').getNumber('national')} icon="phone" />
+                    <Label basic color="blue" as="a" href={`tel:${new PhoneNumber(salesContactNumber, 'GB').getNumber('national')}`} content={new PhoneNumber(salesContactNumber, 'GB').getNumber('national')} icon="phone" />
                   </Card.Content>
                 </Card>
               </Grid.Column>
@@ -209,7 +209,7 @@ export function ProducerProfilePage({
                     zoomControl={false}
                   >
                     <TileLayer
-                      url="https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png"
+                      url={MAP_TILE_PROVIDER_URL}
                     />
                     <DistributionAreaDisplay
                       distributionAreas={distributionAreas}
