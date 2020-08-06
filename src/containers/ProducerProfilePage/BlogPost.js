@@ -20,7 +20,7 @@ import { editBlog } from './actions';
 import { makeSelectBlogPosting } from './selectors';
 
 const BlogPost = ({
-  blogPost, blogPage, index, blogEdit,
+  user, businessId, blogPost, blogPage, index, blogEdit,
 }) => {
   const parsedBlog = JSON.parse(blogPost.blogData);
   const initialContentState = convertFromRaw(parsedBlog);
@@ -46,9 +46,9 @@ const BlogPost = ({
   };
 
   return (
-    <Segment stacked style={{ marginTop: 0, marginBottom: 0 }}>
+    <Segment stacked style={{ marginTop: '1em', marginBottom: 0 }}>
       <Item.Group>
-        <Item>
+        <Item style={{ marginTop: 0, marginBottom: 0 }}>
           {/* <Item.Image src="https://react.semantic-ui.com/images/wireframe/image.png" /> */}
           <Item.Content>
             {editingBlog
@@ -109,15 +109,19 @@ const BlogPost = ({
                   </Grid>
                 )
                 : (
-                  <Grid style={{ padding: 0 }} textAlign="right" verticalAlign="middle">
-                    <Grid.Column textAlign="left" width={2} style={{ padding: 0 }}>
-                      {blogMeta.display ? <strong>Displayed</strong> : 'Hidden'}
-                    </Grid.Column>
-                    <Grid.Column width={12} />
-                    <Grid.Column width={2} style={{ padding: 0 }}>
-                      <Button compact basic floated="right" primary onClick={() => setEditingBlog(true)} content="Edit" />
-                    </Grid.Column>
-                  </Grid>
+                  <>
+                    {(user && user.businessId === businessId) && (
+                      <Grid style={{ padding: 0 }} textAlign="right" verticalAlign="middle">
+                        <Grid.Column textAlign="left" width={8} style={{ padding: 0 }} verticalAlign="bottom">
+                          {blogMeta.display ? <strong>Displayed</strong> : 'Hidden'}
+                        </Grid.Column>
+                        {/* <Grid.Column width={12} /> */}
+                        <Grid.Column width={8} textAlign="right" style={{ padding: 0 }}>
+                          <Button compact basic floated="right" primary onClick={() => setEditingBlog(true)} content="Edit" />
+                        </Grid.Column>
+                      </Grid>
+                    )}
+                  </>
                 )}
             </Item.Extra>
           </Item.Content>
@@ -128,6 +132,8 @@ const BlogPost = ({
 };
 
 BlogPost.propTypes = {
+  user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  businessId: PropTypes.string,
   blogPost: PropTypes.object,
   blogPage: PropTypes.number,
   index: PropTypes.number,

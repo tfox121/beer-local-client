@@ -16,7 +16,7 @@ const LineChart = ({
 
   function* currentDateRange(periodString, stepString) {
     const today = moment();
-    const startDate = moment().subtract(1, periodString);
+    const startDate = moment().subtract(1, periodString).add(1, stepString);
 
     while (startDate <= today) {
       yield startDate.format();
@@ -26,7 +26,7 @@ const LineChart = ({
 
   function* previousDateRange(periodString, stepString) {
     const endDate = moment().subtract(1, periodString).subtract(1, 'day');
-    const startDate = moment().subtract(2, periodString).subtract(1, 'day');
+    const startDate = moment().subtract(2, periodString).add(1, stepString).subtract(1, 'day');
 
     while (startDate <= endDate) {
       yield startDate.format();
@@ -54,9 +54,9 @@ const LineChart = ({
   useEffect(() => {
     if (data && data.length && dates.length) {
       const mappedDates = mapDatesToTotals(dates, data, status, step);
-      console.log('MAPPED', mappedDates);
       setValues(mappedDates);
-      setPreviousValues(mapDatesToTotals(previousDates, data, status, step));
+      const mappedPrevDates = mapDatesToTotals(previousDates, data, status, step);
+      setPreviousValues(mappedPrevDates);
     }
   }, [data, dates]);
 
@@ -129,6 +129,11 @@ const LineChart = ({
     legend: {
       display: false,
     },
+    tooltips: {
+      callbacks: {
+        label: (tooltipItems) => `£${tooltipItems.value}`,
+      },
+    },
     scales: {
       yAxes: [{
         id: 'y-axis',
@@ -149,7 +154,7 @@ const LineChart = ({
         id: 'x-axis',
         type: 'time',
         time: {
-          isoWeekday: true,
+          isoWeekday: false,
           unit: step,
           tooltipFormat: toolTipFormat[step],
           displayFormats: {

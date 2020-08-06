@@ -38,7 +38,6 @@ const producerOrdersPageReducer = (state = initialState, action) => produce(stat
       draftState.fetchingOrders = false;
       break;
     case EDIT_ORDER:
-      console.log(action);
       if (action.editObj) {
         draftState.editOrderError = false;
         draftState.editingOrder = action.editObj._id;
@@ -47,7 +46,6 @@ const producerOrdersPageReducer = (state = initialState, action) => produce(stat
     case EDIT_ORDER_SUCCESS:
       if (action.order) {
         draftState.orders.orders = draftState.orders.orders.map((order) => {
-
           if (order._id === action.order._id) {
             return action.order;
           }

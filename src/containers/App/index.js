@@ -15,12 +15,10 @@ import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import { useAuth0 } from '@auth0/auth0-react';
 import styled from 'styled-components';
-// import { push } from 'connected-react-router';
-
-import { push } from 'connected-react-router';
 import {
   Dimmer, Loader, Button, Segment, Header,
 } from 'semantic-ui-react';
+
 import {
   makeSelectUser,
   makeSelectFetchingUser,
@@ -45,7 +43,6 @@ import saga from './saga';
 
 import GlobalStyle from '../../global-styles';
 import { fetchUser, clearUser } from './actions';
-import ProducerDashboardPage from '../ProducerDashboardPage';
 
 const key = 'global';
 const AppWrapper = styled.div`
@@ -60,7 +57,7 @@ const AppWrapper = styled.div`
 `;
 
 const App = ({
-  userProfile, userFetch, userClear, pushRoute, location, fetchingUser, userFetchError,
+  userProfile, userFetch, userClear, location, fetchingUser, userFetchError,
 }) => {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
@@ -140,7 +137,6 @@ App.propTypes = {
   userFetch: PropTypes.func,
   userClear: PropTypes.func,
   location: PropTypes.object,
-  pushRoute: PropTypes.func,
   fetchingUser: PropTypes.bool,
   userFetchError: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 };
@@ -156,7 +152,6 @@ export function mapDispatchToProps(dispatch) {
   return {
     userFetch: () => dispatch(fetchUser()),
     userClear: () => dispatch(clearUser()),
-    pushRoute: (path) => dispatch(push(path)),
   };
 }
 

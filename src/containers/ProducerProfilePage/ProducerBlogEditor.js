@@ -23,7 +23,7 @@ const ProducerBlogEditor = ({ blogPost }) => {
   };
 
   return (
-    <Modal open={modalOpen} trigger={<Button onClick={() => setModalOpen(true)} primary>Write new post</Button>}>
+    <Modal open={modalOpen} trigger={<Button onClick={() => setModalOpen(true)} primary>Add</Button>}>
       <Modal.Header>New post</Modal.Header>
       <Modal.Content>
         <Modal.Description>

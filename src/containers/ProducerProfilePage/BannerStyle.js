@@ -18,8 +18,7 @@ const BannerStyle = styled.div`
   .image-stack__item--bottom {
     grid-column: 1 / span 16;
     grid-row: 1; // must be on the same row as the other image
-    height: 185px;
-    background-color: lightgray;
+    /* height: 185px; */
   }
 
   .image-stack__item--top {
@@ -28,6 +27,10 @@ const BannerStyle = styled.div`
     grid-column: 1 / -1;
     grid-row: 1; // make this image be on the same row
     z-index: 1; // make this image render on top of the bottom
+    @media only screen and (max-width: 768px) {
+      padding-top: 18vw;
+    }
+
   }
 
   .bordered.circular.image {
@@ -43,10 +46,14 @@ const BannerStyle = styled.div`
 
   .profile-image.ui.centered.image {
     margin-left: 0;
+    min-width: 100px;
   }
 
   .ui.grid > .row > .profile-buttons.column {
     padding-top: 100px;
+    @media only screen and (max-width: 768px) {
+      padding-top: 75px;
+    }
   }
 `;
 

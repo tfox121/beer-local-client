@@ -127,7 +127,7 @@ const PromotionModal = ({
       open={modalOpen}
       onClose={handleModalClose}
       closeIcon
-      trigger={<Button primary onClick={() => setModalOpen(true)}>Add Promotion</Button>}
+      trigger={<Button primary onClick={() => setModalOpen(true)}>Add</Button>}
     >
       <Modal.Header>
         Add New Promotion

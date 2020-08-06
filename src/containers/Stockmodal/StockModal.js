@@ -1,4 +1,3 @@
-
 /**
  *
  * StockModal
@@ -197,7 +196,7 @@ export function StockModal({
         onClose={handleModalClose}
         closeOnDimmerClick={!stockEditPending}
         closeIcon
-        trigger={<Button primary onClick={() => setModalOpen(true)}>Edit Stock</Button>}
+        trigger={<Button primary onClick={() => setModalOpen(true)}>Edit</Button>}
       >
         <Modal.Header>
           <StockModalMenu

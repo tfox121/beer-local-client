@@ -62,6 +62,7 @@ import PromotionModal from './PromotionModal';
 import MapStyle from './MapStyle';
 import BlogStyle from './BlogStyle';
 import BannerStyle from './BannerStyle';
+import AvailabilityMobile from './AvailabilityMobile';
 
 export function ProducerProfilePage({
   profileFetch,
@@ -142,7 +143,7 @@ export function ProducerProfilePage({
     }
     return (
       <React.Fragment key={blogPost._id}>
-        <BlogPost blogPost={blogPost} blogPage={blogPage} index={index} />
+        <BlogPost user={user} businessId={businessId} blogPost={blogPost} blogPage={blogPage} index={index} />
       </React.Fragment>
     );
   });
@@ -168,8 +169,7 @@ export function ProducerProfilePage({
                 <Grid.Column width={4}>
                   <Image className="profile-image" src={avatarSource || '/images/avatars/blank-avatar.webp'} size="small" bordered centered circular />
                 </Grid.Column>
-                <Grid.Column width={7} />
-                <Grid.Column className="profile-buttons" width={5} textAlign="right" verticalAlign="middle">
+                <Grid.Column className="profile-buttons" width={12} textAlign="right" verticalAlign="middle">
                   {(user && user.businessId === businessId) && (
                     <Modal open={profileEditModalOpen} onClose={() => setProfileEditModalOpen(false)} closeIcon size="small" trigger={<Button onClick={() => setProfileEditModalOpen(true)} primary>Edit Profile</Button>}>
                       <Modal.Header>Edit profile</Modal.Header>
@@ -185,7 +185,7 @@ export function ProducerProfilePage({
           </div>
         </BannerStyle>
         <Segment basic className="wrapper" textAlign="center">
-          <Grid columns={3} padded="vertically">
+          <Grid columns={2} stackable reversed="mobile" padded="vertically">
             <Grid.Row>
               <Grid.Column width={10} textAlign="left">
                 <Header as="h1">{businessName}</Header>
@@ -226,10 +226,10 @@ export function ProducerProfilePage({
           <Segment basic className="wrapper">
             <BlogStyle>
               <Grid columns={2} style={{ marginBottom: '0.05em' }}>
-                <Grid.Column textAlign="left">
+                <Grid.Column width={7} textAlign="left">
                   <Header as="h2">News</Header>
                 </Grid.Column>
-                <Grid.Column textAlign="right">
+                <Grid.Column width={9} textAlign="right">
                   {(user && user.businessId === businessId)
                   && (
                     <ProducerBlogEditor />
@@ -265,10 +265,10 @@ export function ProducerProfilePage({
         {producerProfile.profileOptions.activeModules.includes('promotions') && (
           <Segment basic className="wrapper">
             <Grid columns={2} style={{ marginBottom: '0.05em' }}>
-              <Grid.Column width={5} textAlign="left">
+              <Grid.Column width={8} textAlign="left">
                 <Header as="h2">Promotions</Header>
               </Grid.Column>
-              <Grid.Column width={11} textAlign="right">
+              <Grid.Column width={8} textAlign="right">
                 {(user && user.businessId === businessId)
                 && (
                   <>
@@ -293,17 +293,18 @@ export function ProducerProfilePage({
                       <Item key={promotion._id}>
                         <Item.Content>
                           <Grid verticalAlign="middle">
-                            <Grid.Column width={14}>
+                            <Grid.Column computer={user && user.businessId === businessId ? 13 : 16}>
                               <Icon circular name="pound sign" size="small" />
                               {' '}
                               {promotionCopy}
                             </Grid.Column>
-                            <Grid.Column width={2}>
-                              {(user && user.businessId === businessId)
-                          && (
-                            <Button negative compact basic size="small" icon="cancel" onClick={() => handleDeletePromo(promotion._id)} />
-                          )}
-                            </Grid.Column>
+                            {(user && user.businessId === businessId)
+                              && (
+                                <Grid.Column width={2}>
+                                  <Button negative compact basic size="small" icon="cancel" onClick={() => handleDeletePromo(promotion._id)} />
+                                </Grid.Column>
+                              )}
+
                           </Grid>
                         </Item.Content>
                       </Item>
@@ -323,10 +324,10 @@ export function ProducerProfilePage({
         {producerProfile.profileOptions.activeModules.includes('availability') && (
           <Segment basic className="wrapper">
             <Grid columns={2} style={{ marginBottom: '0.05em' }}>
-              <Grid.Column width={5} textAlign="left">
-                <Header as="h2">Available Items</Header>
+              <Grid.Column width={8} textAlign="left">
+                <Header as="h2">Availability</Header>
               </Grid.Column>
-              <Grid.Column width={11} textAlign="right">
+              <Grid.Column width={8} textAlign="right">
                 {(user && user.businessId === businessId)
                   && (
                     <>
@@ -336,9 +337,9 @@ export function ProducerProfilePage({
                   )}
               </Grid.Column>
             </Grid>
-            {/* <AvailabilityBasic stock={stock} /> */}
             {stock && (
-              <AvailabilityCategories data={stock} />
+              // <AvailabilityCategories data={stock} />
+              <AvailabilityMobile data={stock} />
             )}
           </Segment>
         )}

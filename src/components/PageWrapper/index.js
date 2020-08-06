@@ -13,10 +13,11 @@ const PageWrapperStyle = styled(Container)`
   &&& {
     background-color: white;
     min-height: calc(100vh - 49px);
-    min-width: 800px;
+    /* min-width: 800px; */
 
   @media only screen and (max-width: 767px) {
     margin-left: 0 !important;
+    margin-right: 0 !important;
   }
 
     div.ui.text.loader {
@@ -35,6 +36,10 @@ const PageWrapperStyle = styled(Container)`
       /* padding-bottom: 28px; */
       padding-left: 2em;
       padding-right: 2em;
+      @media only screen and (max-width: 767px) {
+        padding-left: 0.5em !important;
+        padding-right: 0.5em !important;
+      }
     }
 
     div.ui.basic.primary.segment {

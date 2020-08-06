@@ -49,7 +49,7 @@ function NavBar({ userProfile, pushRoute }) {
     <NavBarStyle>
       <Menu fixed="top">
         {userProfile ? (
-          <Responsive as={Dropdown} header text="BeerLocal" item maxWidth={425}>
+          <Responsive as={Dropdown} text="BeerLocal" item maxWidth={425}>
             <Dropdown.Menu>
               <Dropdown.Item
                 content="Home"
