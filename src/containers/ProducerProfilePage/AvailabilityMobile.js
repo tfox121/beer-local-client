@@ -83,9 +83,9 @@ const TableRows = ({
                               <Grid stackable={false}>
                                 <Grid.Row>
                                   <Grid.Column width={1} verticalAlign="middle">
-                                    <Icon name="caret right" rotated={activeIndex === rowIndex && 'clockwise'} />
+                                    <Icon name="caret right" rotated={activeIndex === rowIndex ? 'clockwise' : undefined} />
                                   </Grid.Column>
-                                  <Grid.Column width={15} style={{ width: 'auto' }}>
+                                  <Grid.Column width={15} className="name-cell">
                                     {cell.render('Cell')}
                                     <p style={{ fontSize: '0.8em' }}>{PACK_SIZES[data[index].packSize]}</p>
                                   </Grid.Column>

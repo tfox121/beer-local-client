@@ -15,6 +15,12 @@ const AvailabilityMobileStyle = styled.div`
     min-width: 75px;
   }
 
+  && {
+    .ui.grid > .row > div.fifteen.wide.column.name-cell {
+      width: auto !important;
+    }
+  }
+
   .product-info {
     padding: 1em;
     font-size: 11px;
