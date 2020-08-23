@@ -29,6 +29,7 @@ import {
   Card,
   Icon,
   Label,
+  Responsive,
 } from 'semantic-ui-react';
 import { Map, TileLayer } from 'react-leaflet';
 
@@ -338,8 +339,14 @@ export function ProducerProfilePage({
               </Grid.Column>
             </Grid>
             {stock && (
-              // <AvailabilityCategories data={stock} />
-              <AvailabilityMobile data={stock} />
+              <>
+                <Responsive minWidth={736}>
+                  <AvailabilityCategories data={stock} />
+                </Responsive>
+                <Responsive maxWidth={735}>
+                  <AvailabilityMobile data={stock} />
+                </Responsive>
+              </>
             )}
           </Segment>
         )}
