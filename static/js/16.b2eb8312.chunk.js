@@ -1,0 +1,2 @@
+(this["webpackJsonpbeer-local-client"]=this["webpackJsonpbeer-local-client"]||[]).push([[16],{1435:function(e,t,a){"use strict";a.r(t),a.d(t,"default",(function(){return o}));var n=a(0),c=a.n(n),r=a(96),l=Object(r.defineMessages)({header:{id:"".concat("app.containers.NotFoundPage",".header"),defaultMessage:"Oops, we couldn't find that page..."}}),s=a(314);function o(){return c.a.createElement(s.a,null,c.a.createElement("h1",null,c.a.createElement(r.FormattedMessage,l.header)))}}}]);
+//# sourceMappingURL=16.b2eb8312.chunk.js.map
