@@ -1,5 +1,6 @@
 {
-  "name": "beer-local-cra",
+  "name": "beer-local-client",
+  "homepage": "https://compassionate-brahmagupta-3eab31.netlify.app/",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -71,7 +72,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "netlify deploy --prod"
   },
   "eslintConfig": {
     "extends": "react-app"
