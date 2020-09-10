@@ -138,6 +138,7 @@ const LineChart = ({
       yAxes: [{
         id: 'y-axis',
         ticks: {
+          min: 0,
           maxTicksLimit: 4,
           padding: 10,
           suggestedMax: Math.max(values.reduce((a, b) => Math.max(a, b)), previousValues.reduce((a, b) => Math.max(a, b))) * 1.01,

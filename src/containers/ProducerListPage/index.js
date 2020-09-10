@@ -91,7 +91,7 @@ const ProducerListPage = ({
   return (
     <>
       <Helmet>
-        <title>beerLocal - Breweries</title>
+        <title>BeerLocal - Breweries</title>
         <meta name="description" content="A list of breweries" />
       </Helmet>
       <PageWrapper>

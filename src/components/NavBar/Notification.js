@@ -1,4 +1,3 @@
-
 /**
  *
  * Notification
@@ -10,7 +9,7 @@ import PropTypes from 'prop-types';
 
 // import { FormattedMessage } from 'react-intl';
 import {
-  Dropdown, Feed, Image, Grid,
+  Dropdown, Image, Grid,
 } from 'semantic-ui-react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';

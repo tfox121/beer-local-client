@@ -106,6 +106,16 @@ export function CreateProfilePage({ userSave, savingUser }) {
     };
   }, [avatarSaved]);
 
+  useEffect(() => {
+    if (localStorage.businessName) {
+      setFormValues((prevFormValues) => ({ ...prevFormValues, businessName: localStorage.businessName }));
+    }
+    if (localStorage.businessType) {
+      setFormValues((prevFormValues) => ({ ...prevFormValues, type: localStorage.businessType }));
+      setProfileStage(1);
+    }
+  }, [localStorage]);
+
   // useEffect(() => {
   //   console.log('CHECKING');
   //   if (formValues.pictureFile && !formValues.fileValid) {
@@ -191,7 +201,7 @@ export function CreateProfilePage({ userSave, savingUser }) {
   return (
     <>
       <Helmet>
-        <title>beerLocal - Create your profile</title>
+        <title>BeerLocal - Create your profile</title>
         <meta name="description" content="Profile creation form" />
       </Helmet>
       <PageWrapper>

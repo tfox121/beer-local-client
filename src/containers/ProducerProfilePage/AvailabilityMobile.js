@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTable, useSortBy } from 'react-table';
 import {
-  Table, Input, Menu, Modal, Header, Button, Icon, Popup, Image, Grid, Dimmer, Loader, Accordion,
+  Table, Input, Menu, Modal, Header, Button, Icon, Image, Grid, Dimmer, Loader,
 } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';

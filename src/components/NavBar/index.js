@@ -7,7 +7,6 @@
 import React, { useState, memo } from 'react';
 import PropTypes from 'prop-types';
 
-import { FormattedMessage } from 'react-intl';
 import { Menu, Responsive, Dropdown } from 'semantic-ui-react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -17,7 +16,6 @@ import { push } from 'connected-react-router';
 import UserMenuItems from './UserMenuItems';
 import Can from '../Can';
 
-import messages from './messages';
 import { makeSelectUser } from './selectors';
 import NavBarStyle from './NavBarStyle';
 

@@ -64,6 +64,14 @@ const HomepageStyle = styled.div`
     background-position: center;
     filter: blur(2px);
   }
+
+  .action-group {
+    height: 45px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 export default HomepageStyle;

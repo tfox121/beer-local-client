@@ -146,8 +146,6 @@ const ProducerDashboardPage = ({
     return null;
   }
 
-  console.log(Number.isNaN(periodSales.averageItems));
-
   // const periodOptions = [
   //   { text: 'week', value: 'week' },
   //   { text: 'quarter', value: 'quarter' },
@@ -164,8 +162,8 @@ const ProducerDashboardPage = ({
       )}
       <Segment basic className="primary wrapper">
         <ProducerDashboardStyle>
-          <Grid columns={2} verticalAlign="middle">
-            <Grid.Column width="10">
+          <Grid stackable columns={2} verticalAlign="middle">
+            <Grid.Column className="header-column" width="10">
               <Header as="h1">
                 Hi
                 {' '}
@@ -174,7 +172,7 @@ const ProducerDashboardPage = ({
                 here&apos;s how things are going.
               </Header>
             </Grid.Column>
-            <Grid.Column width="6" textAlign="right">
+            <Grid.Column className="button-column" width="6" textAlign="right">
               <Button.Group>
                 <Button active={salesPeriod === 'week'} onClick={() => setSalesPeriod('week')}>Week</Button>
                 <Button active={salesPeriod === 'month'} onClick={() => setSalesPeriod('month')}>Month</Button>
@@ -183,7 +181,7 @@ const ProducerDashboardPage = ({
             </Grid.Column>
           </Grid>
           <Segment basic>
-            <Grid columns={3}>
+            <Grid columns={3} stackable>
               <Grid.Column className="sales-summary" width={6}>
                 <Header>
                   This

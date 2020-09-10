@@ -158,7 +158,7 @@ const FeedItem = ({
         <Feed.Summary>
           <Feed.User as="div"><Link to={`/brewery/${producer.businessId}`}>{producer.businessName}</Link></Feed.User>
           {' '}
-          has joined beerLocal, and they deliver to your area!
+          has joined BeerLocal, and they deliver to your area!
           <Feed.Date>{timeAgo.format(Date.parse(producer.createdAt))}</Feed.Date>
         </Feed.Summary>
         <Segment>

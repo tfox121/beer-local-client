@@ -152,7 +152,7 @@ export function ProducerProfilePage({
   return (
     <>
       <Helmet>
-        <title>{`beerLocal - ${businessName}`}</title>
+        <title>{`BeerLocal - ${businessName}`}</title>
         <meta name="description" content={`${businessName} - profile`} />
       </Helmet>
       <PageWrapper>

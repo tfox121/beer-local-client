@@ -18,7 +18,6 @@ import {
 import NumberFormat from 'react-number-format';
 import { useInjectSaga } from '../../utils/injectSaga';
 import { useInjectReducer } from '../../utils/injectReducer';
-import { getPrivateRoute } from '../../utils/api';
 import promotionCopySelection from '../../utils/promotionCopy';
 import { fetchProfile, addPromotion } from './actions';
 import reducer from './reducer';

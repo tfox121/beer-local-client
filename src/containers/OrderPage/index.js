@@ -8,7 +8,7 @@ import { Map, TileLayer } from 'react-leaflet';
 
 import { createStructuredSelector } from 'reselect';
 import {
-  Header, Segment, Button, Modal, Form, Grid, Message, TextArea,
+  Header, Segment, Button, Grid, Message, TextArea,
 } from 'semantic-ui-react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
@@ -22,7 +22,7 @@ import {
 } from './actions';
 
 import PageWrapper from '../../components/PageWrapper';
-import { makeSelectUser, makeSelectLocation } from '../App/selectors';
+import { makeSelectUser } from '../App/selectors';
 import { makeSelectOrder, makeSelectEditingOrder, makeSelectSendingMessage } from './selectors';
 import OrderModalContent from '../../components/OrderModalContent';
 import { getPrivateRoute } from '../../utils/api';
@@ -34,7 +34,7 @@ import MessageBoxStyle from './MessageBoxStyle';
 import { ORDER_MESSAGE_CHARACTER_LIMIT, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 
 const OrderPage = ({
-  orderInfo, orderFetch, orderClear, userProfile, routerLocation, orderEdit, orderEditing, messageSend, messageSending,
+  orderInfo, orderFetch, orderClear, userProfile, orderEdit, orderEditing, messageSend, messageSending,
 }) => {
   useInjectReducer({ key: 'OrderPage', reducer });
   useInjectSaga({ key: 'OrderPage', saga });
@@ -51,15 +51,14 @@ const OrderPage = ({
 
   console.log('ORDER', orderInfo);
 
-  const { pathname } = routerLocation;
   const { role } = userProfile;
 
   const [editingOrder, setEditingOrder] = useState(false);
   const [orderData, setOrderData] = useState({ ...orderInfo.order });
   const [orderItems, setOrderItems] = useState([]);
   const [availableStock, setAvailableStock] = useState([]);
-  const [orderEditPending, setOrderEditPending] = useState(false);
-  const [messageModalOpen, setMessageModalOpen] = useState(false);
+  // const [orderEditPending, setOrderEditPending] = useState(false);
+  // const [messageModalOpen, setMessageModalOpen] = useState(false);
   const [messageContent, setMessageContent] = useState('');
 
   useEffect(() => {
@@ -162,7 +161,7 @@ const OrderPage = ({
   };
 
   const handleDeleteItem = (id) => {
-    setOrderEditPending(true);
+    // setOrderEditPending(true);
     setOrderItems(orderItems.map((orderItem) => {
       if (orderItem.id === id && orderItem.orderChange === 'delete') {
         return { ...orderItem, orderChange: '' };
@@ -175,7 +174,7 @@ const OrderPage = ({
   };
 
   const handleAddItem = (newItem) => {
-    setOrderEditPending(true);
+    // setOrderEditPending(true);
     const item = newItem;
     delete item.label;
     delete item.value;
@@ -185,7 +184,7 @@ const OrderPage = ({
   };
 
   const handleDecreaseQuant = (id) => {
-    setOrderEditPending(true);
+    // setOrderEditPending(true);
     const orderItemsEdit = orderItems.map((orderItem) => {
       if (orderItem.id === id && orderItem.orderQuant > 1) {
         const decreasedItem = { ...orderItem, orderQuant: orderItem.orderQuant - 1 };
@@ -205,7 +204,7 @@ const OrderPage = ({
   };
 
   const handleIncreaseQuant = (id) => {
-    setOrderEditPending(true);
+    // setOrderEditPending(true);
     const orderItemsEdit = orderItems.map((orderItem) => {
       if (orderItem.id === id) {
         const increasedItem = { ...orderItem, orderQuant: orderItem.orderQuant + 1 };
@@ -233,7 +232,7 @@ const OrderPage = ({
     // setOrderData(rejectedOrder);
     // orderFetch();
     setEditingOrder(false);
-    setOrderEditPending(false);
+    // setOrderEditPending(false);
     // console.log(response.data);
   };
 
@@ -245,7 +244,7 @@ const OrderPage = ({
     // setOrderData(rejectedOrder);
     // orderFetch();
     setMessageContent('');
-    setMessageModalOpen(false);
+    // setMessageModalOpen(false);
     // console.log(response.data);
   };
 
@@ -259,7 +258,7 @@ const OrderPage = ({
   return (
     <>
       <Helmet>
-        <title>beerLocal - Order Info</title>
+        <title>BeerLocal - Order Info</title>
         <meta name="description" content="Your order" />
       </Helmet>
       <PageWrapper>
@@ -436,7 +435,6 @@ OrderPage.propTypes = {
   orderFetch: PropTypes.func,
   orderClear: PropTypes.func,
   userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  routerLocation: PropTypes.object,
   orderEdit: PropTypes.func,
   orderEditing: PropTypes.bool,
   messageSend: PropTypes.func,
@@ -446,7 +444,6 @@ OrderPage.propTypes = {
 const mapStateToProps = createStructuredSelector({
   orderInfo: makeSelectOrder(),
   userProfile: makeSelectUser(),
-  routerLocation: makeSelectLocation(),
   orderEditing: makeSelectEditingOrder(),
   messageSending: makeSelectSendingMessage(),
 });

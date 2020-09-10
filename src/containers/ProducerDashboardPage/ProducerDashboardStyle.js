@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
 const ProducerDashboardStyle = styled.div`
-
   .my-masonry-grid {
     display: -webkit-box; /* Not needed if autoprefixing */
     display: -ms-flexbox; /* Not needed if autoprefixing */
@@ -15,7 +14,8 @@ const ProducerDashboardStyle = styled.div`
   }
 
   /* Style your items */
-  .my-masonry-grid_column > div { /* change div to reference your elements you put in <Masonry> */
+  .my-masonry-grid_column > div {
+    /* change div to reference your elements you put in <Masonry> */
   }
 
   @media (max-width: 800px) {
@@ -47,6 +47,20 @@ const ProducerDashboardStyle = styled.div`
     }
     .ui.header.top-level:first-child {
       margin-top: 0;
+    }
+  }
+  @media (max-width: 600px) {
+    .ui.stackable.grid > .header-column.wide.column h1.ui.header {
+      text-align: center;
+      font-size: 1.5em;
+      padding: 0 2em;
+    }
+    .ui.stackable.grid > .button-column.wide.column {
+      text-align: center;
+    }
+
+    div.ui.basic.segment > div.ui.stackable.three.column.grid {
+      text-align: center;
     }
   }
 `;

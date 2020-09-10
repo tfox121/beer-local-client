@@ -8,7 +8,7 @@ import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
-import L, { divIcon } from 'leaflet';
+import { divIcon } from 'leaflet';
 import { Icon } from 'semantic-ui-react';
 
 const blueMarkerIconMarkup = renderToStaticMarkup(<Icon size="big" color="blue" name="map marker alternate" />);

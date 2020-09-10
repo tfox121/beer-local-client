@@ -179,7 +179,7 @@ const RetailerForm = ({
                 onChange={handleChange}
                 maxLength={DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
               />
-              {!!formValues.deliveryInstruction.length && (
+              {formValues.deliveryInstruction && !!formValues.deliveryInstruction.length && (
                 <p style={{ textAlign: 'right', fontSize: '10px' }}>
                   {formValues.deliveryInstruction.length}
                   /

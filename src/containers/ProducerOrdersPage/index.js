@@ -57,7 +57,7 @@ const ProducerOrdersPage = ({
   return (
     <>
       <Helmet>
-        <title>beerLocal - Order History</title>
+        <title>BeerLocal - Order History</title>
         <meta name="description" content="Your orders" />
       </Helmet>
       <PageWrapper>
