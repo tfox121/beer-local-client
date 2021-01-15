@@ -188,7 +188,7 @@ const ProducerForm = ({
                 onChange={handleChange}
                 maxLength={INTRO_CHARACTER_LIMIT}
               />
-              {!!formValues.intro.length && (
+              {formValues.intro && !!formValues.intro.length && (
                 <p style={{ textAlign: 'right', fontSize: '10px' }}>
                   {formValues.intro.length}
                   /
