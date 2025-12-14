@@ -9,7 +9,7 @@
 import React from 'react';
 // import Provider from 'react-redux';
 // import ShallowRenderer from 'react-test-renderer/shallow';
-import { render } from 'react-testing-library';
+import { render } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 // import 'jest-dom/extend-expect'; // add some helpful assertions
 
