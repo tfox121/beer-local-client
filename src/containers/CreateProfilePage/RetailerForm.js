@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
-import Geosuggest from 'react-geosuggest';
+import AddressAutocomplete from '../../components/AddressAutocomplete';
 
 import ayt from '../../utils/phoneNumberValidation';
 
@@ -72,11 +72,15 @@ const RetailerForm = ({
 
   const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
-      const { location, gmaps } = suggestion;
+      const { location: locationArray, gmaps } = suggestion;
+      // Convert array [lat, lon] to object {lat, lng} format
+      const locationObj = Array.isArray(locationArray)
+        ? { lat: locationArray[0], lng: locationArray[1] }
+        : locationArray;
       const newErrors = { ...formErrors };
       delete newErrors.location;
       setFormErrors({ ...newErrors });
-      setFormValues({ ...formValues, location, address: gmaps.formatted_address });
+      setFormValues({ ...formValues, location: locationObj, address: gmaps.formatted_address });
     }
   };
 
@@ -89,7 +93,7 @@ const RetailerForm = ({
               <Form.Input
                 label="Premises name"
                 name="businessName"
-                value={formValues.businessName}
+                value={formValues.businessName || ''}
                 required
                 onChange={handleChange}
                 error={
@@ -102,7 +106,7 @@ const RetailerForm = ({
               <Form.Input
                 label="Primary contact name"
                 name="primaryContactName"
-                value={formValues.primaryContactName}
+                value={formValues.primaryContactName || ''}
                 required
                 onChange={handleChange}
                 error={
@@ -116,7 +120,7 @@ const RetailerForm = ({
                 label="Purchasing email address"
                 name="purchasingEmail"
                 type="email"
-                value={formValues.purchasingEmail}
+                value={formValues.purchasingEmail || ''}
                 required
                 onChange={handleChange}
                 error={
@@ -130,7 +134,7 @@ const RetailerForm = ({
                 label="Purchasing contact number"
                 name="purchasingContactNumber"
                 type="tel"
-                value={formValues.purchasingContactNumber}
+                value={formValues.purchasingContactNumber || ''}
                 onChange={(e) => setUnformattedTel(e.target.value)}
                 error={
                   formErrors.purchasingContactNumber && {
@@ -143,19 +147,16 @@ const RetailerForm = ({
                 className={`${formErrors.location && 'error'} required field`}
               >
                 <SuggestBlockStyle>
-                  <Geosuggest
+                  <AddressAutocomplete
                     ref={geosuggestEl}
                     label="Location"
                     id="Location"
-                    location={
-                      // eslint-disable-next-line no-undef
-                      new google.maps.LatLng(mapCentre[0], mapCentre[1])
-                    }
-                    radius="1500"
-                    minlegnth="3"
+                    location={mapCentre}
+                    radius={1500}
+                    minlength={3}
                     country="gb"
                     onSuggestSelect={handleSuggestSelect}
-                    onBlur={() => geosuggestEl.current.selectSuggest()}
+                    onBlur={() => geosuggestEl.current?.selectSuggest()}
                     autoActivateFirstSuggest
                     required
                   />
@@ -174,7 +175,7 @@ const RetailerForm = ({
               <Form.TextArea
                 label="Delivery Instruction"
                 placeholder="Any delivery restrictions or instructions..."
-                value={formValues.deliveryInstruction}
+                value={formValues.deliveryInstruction || ''}
                 name="deliveryInstruction"
                 onChange={handleChange}
                 maxLength={DELIVERY_INSTRUCTION_CHARACTER_LIMIT}

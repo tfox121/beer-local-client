@@ -48,7 +48,7 @@ const MetadataModal = ({ cell, updateMyData }) => {
   useEffect(() => {
     if (!productImage) {
       setImageResizeModalOpen(false);
-    } else if (productImage.name) {
+    } else if (productImage && productImage.name) {
       setImageResizeModalOpen(true);
     }
   }, [productImage]);
@@ -72,7 +72,7 @@ const MetadataModal = ({ cell, updateMyData }) => {
   const handleApply = () => {
     if (editorRef.current) {
       const canvasScaled = editorRef.current.getImageScaledToCanvas();
-      if (productImage.name) {
+      if (productImage && productImage.name) {
         setProductImageSaved(canvasScaled.toDataURL());
         setProductImage(undefined);
       }
@@ -113,7 +113,16 @@ const MetadataModal = ({ cell, updateMyData }) => {
           <Grid width={16}>
             <Grid.Column width={6}>
               <div className="button-image-container">
-                <Image className="product-image" src={productImageSaved || cell.row.original.imageSource || '/images/products/blank-product.png'} size="small" bordered centered />
+                <Image
+                  className="product-image"
+                  src={productImageSaved || cell.row.original.imageSource || '/images/products/blank-product.png'}
+                  size="small"
+                  bordered
+                  centered
+                  onError={(e) => {
+                    e.target.src = '/images/products/blank-product.png';
+                  }}
+                />
                 <Button inverted circular basic className="image-button" icon="camera" onClick={() => productImageRef.current.click()} />
                 <input
                   id="productImageUpload"
@@ -121,7 +130,10 @@ const MetadataModal = ({ cell, updateMyData }) => {
                   type="file"
                   accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
                   hidden
-                  onChange={(e) => setProductImage(e.target.files[0])}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    setProductImage(file || undefined);
+                  }}
                 />
               </div>
             </Grid.Column>

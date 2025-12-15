@@ -56,8 +56,6 @@ export const initialState = {
 /* eslint-disable default-case, no-param-reassign */
 const producerProfilePageReducer = (state = initialState, action) => produce(state, (draftState) => {
   switch (action.type) {
-    default:
-      break;
     case FETCH_PROFILE:
       draftState.fetchProfileError = false;
       draftState.fetchingProfile = true;
@@ -182,6 +180,8 @@ const producerProfilePageReducer = (state = initialState, action) => produce(sta
     case DELETE_PROMOTION_ERROR:
       draftState.deletingPromotionError = true;
       draftState.deletingPromotion = false;
+      break;
+    default:
       break;
   }
 });

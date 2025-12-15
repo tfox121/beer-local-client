@@ -1,7 +1,7 @@
 const checkUserStatus = (authLoading, authError, authenticated, userLoading, userLoadingError, userData) => {
   console.log('CHECKING');
   const userStatusObj = {
-    authenticated: false, registered: false, loading: false, error: false, notFound: false,
+    authenticated: false, registered: false, loading: false, error: false, notFound: false, connectionError: false,
   };
   if (authLoading) {
     userStatusObj.loading = true;
@@ -11,22 +11,40 @@ const checkUserStatus = (authLoading, authError, authenticated, userLoading, use
     userStatusObj.loading = false;
     return userStatusObj;
   }
-  if (authenticated) {
-    userStatusObj.authenticated = true;
-    // necessary in order to prevent routes from rendering before user retrieved.
-    userStatusObj.loading = true;
-  }
-  if (userLoading) {
-    userStatusObj.loading = true;
-  }
   if (userLoadingError) {
+    // Check for connection errors (backend unavailable)
+    const isConnectionError = !userLoadingError.response
+      && (userLoadingError.code === 'ECONNREFUSED'
+        || userLoadingError.message?.includes('ERR_CONNECTION_REFUSED')
+        || userLoadingError.message?.includes('Network Error')
+        || userLoadingError.request);
+
+    if (isConnectionError) {
+      userStatusObj.loading = false;
+      userStatusObj.connectionError = true;
+      userStatusObj.error = userLoadingError;
+      return userStatusObj;
+    }
+
     if (userLoadingError.response && userLoadingError.response.status === 404) {
       userStatusObj.loading = false;
       userStatusObj.notFound = true;
     } else {
       userStatusObj.error = userLoadingError;
+      userStatusObj.loading = false;
       return userStatusObj;
     }
+  }
+  if (authenticated) {
+    userStatusObj.authenticated = true;
+    // necessary in order to prevent routes from rendering before user retrieved.
+    // Only set loading if there's no error
+    if (!userLoadingError) {
+      userStatusObj.loading = true;
+    }
+  }
+  if (userLoading && !userLoadingError) {
+    userStatusObj.loading = true;
   }
   if (userData) {
     userStatusObj.loading = false;

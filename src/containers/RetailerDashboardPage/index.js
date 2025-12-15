@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -28,10 +28,16 @@ const RetailerDashboardPage = ({
 }) => {
   useInjectReducer({ key: 'RetailerDashboardPage', reducer });
   useInjectSaga({ key: 'RetailerDashboardPage', saga });
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    producerFeedFetch();
-  }, [producerFeedFetch]);
+    // Only fetch once when component mounts
+    if (!hasFetchedRef.current) {
+      producerFeedFetch();
+      hasFetchedRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!producerFeed) {
     return null;
@@ -48,11 +54,17 @@ const RetailerDashboardPage = ({
         <Header as="h1">Updates</Header>
         <RetailerDashboardStyle>
           <Feed size="large">
-            {producerFeed.map((producerItem) => (
-              <React.Fragment key={`producerItem._id-${Math.random()}`}>
-                <FeedItem producerItem={producerItem} userProfile={userProfile} />
-              </React.Fragment>
-            ))}
+            {producerFeed.map((producerItem, index) => {
+              // Create a stable key - use _id if available, or index as fallback
+              const key = producerItem._id
+                || producerItem.producerItems?.[0]?._id
+                || `feed-item-${index}`;
+              return (
+                <React.Fragment key={key}>
+                  <FeedItem producerItem={producerItem} userProfile={userProfile} />
+                </React.Fragment>
+              );
+            })}
           </Feed>
         </RetailerDashboardStyle>
       </Segment>

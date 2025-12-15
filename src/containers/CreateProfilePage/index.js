@@ -160,7 +160,7 @@ export function CreateProfilePage({ userSave, savingUser }) {
     if (!formValues.terms) {
       errors.terms = 'This field is required';
     }
-    if (formValues.location && !formValues.location.lat) {
+    if (!formValues.location || !formValues.location.lat) {
       errors.location = 'This field is required';
     }
     if (!formValues.fileValid) {

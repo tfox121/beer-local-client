@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
   const [visible, setVisible] = useState(false);
 
-  const { contactOptions } = formValues;
+  const { contactOptions = {} } = formValues;
 
   // const contactOptions = {};
 

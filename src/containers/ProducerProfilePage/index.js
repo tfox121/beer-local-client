@@ -160,7 +160,14 @@ export function ProducerProfilePage({
           <div className="image-stack__item image-stack__item--bottom">
             <Grid.Row>
               <Grid.Column width={16}>
-                <Image className="banner-image" src={bannerSource || '/images/banners/blank-banner.png'} centered />
+                <Image
+                  className="banner-image"
+                  src={bannerSource || '/images/banners/blank-banner.png'}
+                  centered
+                  onError={(e) => {
+                    e.target.src = '/images/banners/blank-banner.png';
+                  }}
+                />
               </Grid.Column>
             </Grid.Row>
           </div>
@@ -168,7 +175,17 @@ export function ProducerProfilePage({
             <Grid>
               <Grid.Row>
                 <Grid.Column width={4}>
-                  <Image className="profile-image" src={avatarSource || '/images/avatars/blank-avatar.webp'} size="small" bordered centered circular />
+                  <Image
+                    className="profile-image"
+                    src={avatarSource || '/images/avatars/blank-avatar.webp'}
+                    size="small"
+                    bordered
+                    centered
+                    circular
+                    onError={(e) => {
+                      e.target.src = '/images/avatars/blank-avatar.webp';
+                    }}
+                  />
                 </Grid.Column>
                 <Grid.Column className="profile-buttons" width={12} textAlign="right" verticalAlign="middle">
                   {(user && user.businessId === businessId) && (

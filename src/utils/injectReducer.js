@@ -13,7 +13,7 @@ import getInjectors from './reducerInjectors';
  */
 export default ({ key, reducer }) => (WrappedComponent) => {
   class ReducerInjector extends React.Component {
-    static test = 'test'
+    static test = 'test';
 
     static WrappedComponent = WrappedComponent;
 
