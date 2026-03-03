@@ -6,18 +6,15 @@ import {
 import { Link } from 'react-router-dom';
 import { stateToHTML } from 'draft-js-export-html';
 import { EditorState, convertFromRaw } from 'draft-js';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
 import timeAgo from '../../utils/timeAgo';
 import numToWords from '../../utils/numToWords';
 import { PACK_SIZES } from '../../utils/constants';
-import { followProducer } from '../App/actions';
-import { makeSelectProducerFollowing } from '../App/selectors';
+import { useFollowProducerMutation } from '../../queries/user';
 
 const FeedItem = ({
-  producerItem, userProfile, producerFollow, producerFollowing,
+  producerItem, userProfile,
 }) => {
+  const { mutate: producerFollow, isLoading: producerFollowing } = useFollowProducerMutation();
   const [followButtonClicked, setFollowButtonClicked] = useState(false);
 
   useEffect(() => {
@@ -26,7 +23,7 @@ const FeedItem = ({
     }
   }, [producerFollowing]);
 
-  const handleFollowClick = async () => {
+  const handleFollowClick = () => {
     producerFollow(producerItem.sub);
     setFollowButtonClicked(true);
   };
@@ -231,23 +228,5 @@ const FeedItem = ({
 FeedItem.propTypes = {
   producerItem: PropTypes.object,
   userProfile: PropTypes.object,
-  producerFollow: PropTypes.func,
-  producerFollowing: PropTypes.bool,
 };
-
-const mapStateToProps = createStructuredSelector({
-  producerFollowing: makeSelectProducerFollowing(),
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    producerFollow: (producerSub) => dispatch(followProducer(producerSub)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(withConnect)(FeedItem);
+export default FeedItem;
