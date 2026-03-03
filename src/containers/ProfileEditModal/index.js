@@ -305,6 +305,22 @@ const ProfileEditModal = ({
     return null;
   }
 
+  const autocompleteLocation = (() => {
+    const currentLocation = userFormValues.location || location;
+    if (Array.isArray(currentLocation) && currentLocation.length === 2) {
+      return currentLocation;
+    }
+    if (
+      currentLocation
+      && typeof currentLocation === 'object'
+      && typeof currentLocation.lat === 'number'
+      && typeof currentLocation.lng === 'number'
+    ) {
+      return [currentLocation.lat, currentLocation.lng];
+    }
+    return undefined;
+  })();
+
   return (
     <>
       <Modal.Content>
@@ -453,7 +469,7 @@ const ProfileEditModal = ({
                     label="Location"
                     id="breweryLocation"
                     initialValue={userFormValues.address || address}
-                    location={location}
+                    location={autocompleteLocation}
                     radius={1500}
                     minlength={3}
                     country="gb"
