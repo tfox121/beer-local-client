@@ -13,6 +13,7 @@ import 'regenerator-runtime/runtime';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ConnectedRouter } from 'connected-react-router';
 import history from './utils/history';
 import 'sanitize.css/sanitize.css';
@@ -30,6 +31,7 @@ import LanguageProvider from './containers/LanguageProvider';
 /* eslint-enable import/no-unresolved, import/extensions */
 
 import configureStore from './configureStore';
+import queryClient from './queryClient';
 
 // Import i18n messages
 import { translationMessages } from './i18n';
@@ -49,13 +51,15 @@ const render = (messages) => {
       cacheLocation="localstorage"
       // scope="read:current_user update:current_user_metadata"
     >
-      <Provider store={store}>
-        <LanguageProvider messages={messages}>
-          <ConnectedRouter history={history}>
-            <App />
-          </ConnectedRouter>
-        </LanguageProvider>
-      </Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          <LanguageProvider messages={messages}>
+            <ConnectedRouter history={history}>
+              <App />
+            </ConnectedRouter>
+          </LanguageProvider>
+        </Provider>
+      </QueryClientProvider>
     </Auth0Provider>,
     MOUNT_NODE,
   );

@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { push } from 'connected-react-router';
 import {
   Header, Segment, Table, Dropdown, Grid,
 } from 'semantic-ui-react';
@@ -10,25 +9,16 @@ import { createStructuredSelector } from 'reselect';
 
 import { Helmet } from 'react-helmet';
 import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
-import { useInjectReducer } from '../../utils/injectReducer';
-import { useInjectSaga } from '../../utils/injectSaga';
 import PageWrapper from '../../components/PageWrapper';
-// import { loadSession, closeSession } from './actions';
-import reducer from './reducer';
-import saga from './saga';
-import { makeSelectProducerList } from './selectors';
-import { fetchProducers, clearProducers } from './actions';
 import ProducerListPageStyle from './ProducerListPageStyle';
 import { makeSelectUser } from '../App/selectors';
 import ProducerListItem from './ProducerListItem';
-
-const key = 'ProducerListPage';
+import { useProducersQuery } from '../../queries/producers';
 
 const ProducerListPage = ({
-  producers, producersFetch, pushRoute, user,
+  user,
 }) => {
-  useInjectReducer({ key, reducer });
-  useInjectSaga({ key, saga });
+  const { data: producers = [] } = useProducersQuery();
 
   // const [areaFilterToggle, setareaFilterToggle] = useState(true);
   // const [followedFilterToggle, setfollowedFilterToggle] = useState(false);
@@ -68,14 +58,6 @@ const ProducerListPage = ({
 
   const handleChange = (e, { value }) => {
     setFilter(value);
-  };
-
-  useEffect(() => {
-    producersFetch();
-  }, [producersFetch]);
-
-  const handleClick = (businessId) => {
-    pushRoute(`/brewery/${businessId}`);
   };
 
   if (!user || !producers.length) {
@@ -125,29 +107,14 @@ const ProducerListPage = ({
 };
 
 ProducerListPage.propTypes = {
-  producers: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
-  producersFetch: PropTypes.func,
-  pushRoute: PropTypes.func,
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 };
 
 const mapStateToProps = createStructuredSelector({
-  producers: makeSelectProducerList(),
   user: makeSelectUser(),
 });
 
-function mapDispatchToProps(dispatch) {
-  return {
-    producersFetch: () => dispatch(fetchProducers()),
-    producersClear: () => dispatch(clearProducers()),
-    pushRoute: (path) => dispatch(push(path)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
+const withConnect = connect(mapStateToProps);
 
 export default compose(
   withConnect,
