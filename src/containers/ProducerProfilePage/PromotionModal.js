@@ -7,31 +7,22 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl';
-import { createStructuredSelector } from 'reselect';
-import { compose } from 'redux';
 import {
   Modal, Button, Dropdown, Input, Divider,
 } from 'semantic-ui-react';
 
 import NumberFormat from 'react-number-format';
-import { useInjectSaga } from '../../utils/injectSaga';
-import { useInjectReducer } from '../../utils/injectReducer';
 import promotionCopySelection from '../../utils/promotionCopy';
-import { fetchProfile, addPromotion } from './actions';
-import reducer from './reducer';
-import saga from './saga';
 
-import { makeSelectProducerProfile, makeSelectUser } from './selectors';
+import { useUserQuery } from '../../queries/user';
+import { useAddPromotionMutation } from '../../queries/producerProfile';
 import { PACK_SIZES } from '../../utils/constants';
 import PromotionModalStyle from './PromotionModalStyle';
 
-const PromotionModal = ({
-  producerProfile, userProfile, profileFetch, location, promotionAdd,
-}) => {
-  useInjectReducer({ key: 'producerProfilePage', reducer });
-  useInjectSaga({ key: 'producerProfilePage', saga });
+const PromotionModal = ({ onPromotionAdded }) => {
+  const { data: userProfile } = useUserQuery();
+  const { mutateAsync: promotionAdd, isLoading: addingPromotion } = useAddPromotionMutation();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [promotionSelectedValues, setPromotionSelectedValues] = useState({});
@@ -113,8 +104,11 @@ const PromotionModal = ({
   const handleSave = async () => {
     // const privateRoute = await getPrivateRoute();
     // const response = await privateRoute.post('/producer/promotion', promotionSelectedValues);
-    promotionAdd(promotionSelectedValues);
+    await promotionAdd(promotionSelectedValues);
     setModalOpen(false);
+    if (onPromotionAdded) {
+      onPromotionAdded();
+    }
     // console.log(response.data);
   };
 
@@ -290,6 +284,7 @@ const PromotionModal = ({
         <Button
           primary
           className="stock-save"
+          loading={addingPromotion}
           onClick={handleSave}
         >
           Save
@@ -300,29 +295,7 @@ const PromotionModal = ({
 };
 
 PromotionModal.propTypes = {
-  // dispatch: PropTypes.func.isRequired,
-  producerProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  profileFetch: PropTypes.func,
-  promotionAdd: PropTypes.func,
+  onPromotionAdded: PropTypes.func,
 
 };
-
-const mapStateToProps = createStructuredSelector({
-  producerProfile: makeSelectProducerProfile(),
-  userProfile: makeSelectUser(),
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    profileFetch: location => dispatch(fetchProfile(location.pathname)),
-    promotionAdd: promotionAddData => dispatch(addPromotion(promotionAddData)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(withConnect)(PromotionModal);
+export default PromotionModal;

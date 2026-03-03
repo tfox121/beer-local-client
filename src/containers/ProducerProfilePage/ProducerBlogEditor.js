@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import { Modal, Form, Button } from 'semantic-ui-react';
 import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { postBlog } from './actions';
 import { BLOG_CHARACTER_LIMIT, BLOG_EDITOR_TOOLBAR } from '../../utils/constants';
+import { usePostBlogMutation } from '../../queries/producerProfile';
 
-const ProducerBlogEditor = ({ blogPost }) => {
+const ProducerBlogEditor = ({ onBlogPosted }) => {
+  const { mutateAsync: blogPost, isLoading: blogPosting } = usePostBlogMutation();
   const [blogEditor, setBlogEditor] = useState(EditorState.createEmpty());
   const [blogMeta, setBlogMeta] = useState({ title: '', author: '', display: true });
   const [modalOpen, setModalOpen] = useState(false);
@@ -16,10 +15,13 @@ const ProducerBlogEditor = ({ blogPost }) => {
   const handleBlogEditorSave = async () => {
     const contentState = blogEditor.getCurrentContent();
     const rawBlogData = convertToRaw(contentState);
-    blogPost({ rawBlogData: JSON.stringify(rawBlogData), blogMeta });
+    await blogPost({ rawBlogData: JSON.stringify(rawBlogData), blogMeta });
     setBlogEditor(EditorState.createEmpty());
     setBlogMeta({ title: '', author: '', display: true });
     setModalOpen(false);
+    if (onBlogPosted) {
+      onBlogPosted();
+    }
   };
 
   return (
@@ -57,7 +59,7 @@ const ProducerBlogEditor = ({ blogPost }) => {
       </Modal.Content>
       <Modal.Actions>
         <Button onClick={() => setModalOpen(false)} content="Cancel" />
-        <Button primary onClick={handleBlogEditorSave} content="Save" />
+        <Button primary loading={blogPosting} onClick={handleBlogEditorSave} content="Save" />
       </Modal.Actions>
     </Modal>
 
@@ -65,22 +67,7 @@ const ProducerBlogEditor = ({ blogPost }) => {
 };
 
 ProducerBlogEditor.propTypes = {
-  blogPost: PropTypes.func,
+  onBlogPosted: PropTypes.func,
 };
 
-// const mapStateToProps = createStructuredSelector({
-//   blogPosting: makeSelectBlogPosting(),
-// });
-
-function mapDispatchToProps(dispatch) {
-  return {
-    blogPost: blogPost => dispatch(postBlog(blogPost)),
-  };
-}
-
-const withConnect = connect(
-  null,
-  mapDispatchToProps,
-);
-
-export default compose(withConnect)(ProducerBlogEditor);
+export default ProducerBlogEditor;

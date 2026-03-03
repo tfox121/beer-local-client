@@ -3,22 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import { useTable, useSortBy } from 'react-table';
 import {
-  Table, Input, Menu, Modal, Header, Button,
+  Table, Input, Menu, Modal, Button,
 } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
 
-import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { push } from 'connected-react-router';
+import { useHistory } from 'react-router-dom';
 import { PACK_SIZES } from '../../utils/constants';
-import { getPrivateRoute } from '../../utils/api';
 
 import AvailabilityStyle from './AvailabilityStyle';
-import { makeSelectProducerProfile, makeSelectOrderSending } from './selectors';
 import OrderModalContent from '../../components/OrderModalContent';
-import { sendOrder } from './actions';
+import { useSendOrderMutation } from '../../queries/producerProfile';
 
 const EditableCell = ({
   value: initialValue,
@@ -101,10 +96,8 @@ const AvailibilityTable = ({
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  const handleSendOrder = () => {
-    handleSubmit();
-    while (orderSending) {
-    }
+  const handleSendOrder = async () => {
+    await handleSubmit();
     setModalOpen(false);
   };
 
@@ -187,13 +180,18 @@ AvailibilityTable.propTypes = {
 };
 
 const AvailabilityDynamic = ({
-  data, producerProfile, orderSend, orderSending,
+  data, producerProfile,
 }) => {
+  const history = useHistory();
+  const { mutateAsync: orderSend, isLoading: orderSending } = useSendOrderMutation();
   const [orderItems, setOrderItems] = useState([...data].map(stockItem => ({ ...stockItem, orderQuant: 0 })));
 
   const handleSubmit = async () => {
     const order = orderItems.filter(stockItem => stockItem.orderQuant);
-    orderSend({ orderItems: order, producerSub: producerProfile.sub });
+    const response = await orderSend({ orderItems: order, producerSub: producerProfile.sub });
+    if (response && response.order && response.order._id) {
+      history.push(`/order/${response.order._id}`);
+    }
     // const privateRoute = await getPrivateRoute();
     // try {
     //   const response = await privateRoute.post('/orders', {
@@ -317,24 +315,6 @@ const AvailabilityDynamic = ({
 AvailabilityDynamic.propTypes = {
   data: PropTypes.array,
   producerProfile: PropTypes.object,
-  orderSend: PropTypes.func,
-  orderSending: PropTypes.bool,
 };
 
-const mapStateToProps = createStructuredSelector({
-  producerProfile: makeSelectProducerProfile(),
-  orderSending: makeSelectOrderSending(),
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    orderSend: orderObj => dispatch(sendOrder(orderObj)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(withConnect)(AvailabilityDynamic);
+export default AvailabilityDynamic;

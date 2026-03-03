@@ -8,18 +8,15 @@ import {
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
 
-import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { useHistory } from 'react-router-dom';
 import Select from 'react-select';
 import { PACK_SIZES } from '../../utils/constants';
 
 import AvailabilityMobileStyle from './AvailabilityMobileStyle';
-import { makeSelectProducerProfile, makeSelectUser, makeSelectOrderSending } from './selectors';
 import OrderModalContent from '../../components/OrderModalContent';
-import { updateProfileOptions, sendOrder } from './actions';
 import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
 import calcOrderTotal from '../../utils/calcOrderTotal';
+import { useSendOrderMutation } from '../../queries/producerProfile';
 
 const TableRows = ({
   data, rows, prepareRow, storedCategory, index, categories, handleCategoryChange, handleRemoveCategory, producerProfile, user, activeIndex, handleRowClick,
@@ -224,7 +221,9 @@ const AvailibilityTable = ({
   const [categories, setCategories] = useState([]);
   const [stockCategories, setStockCategories] = useState(producerProfile && producerProfile.profileOptions.stockCategories);
   const isInitialMount = useRef(true);
+  const lastPatchedCategories = useRef(stockCategories);
   const [activeIndex, setActiveIndex] = useState(null);
+  const hasOrderItems = data.some(item => Number(item.orderQuant) > 0);
 
   const handleRowClick = rowIndex => {
     if (rowIndex === activeIndex) {
@@ -255,10 +254,17 @@ const AvailibilityTable = ({
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
+      lastPatchedCategories.current = stockCategories;
     } else {
+      const prev = JSON.stringify(lastPatchedCategories.current || []);
+      const next = JSON.stringify(stockCategories || []);
+      if (prev === next) {
+        return;
+      }
+      lastPatchedCategories.current = stockCategories;
       profileOptionsUpdate({ name: 'stockCategories', payload: stockCategories });
     }
-  }, [stockCategories, profileOptionsUpdate]);
+  }, [stockCategories]);
 
   useEffect(() => {
     setCategories([...new Set(data.map(stockItem => stockItem.category))].filter(category => !!category && !stockCategories.includes(category)).map(category => ({ value: category, label: category })));
@@ -271,13 +277,9 @@ const AvailibilityTable = ({
     }
   };
 
-  const handleSendOrder = () => {
-    handleSubmit();
-    setTimeout(() => {
-      while (orderSending) {
-      }
-      setModalOpen(false);
-    }, 0);
+  const handleSendOrder = async () => {
+    await handleSubmit();
+    setModalOpen(false);
   };
 
   return (
@@ -335,11 +337,13 @@ const AvailibilityTable = ({
               <Table.HeaderCell colSpan="16">
                 <Menu floated="right">
                   {geoJsonContainsCoords(producerProfile.distributionAreas, user.location) || producerProfile.profileOptions.distantPurchasing ? (
-                    <Modal
-                      trigger={<Menu.Item name="Place Order" onClick={handleModalOpen} />}
-                      open={modalOpen}
-                      size="large"
-                    >
+                    <>
+                      <Menu.Item name="Place Order" onClick={handleModalOpen} />
+                      <Modal
+                        open={modalOpen}
+                        onClose={() => setModalOpen(false)}
+                        size="large"
+                      >
                       <Modal.Header>Confirm Order</Modal.Header>
                       <OrderModalContent
                         orderItems={data}
@@ -355,11 +359,17 @@ const AvailibilityTable = ({
                         <Button
                           primary
                           content="Confirm"
-                          disabled={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location) && producerProfile.profileOptions.distantPurchasingConditions && calcOrderTotal(data) < producerProfile.profileOptions.distantPurchasingConditions.minSpend}
+                          disabled={
+                            !hasOrderItems
+                            || (!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)
+                              && producerProfile.profileOptions.distantPurchasingConditions
+                              && calcOrderTotal(data) < producerProfile.profileOptions.distantPurchasingConditions.minSpend)
+                          }
                           onClick={handleSendOrder}
                         />
                       </Modal.Actions>
-                    </Modal>
+                      </Modal>
+                    </>
                   ) : (
                     <Menu.Item disabled name="Not available in your area" />
                   )}
@@ -387,13 +397,18 @@ AvailibilityTable.propTypes = {
 };
 
 const AvailabilityMobile = ({
-  data, producerProfile, profileOptionsUpdate, user, orderSend, orderSending,
+  data, producerProfile, profileOptionsUpdate, user,
 }) => {
+  const history = useHistory();
+  const { mutateAsync: orderSend, isLoading: orderSending } = useSendOrderMutation();
   const [orderItems, setOrderItems] = useState([...data].map(stockItem => ({ ...stockItem, orderQuant: 0 })));
 
   const handleSubmit = async () => {
     const order = orderItems.filter(stockItem => stockItem.orderQuant);
-    orderSend({ orderItems: order, producerSub: producerProfile.sub });
+    const response = await orderSend({ orderItems: order, producerSub: producerProfile.sub });
+    if (response && response.order && response.order._id) {
+      history.push(`/order/${response.order._id}`);
+    }
   };
 
   useEffect(() => {
@@ -478,27 +493,6 @@ AvailabilityMobile.propTypes = {
   producerProfile: PropTypes.object,
   profileOptionsUpdate: PropTypes.func,
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  orderSend: PropTypes.func,
-  orderSending: PropTypes.bool,
 };
 
-const mapStateToProps = createStructuredSelector({
-  producerProfile: makeSelectProducerProfile(),
-  user: makeSelectUser(),
-  orderSending: makeSelectOrderSending(),
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    profileOptionsUpdate: updateObj => dispatch(updateProfileOptions(updateObj)),
-    orderSend: orderInfo => dispatch(sendOrder(orderInfo)),
-
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(withConnect)(AvailabilityMobile);
+export default AvailabilityMobile;

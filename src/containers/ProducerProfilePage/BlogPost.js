@@ -10,18 +10,15 @@ import {
 } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { Editor } from 'react-draft-wysiwyg';
-import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
 
 import { BLOG_ITEMS_PER_PAGE, BLOG_EDITOR_TOOLBAR, BLOG_CHARACTER_LIMIT } from '../../utils/constants';
 import timeAgo from '../../utils/timeAgo';
-import { editBlog } from './actions';
-import { makeSelectBlogPosting } from './selectors';
+import { useEditBlogMutation } from '../../queries/producerProfile';
 
 const BlogPost = ({
-  user, businessId, blogPost, blogPage, index, blogEdit,
+  user, businessId, blogPost, blogPage, index, onBlogEdited,
 }) => {
+  const { mutateAsync: blogEdit, isLoading: editingBlogRequest } = useEditBlogMutation();
   const parsedBlog = JSON.parse(blogPost.blogData);
   const initialContentState = convertFromRaw(parsedBlog);
   const [blogData, setBlogData] = useState(EditorState.createWithContent(initialContentState));
@@ -41,8 +38,11 @@ const BlogPost = ({
   const handleEditConfirm = async () => {
     const contentState = blogData.getCurrentContent();
     const rawBlogData = convertToRaw(contentState);
-    blogEdit({ id: blogPost._id, rawBlogData: JSON.stringify(rawBlogData), blogMeta });
+    await blogEdit({ id: blogPost._id, rawBlogData: JSON.stringify(rawBlogData), blogMeta });
     setEditingBlog(false);
+    if (onBlogEdited) {
+      onBlogEdited();
+    }
   };
 
   return (
@@ -101,6 +101,7 @@ const BlogPost = ({
                       <Button
                         compact
                         color="green"
+                        loading={editingBlogRequest}
                         onClick={handleEditConfirm}
                         content="Save"
                         floated="right"
@@ -137,22 +138,7 @@ BlogPost.propTypes = {
   blogPost: PropTypes.object,
   blogPage: PropTypes.number,
   index: PropTypes.number,
-  blogEdit: PropTypes.func,
+  onBlogEdited: PropTypes.func,
 };
 
-const mapStateToProps = createStructuredSelector({
-  blogPosting: makeSelectBlogPosting(),
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    blogEdit: blogPost => dispatch(editBlog(blogPost)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(withConnect)(BlogPost);
+export default BlogPost;

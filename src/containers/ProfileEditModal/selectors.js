@@ -11,7 +11,6 @@ const ProfileEditModalDomain = state => state.profileEditModal || initialState;
  * Other specific selectors
  */
 const selectGlobal = state => state.global || initialState;
-const selectProducerProfilePage = state => state.producerProfilePage || initialState;
 
 const makeSelectUser = () => createSelector(
   selectGlobal,
@@ -23,14 +22,6 @@ const makeSelectUpdatingUser = () => createSelector(
   globalState => globalState.updatingUser,
 );
 
-const makeSelectProducerProfile = () => createSelector(
-  selectProducerProfilePage,
-  substate => substate.profile,
-);
-/**
- * Default selector used by ProfileEditModal
- */
-
 const makeProfileEditModal = () => createSelector(
   ProfileEditModalDomain,
   substate => substate,
@@ -38,5 +29,5 @@ const makeProfileEditModal = () => createSelector(
 
 export default makeProfileEditModal;
 export {
-  ProfileEditModalDomain, makeSelectUser, makeSelectUpdatingUser, makeSelectProducerProfile,
+  ProfileEditModalDomain, makeSelectUser, makeSelectUpdatingUser,
 };

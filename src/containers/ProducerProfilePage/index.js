@@ -6,7 +6,7 @@
  *
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
@@ -14,7 +14,6 @@ import { Helmet } from 'react-helmet';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { createStructuredSelector } from 'reselect';
-import { compose } from 'redux';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import PhoneNumber from 'awesome-phonenumber';
 import {
@@ -33,19 +32,16 @@ import {
 } from 'semantic-ui-react';
 import { Map, TileLayer } from 'react-leaflet';
 
-import { useInjectSaga } from '../../utils/injectSaga';
-import { useInjectReducer } from '../../utils/injectReducer';
 import { BLOG_ITEMS_PER_PAGE, PACK_SIZES, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
-import { makeSelectUser, makeSelectProducerProfile } from './selectors';
-import { makeSelectLocation, makeSelectProducerFollowing } from '../App/selectors';
-import {
-  fetchProfile, clearProfile, addPromotion, deletePromotion,
-} from './actions';
+import { makeSelectLocation, makeSelectProducerFollowing, makeSelectUser } from '../App/selectors';
 import { followProducer } from '../App/actions';
-import reducer from './reducer';
-import saga from './saga';
-import { getPrivateRoute } from '../../utils/api';
 import promotionCopySelection from '../../utils/promotionCopy';
+import {
+  useDeletePromotionMutation,
+  useProducerProfileQuery,
+  useUpdateProfileMutation,
+  useUpdateProfileOptionsMutation,
+} from '../../queries/producerProfile';
 // import messages from './messages';
 
 import PageWrapper from '../../components/PageWrapper';
@@ -66,18 +62,55 @@ import BannerStyle from './BannerStyle';
 import AvailabilityMobile from './AvailabilityMobile';
 
 export function ProducerProfilePage({
-  profileFetch,
-  profileClear,
-  producerProfile,
   user,
   routerLocation,
   producerFollow,
   producerFollowing,
-  promotionAdd,
-  promotionDelete,
 }) {
-  useInjectReducer({ key: 'producerProfilePage', reducer });
-  useInjectSaga({ key: 'producerProfilePage', saga });
+  const producerBusinessId = routerLocation && routerLocation.pathname && routerLocation.pathname.split('/')[2];
+  const {
+    data: producerProfile,
+    refetch: profileFetch,
+    isLoading: fetchingProfile,
+    isFetching: profileRefetching,
+  } = useProducerProfileQuery(producerBusinessId);
+  const { mutateAsync: promotionDeleteMutation } = useDeletePromotionMutation();
+  const { mutateAsync: profileUpdateMutation } = useUpdateProfileMutation();
+  const { mutateAsync: profileOptionsUpdateMutation } = useUpdateProfileOptionsMutation();
+
+  const [producerFollowed, setProducerFollowed] = useState(false);
+  const [blogPage, setBlogPage] = useState(1);
+  const [profileEditModalOpen, setProfileEditModalOpen] = useState(false);
+  const followedProducers = (user && user.followedProducers) || [];
+  const producerSub = producerProfile && producerProfile.sub;
+
+  useEffect(() => {
+    if (followedProducers && producerSub) {
+      const followedProducerList = followedProducers.map(producer => producer.sub);
+      if (followedProducerList.includes(producerSub)) {
+        setProducerFollowed(true);
+      }
+    }
+  }, [followedProducers, producerSub]);
+
+  const handleDeletePromo = useCallback(async id => {
+    await promotionDeleteMutation(id);
+    await profileFetch();
+  }, [promotionDeleteMutation, profileFetch]);
+
+  const handleProfileUpdate = useCallback(async updateObj => {
+    await profileUpdateMutation(updateObj);
+    await profileFetch();
+  }, [profileUpdateMutation, profileFetch]);
+
+  const handleProfileOptionsUpdate = useCallback(async updateObj => {
+    await profileOptionsUpdateMutation(updateObj);
+    await profileFetch();
+  }, [profileOptionsUpdateMutation, profileFetch]);
+
+  if (fetchingProfile || !producerProfile) {
+    return null;
+  }
 
   const {
     sub,
@@ -95,45 +128,10 @@ export function ProducerProfilePage({
     avatarSource,
   } = producerProfile;
 
-  const { followedProducers } = user;
-
-  const [producerFollowed, setProducerFollowed] = useState(false);
-  const [blogPage, setBlogPage] = useState(1);
-  const [profileEditModalOpen, setProfileEditModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (followedProducers && sub) {
-      const followedProducerList = followedProducers.map(producer => producer.sub);
-      if (followedProducerList.includes(sub)) {
-        setProducerFollowed(true);
-      }
-    }
-  }, [followedProducers, sub]);
-
-  useEffect(() => {
-    // if (Object.keys(user).length) {
-    profileFetch();
-    // }
-    return () => {
-      profileClear();
-    };
-  }, []);
-
-  if (!producerProfile) {
-    return null;
-  }
-
   TimeAgo.addLocale(en);
 
   const handleFollowClick = async () => {
     producerFollow(producerProfile.sub);
-  };
-
-  const handleDeletePromo = async id => {
-    // const privateRoute = await getPrivateRoute();
-    // const response = await privateRoute.delete(`/producer/promotion/${id}`);
-    // console.log(response);
-    promotionDelete(id);
   };
 
   const blogRender = (blogArray, page) => blogArray.filter(blogPost => blogPost.display === true || (user && user.businessId === businessId)).map((blogPost, index) => {
@@ -142,7 +140,7 @@ export function ProducerProfilePage({
     }
     return (
       <React.Fragment key={blogPost._id}>
-        <BlogPost user={user} businessId={businessId} blogPost={blogPost} blogPage={blogPage} index={index} />
+        <BlogPost user={user} businessId={businessId} blogPost={blogPost} blogPage={blogPage} index={index} onBlogEdited={profileFetch} />
       </React.Fragment>
     );
   });
@@ -189,7 +187,7 @@ export function ProducerProfilePage({
                   {(user && user.businessId === businessId) && (
                     <Modal open={profileEditModalOpen} onClose={() => setProfileEditModalOpen(false)} closeIcon size="small" trigger={<Button onClick={() => setProfileEditModalOpen(true)} primary>Edit Profile</Button>}>
                       <Modal.Header>Edit profile</Modal.Header>
-                      <ProfileEditModal profileEditModalOpen={profileEditModalOpen} setProfileEditModalOpen={setProfileEditModalOpen} location={routerLocation} />
+                      <ProfileEditModal profileEditModalOpen={profileEditModalOpen} setProfileEditModalOpen={setProfileEditModalOpen} location={routerLocation} producerProfile={producerProfile} profileUpdate={handleProfileUpdate} />
                     </Modal>
                   )}
                   {(user && user.role === 'retailer') && (
@@ -248,7 +246,7 @@ export function ProducerProfilePage({
                 <Grid.Column width={9} textAlign="right">
                   {(user && user.businessId === businessId)
                   && (
-                    <ProducerBlogEditor />
+                    <ProducerBlogEditor onBlogPosted={profileFetch} />
                   )}
                 </Grid.Column>
               </Grid>
@@ -287,7 +285,7 @@ export function ProducerProfilePage({
               <Grid.Column width={8} textAlign="right">
                 {(user && user.businessId === businessId)
                 && (
-                  <PromotionModal />
+                  <PromotionModal onPromotionAdded={profileFetch} />
                 )}
               </Grid.Column>
             </Grid>
@@ -346,7 +344,7 @@ export function ProducerProfilePage({
                   && (
                     <>
                       {/* <Input value={stockCategoryNum} style={{ width: '60px', marginRight: '100px' }} onChange={(e) => setStockCategoryNum(e.target.value)} label="Categories" type="number" min={1} /> */}
-                      <StockModal />
+                      <StockModal stock={stock} fetchingProfile={fetchingProfile || profileRefetching} onStockUpdated={profileFetch} />
                     </>
                   )}
               </Grid.Column>
@@ -354,10 +352,10 @@ export function ProducerProfilePage({
             {stock && (
               <>
                 <Responsive minWidth={736}>
-                  <AvailabilityCategories data={stock} />
+                  <AvailabilityCategories data={stock} producerProfile={producerProfile} user={user} profileOptionsUpdate={handleProfileOptionsUpdate} />
                 </Responsive>
                 <Responsive maxWidth={735}>
-                  <AvailabilityMobile data={stock} />
+                  <AvailabilityMobile data={stock} producerProfile={producerProfile} user={user} profileOptionsUpdate={handleProfileOptionsUpdate} />
                 </Responsive>
               </>
             )}
@@ -369,35 +367,25 @@ export function ProducerProfilePage({
 }
 
 ProducerProfilePage.propTypes = {
-  profileFetch: PropTypes.func.isRequired,
-  profileClear: PropTypes.func.isRequired,
-  producerProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   routerLocation: PropTypes.object,
   producerFollow: PropTypes.func,
   producerFollowing: PropTypes.bool,
-  promotionDelete: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
-  producerProfile: makeSelectProducerProfile(),
   user: makeSelectUser(),
   routerLocation: makeSelectLocation(),
   producerFollowing: makeSelectProducerFollowing(),
 });
 
-function mapDispatchToProps(dispatch, { location }) {
+function mapDispatchToProps(dispatch) {
   return {
-    profileFetch: () => dispatch(fetchProfile(location.pathname)),
-    profileClear: () => dispatch(clearProfile()),
     producerFollow: producerSub => dispatch(followProducer(producerSub)),
-    promotionDelete: promotionId => dispatch(deletePromotion(promotionId)),
   };
 }
 
-const withConnect = connect(
+export default connect(
   mapStateToProps,
   mapDispatchToProps,
-);
-
-export default compose(withConnect)(ProducerProfilePage);
+)(ProducerProfilePage);

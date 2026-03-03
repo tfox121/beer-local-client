@@ -6,37 +6,23 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl';
 import shortid from 'shortid';
-import { createStructuredSelector } from 'reselect';
-import { compose } from 'redux';
 import {
   Modal, Button, Confirm, Loader, Icon, Message,
 } from 'semantic-ui-react';
-import { withRouter } from 'react-router';
 
-import { useInjectSaga } from '../../utils/injectSaga';
-import { useInjectReducer } from '../../utils/injectReducer';
 import arrayMove from '../../utils/arrayMove';
-import { updateStock } from '../ProducerProfilePage/actions';
-import reducer from '../ProducerProfilePage/reducer';
-import saga from '../ProducerProfilePage/saga';
+import { useUpdateStockMutation } from '../../queries/producerProfile';
 
-import makeSelectProducerProfilePage from '../ProducerProfilePage/selectors';
 import StockModalStyle from './StockModalStyle';
 import StockModalMenu from './StockModalMenu';
 import StockManager from './StockManager';
 
 export function StockModal({
-  producerProfilePage, stockUpdate,
+  stock, fetchingProfile, onStockUpdated,
 }) {
-  useInjectReducer({ key: 'producerProfilePage', reducer });
-  useInjectSaga({ key: 'producerProfilePage', saga });
-
-  const { stock } = producerProfilePage.profile;
-
-  const { fetchingProfile, updatingStock } = producerProfilePage;
+  const { mutateAsync: stockUpdate, isLoading: updatingStock } = useUpdateStockMutation();
 
   const stockDataTemplate = {
     id: shortid.generate(),
@@ -55,7 +41,6 @@ export function StockModal({
   const [originalStockData, setOriginalStockData] = useState(null);
   const [selected, setSelected] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
-  const [stockEditPending, setStockEditPending] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -188,13 +173,13 @@ export function StockModal({
       if (incompleteStockItem) {
         setIncompleteStockItem(false);
       }
-      stockUpdate(stockData);
-      setStockEditPending(false);
+      await stockUpdate(stockData);
       // Update original data after successful save
       setOriginalStockData(JSON.parse(JSON.stringify(stockData)));
-      while (updatingStock) {
-      }
       setModalOpen(false);
+      if (onStockUpdated) {
+        onStockUpdated();
+      }
     } else if (!incompleteStockItem) {
       setIncompleteStockItem(true);
     }
@@ -206,7 +191,6 @@ export function StockModal({
       return setConfirmOpen(true);
     }
     setIncompleteStockItem(false);
-    setStockEditPending(false);
     return setModalOpen(false);
   };
 
@@ -218,7 +202,6 @@ export function StockModal({
     setConfirmOpen(false);
     setModalOpen(false);
     setIncompleteStockItem(false);
-    setStockEditPending(false);
     // Reset to original data
     if (originalStockData && originalStockData.length) {
       setStockData(JSON.parse(JSON.stringify(originalStockData)));
@@ -270,7 +253,7 @@ export function StockModal({
               data={stockData}
               setData={setStockData}
               setSelected={setSelected}
-              setStockEditPending={setStockEditPending}
+              setStockEditPending={() => {}}
             />
           </Modal.Content>
           <Message style={{ width: '97%', margin: '1.5%' }} icon error compact hidden={!incompleteStockItem}>
@@ -309,24 +292,14 @@ export function StockModal({
 }
 
 StockModal.propTypes = {
-  // dispatch: PropTypes.func.isRequired,
-  producerProfilePage: PropTypes.object,
-  stockUpdate: PropTypes.func,
+  stock: PropTypes.array,
+  fetchingProfile: PropTypes.bool,
+  onStockUpdated: PropTypes.func,
 };
 
-const mapStateToProps = createStructuredSelector({
-  producerProfilePage: makeSelectProducerProfilePage(),
-});
+StockModal.defaultProps = {
+  stock: [],
+  fetchingProfile: false,
+};
 
-function mapDispatchToProps(dispatch) {
-  return {
-    stockUpdate: stockData => dispatch(updateStock(stockData)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default withRouter(compose(withConnect)(StockModal));
+export default StockModal;

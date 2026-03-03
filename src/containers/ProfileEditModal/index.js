@@ -8,7 +8,6 @@ import {
 } from 'semantic-ui-react';
 import AvatarEditor from 'react-avatar-editor';
 import { Slider } from 'react-semantic-ui-range';
-import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import PhoneNumber from 'awesome-phonenumber';
@@ -20,12 +19,11 @@ import AddressAutocomplete from '../../components/AddressAutocomplete';
 import L from 'leaflet';
 import { Map, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import { makeSelectProducerProfile, makeSelectUser, makeSelectUpdatingUser } from './selectors';
+import { makeSelectUser, makeSelectUpdatingUser } from './selectors';
 // import saga from './saga';
 import ayt from '../../utils/phoneNumberValidation';
 import { updateUser } from '../App/actions';
 import EditProfileStyle from './EditProfileStyle';
-import { updateProfile } from '../ProducerProfilePage/actions';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
 import SuggestBlockStyle from '../CreateProfilePage/SuggestBlockStyle';
@@ -620,7 +618,6 @@ ProfileEditModal.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  producerProfile: makeSelectProducerProfile(),
   user: makeSelectUser(),
   userUpdating: makeSelectUpdatingUser(),
 });
@@ -628,13 +625,10 @@ const mapStateToProps = createStructuredSelector({
 function mapDispatchToProps(dispatch, { location }) {
   return {
     userUpdate: updateObj => dispatch(updateUser(updateObj, location.pathname)),
-    profileUpdate: updateObj => dispatch(updateProfile(updateObj)),
   };
 }
 
-const withConnect = connect(
+export default connect(
   mapStateToProps,
   mapDispatchToProps,
-);
-
-export default compose(withConnect)(ProfileEditModal);
+)(ProfileEditModal);
