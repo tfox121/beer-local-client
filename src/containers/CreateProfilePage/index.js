@@ -191,7 +191,6 @@ export function CreateProfilePage({ userSave, savingUser }) {
           avatarSource = getImageUrl(user.sub, 'avatar');
         }
       }
-      console.log('SAVING', { ...formValues, avatarSource });
       userSave({ ...formValues, avatarSource });
     } else {
       setFormErrors(errors);

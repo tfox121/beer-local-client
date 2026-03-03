@@ -47,7 +47,6 @@ const HomePage = ({ userProfile }) => {
   // if (!userProfile.sub) {
   //   userFetch();
   // }
-  console.log('HOME');
 
   const homeDisplay = (authenticated, user) => {
     if (authenticated && !user) {

@@ -73,7 +73,6 @@ const ProducerForm = ({
 
   const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
-      console.log(suggestion);
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
       const locationObj = Array.isArray(locationArray)

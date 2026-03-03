@@ -65,7 +65,6 @@ export function StockModal({
     if (fetchingProfile && !loadingData) {
       setDataLoaded(false);
       setLoadingData(true);
-      console.log('LOADING');
       return;
     }
     if (!fetchingProfile && loadingData) {
@@ -171,7 +170,6 @@ export function StockModal({
       delete newRow._id;
       return newRow;
     });
-    console.log(duplicateRows);
     setStockData([...duplicateRows, ...stockData]);
   };
 
@@ -195,7 +193,6 @@ export function StockModal({
       // Update original data after successful save
       setOriginalStockData(JSON.parse(JSON.stringify(stockData)));
       while (updatingStock) {
-        console.log('Updating stock');
       }
       setModalOpen(false);
     } else if (!incompleteStockItem) {

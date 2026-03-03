@@ -53,7 +53,6 @@ const SelectDistroAreasForm = ({
 
   const onCreated = (e) => {
     const type = e.layerType;
-    console.log('onCreated: something else created:', type, e);
 
     onChange();
   };

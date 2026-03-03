@@ -1,5 +1,4 @@
 const checkUserStatus = (authLoading, authError, authenticated, userLoading, userLoadingError, userData) => {
-  console.log('CHECKING');
   const userStatusObj = {
     authenticated: false, registered: false, loading: false, error: false, notFound: false, connectionError: false,
   };

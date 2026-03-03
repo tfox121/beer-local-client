@@ -15,7 +15,6 @@ function* fetchOrder({ pathName }) {
     const fetchOrderData = () => privateRoute.get(`/orders/${orderId}`);
     const response = yield call(fetchOrderData);
 
-    console.log('ORDER RETRIEVED', response.data);
 
     if (response.data) {
       yield put(orderFetched(response.data));
@@ -33,7 +32,6 @@ function* editOrder({ editObj }) {
     });
     const response = yield call(fetchOrderData);
 
-    console.log('ORDER EDITED', response.data);
 
     if (response.data) {
       yield put(orderEdited(response.data));
@@ -50,7 +48,6 @@ function* sendMessage({ messageContent }) {
 
     const response = yield call(fetchOrderData);
 
-    console.log('MESSAGE SENT', response.data);
 
     if (response.data) {
       yield put(messageSent(response.data));

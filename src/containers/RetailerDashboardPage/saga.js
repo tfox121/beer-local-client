@@ -13,7 +13,6 @@ function* fetchProducerFeed() {
     const fetchProducerFeedData = () => privateRoute.get('/retailer/producers');
     const response = yield call(fetchProducerFeedData);
 
-    console.log('PRODUCER FEED RETRIEVED', response.data);
 
     if (response.data) {
       yield put(producerFeedFetched(response.data));

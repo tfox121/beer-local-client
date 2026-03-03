@@ -67,22 +67,18 @@ const App = ({
 
   const userStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
 
-  console.log(userStatus);
 
   useEffect(() => {
     const checkStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
     // Don't retry if there's a connection error
     if (checkStatus.authenticated && !checkStatus.registered && !checkStatus.notFound && !checkStatus.connectionError && !fetchingUser) {
-      console.log('FETCHING');
       userFetch();
     }
     if (!checkStatus.authenticated && !checkStatus.loading && checkStatus.registered) {
-      console.log('CLEARING USER');
       userClear();
     }
     return () => {
       if (!checkStatus.authenticated && !checkStatus.loading && checkStatus.registered) {
-        console.log('CLEARING USER');
         userClear();
       }
     };
@@ -100,7 +96,6 @@ const App = ({
     const checkStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
     // Don't retry if there's a connection error or already fetching
     if (pathnameChanged && checkStatus.authenticated && checkStatus.registered && !checkStatus.connectionError && !fetchingUser && !hasFetchedForPathRef.current) {
-      console.log('FETCHING for pathname change');
       hasFetchedForPathRef.current = true;
       userFetch();
     }
@@ -108,7 +103,6 @@ const App = ({
   }, [location.pathname, isAuthenticated, isLoading, fetchingUser, userFetchError]);
 
   if (userStatus.error) {
-    console.log('User fetch error', userStatus.error);
     const isConnectionError = userStatus.connectionError;
     return (
       <Dimmer active page>
@@ -146,7 +140,6 @@ const App = ({
     );
   }
 
-  console.log('RENDER APP');
 
   return (
     <AppWrapper>

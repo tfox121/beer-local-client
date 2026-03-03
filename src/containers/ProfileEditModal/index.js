@@ -116,7 +116,6 @@ const ProfileEditModal = ({
 
   useEffect(() => {
     if (distributionAreas) {
-      console.log('SETTING POLYS');
       setSavedPolygons({ ...distributionAreas });
     }
   }, [distributionAreas]);

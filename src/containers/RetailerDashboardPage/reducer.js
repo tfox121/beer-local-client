@@ -76,7 +76,6 @@ const RetailerDashboardPageReducer = (state = initialState, action) => produce(s
           // Sort newest first (descending order)
           return dateB - dateA;
         });
-        console.log('SORTED', dateSorted);
 
         draftState.producerFeed = dateSorted;
         draftState.fetchingProducerFeedError = false;

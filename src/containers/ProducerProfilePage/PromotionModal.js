@@ -42,7 +42,6 @@ const PromotionModal = ({
   const [promotionSaved, setPromotionSaved] = useState(false);
 
   useEffect(() => {
-    console.log('USER', userProfile);
     if (userProfile && userProfile.stock) {
       setAvailableStock(userProfile.stock
         .filter((stockItem) => stockItem.display === 'Show')

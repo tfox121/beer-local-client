@@ -20,13 +20,11 @@ function* fetchUser() {
     const fetchUserData = () => privateRoute.get('/user');
     const response = yield call(fetchUserData);
 
-    console.log('USER RETRIEVED', response.data);
     if (Object.keys(response.data.user).length && Object.keys(response.data.business).length) {
       yield put(userFetched({
         ...response.data.business, ...response.data.user,
       }));
     } else {
-      console.log('NO USER FOUND');
       // yield put(push('/create'));
     }
   } catch (err) {
@@ -42,7 +40,6 @@ function* updateUser({ updateObj, pathname }) {
     const updateUserProfile = () => privateRoute.patch('/user', updateObj);
     const response = yield call(updateUserProfile);
 
-    console.log('USER UPDATED', response.data);
     if (Object.keys(response.data.user).length && Object.keys(response.data.business).length) {
       yield put(userUpdated({
         ...response.data.user, ...response.data.business,
@@ -61,7 +58,6 @@ function* saveUser({ profileData }) {
     // Call our request helper (see 'utils/request')
     const privateRoute = yield call(getPrivateRoute);
 
-    console.log(profileData);
 
     const saveUserData = (formValues) => privateRoute.post(
       '/user', formValues,
@@ -95,7 +91,6 @@ function* followProducer({ producerSub }) {
       yield put(producerFollowed(response.data));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(producerFollowError(err));
   }
 }

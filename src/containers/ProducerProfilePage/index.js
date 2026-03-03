@@ -112,11 +112,9 @@ export function ProducerProfilePage({
 
   useEffect(() => {
     // if (Object.keys(user).length) {
-    console.log('FETCHING PROFILE');
     profileFetch();
     // }
     return () => {
-      console.log('CLEAR PROFILE');
       profileClear();
     };
   }, []);

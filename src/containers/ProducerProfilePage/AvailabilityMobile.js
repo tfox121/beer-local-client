@@ -277,7 +277,6 @@ const AvailibilityTable = ({
     handleSubmit();
     setTimeout(() => {
       while (orderSending) {
-        console.log('Sending');
       }
       setModalOpen(false);
     }, 0);

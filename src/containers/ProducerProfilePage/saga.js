@@ -30,14 +30,12 @@ function* fetchProfile({ pathName }) {
     const fetchProfileData = () => publicRoute.get(`/producer/${businessId}`);
     const response = yield call(fetchProfileData);
 
-    console.log('PROFILE RETRIEVED', response.data);
     if (response.data) {
       yield put(profileFetched({
         ...response.data.business, ...response.data.user,
       }));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(profileFetchError(err));
   }
 }
@@ -49,19 +47,16 @@ function* updateProfile({ updateObj }) {
 
     const response = yield call(updateProfileData);
 
-    console.log('RESPONSE', response.data);
 
     if (response.data) {
       yield put(profileUpdated({ ...response.data.producer, ...response.data.user }));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(profileUpdateError(err));
   }
 }
 
 function* updateProfileOptions({ updateObj }) {
-  console.log('UPDATING PROFILE');
   try {
     const privateRoute = yield call(getPrivateRoute);
     const fetchProfileData = () => privateRoute.patch('/producer/profile/options', updateObj);
@@ -72,13 +67,11 @@ function* updateProfileOptions({ updateObj }) {
       yield put(profileUpdated({ ...response.data.producer, ...response.data.user }));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(profileUpdateError(err));
   }
 }
 
 function* sendOrder({ orderInfo }) {
-  console.log(orderInfo);
   try {
     const privateRoute = yield call(getPrivateRoute);
     const sendOrderData = () => privateRoute.post('/orders', orderInfo);
@@ -91,7 +84,6 @@ function* sendOrder({ orderInfo }) {
       yield put(push(`/order/${response.data.order._id}`));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(orderSendError(err));
   }
 }
@@ -107,7 +99,6 @@ function* blogPost({ blogPostData }) {
       yield put(blogPosted(response.data.blog));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(blogPostError(err));
   }
 }
@@ -124,7 +115,6 @@ function* blogEdit({ blogEditData }) {
       yield put(blogEdited(response.data.blog));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(blogEditError(err));
   }
 }
@@ -141,7 +131,6 @@ function* stockUpdate({ stockEditData }) {
       yield put(stockUpdated(response.data.stock));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(stockUpdateError(err));
   }
 }
@@ -158,7 +147,6 @@ function* addPromotion({ promotionAddData }) {
       yield put(promotionAdded(response.data.promotions));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(promotionAddError(err));
   }
 }
@@ -175,7 +163,6 @@ function* deletePromotion({ promotionId }) {
       yield put(promotionAdded(response.data.promotions));
     }
   } catch (err) {
-    console.log('ERROR', err);
     yield put(promotionAddError(err));
   }
 }

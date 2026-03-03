@@ -104,7 +104,6 @@ const AvailibilityTable = ({
   const handleSendOrder = () => {
     handleSubmit();
     while (orderSending) {
-      console.log('Sending');
     }
     setModalOpen(false);
   };

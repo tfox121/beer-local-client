@@ -6,7 +6,6 @@ import { getPrivateRoute } from './api';
 export const getPresignedRoute = async (type, productId) => {
   const privateRoute = await getPrivateRoute();
   const response = await privateRoute.post('/image', { type, productId });
-  console.log(response);
   return response.data;
 };
 

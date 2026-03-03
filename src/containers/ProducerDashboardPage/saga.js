@@ -16,7 +16,6 @@ function* fetchProducerDashboard() {
     const fetchRetailersData = () => privateRoute.get('/producer/retailers');
     const retailersResponse = yield call(fetchRetailersData);
 
-    console.log('PRODUCER DASHBOARD DATA RETRIEVED');
 
     if (orderResponse.data && retailersResponse.data) {
       yield put(producerDashboardFetched({ orders: orderResponse.data, retailers: retailersResponse.data }));
