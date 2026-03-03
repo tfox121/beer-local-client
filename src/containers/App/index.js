@@ -7,7 +7,7 @@
  *
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -62,6 +62,8 @@ const App = ({
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
   const { isAuthenticated, isLoading, error } = useAuth0();
+  const lastPathnameRef = useRef(location.pathname);
+  const hasFetchedForPathRef = useRef(false);
 
   const userStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
 
@@ -69,7 +71,8 @@ const App = ({
 
   useEffect(() => {
     const checkStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
-    if (checkStatus.authenticated && !userStatus.registered && !userStatus.notFound) {
+    // Don't retry if there's a connection error
+    if (checkStatus.authenticated && !checkStatus.registered && !checkStatus.notFound && !checkStatus.connectionError && !fetchingUser) {
       console.log('FETCHING');
       userFetch();
     }
@@ -83,23 +86,53 @@ const App = ({
         userClear();
       }
     };
-  }, [userProfile, isAuthenticated, userFetch, userClear, isLoading, fetchingUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, isLoading, fetchingUser, userFetchError, userProfile?.sub]);
 
   useEffect(() => {
+    // Only fetch on pathname change if user is registered, and only once per pathname
+    const pathnameChanged = lastPathnameRef.current !== location.pathname;
+    if (pathnameChanged) {
+      lastPathnameRef.current = location.pathname;
+      hasFetchedForPathRef.current = false;
+    }
+
     const checkStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
-    if (checkStatus.authenticated && userStatus.registered) {
-      console.log('FETCHING');
+    // Don't retry if there's a connection error or already fetching
+    if (pathnameChanged && checkStatus.authenticated && checkStatus.registered && !checkStatus.connectionError && !fetchingUser && !hasFetchedForPathRef.current) {
+      console.log('FETCHING for pathname change');
+      hasFetchedForPathRef.current = true;
       userFetch();
     }
-  }, [location.pathname]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, isAuthenticated, isLoading, fetchingUser, userFetchError]);
 
   if (userStatus.error) {
     console.log('User fetch error', userStatus.error);
+    const isConnectionError = userStatus.connectionError;
     return (
       <Dimmer active page>
         <Segment padded="very">
-          <Header as="h2">There has been an error.</Header>
-          <Button as="a" href="/">Return to home</Button>
+          <Header as="h2">
+            {isConnectionError ? 'Unable to connect to server' : 'There has been an error.'}
+          </Header>
+          <p>
+            {isConnectionError
+              ? 'The backend server appears to be unavailable. Please check your connection or try again later.'
+              : 'An error occurred while loading your data.'}
+          </p>
+          <Button
+            onClick={() => {
+              if (isConnectionError) {
+                // Log out on connection error
+                window.location.href = '/';
+              } else {
+                window.location.href = '/';
+              }
+            }}
+          >
+            {isConnectionError ? 'Return to login' : 'Return to home'}
+          </Button>
         </Segment>
       </Dimmer>
     );

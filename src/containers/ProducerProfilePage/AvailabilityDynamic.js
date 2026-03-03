@@ -244,7 +244,7 @@ const AvailabilityDynamic = ({
           if (!properties.value) {
             return '';
           }
-          return PACK_SIZES[properties.value];
+          return PACK_SIZES[properties.value] || properties.value;
         },
       },
       {

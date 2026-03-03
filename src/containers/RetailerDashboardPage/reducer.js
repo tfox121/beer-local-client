@@ -14,8 +14,6 @@ export const initialState = {
 /* eslint-disable default-case, no-param-reassign */
 const RetailerDashboardPageReducer = (state = initialState, action) => produce(state, (draftState) => {
   switch (action.type) {
-    default:
-      break;
     case FETCH_PRODUCER_FEED:
       draftState.fetchingProducerFeedError = false;
       draftState.fetchingProducerFeed = true;
@@ -31,7 +29,11 @@ const RetailerDashboardPageReducer = (state = initialState, action) => produce(s
               producer: followedProducers[index].businessName, producerId: followedProducers[index].businessId, avatarSource: followedProducers[index].avatarSource, ...producerItem,
             })))
           .flat()
-          .sort((a, b) => (a.createdAt > b.createdAt) ? -1 : ((a.createdAt < b.createdAt) ? 1 : 0));
+          .sort((a, b) => {
+            if (a.createdAt > b.createdAt) return -1;
+            if (a.createdAt < b.createdAt) return 1;
+            return 0;
+          });
         const groupedBeers = withProducerProps.reduce((groups, producerItem) => {
           const groupsObj = groups;
           if (producerItem.price && producerItem.display === 'Show') {
@@ -43,16 +45,36 @@ const RetailerDashboardPageReducer = (state = initialState, action) => produce(s
           }
           return groupsObj;
         }, {});
-        const groupedBeersArray = Object.keys(groupedBeers).map((date) => ({
-          createdAt: date.split(':')[0],
-          producerItems: groupedBeers[date],
+        const groupedBeersArray = Object.keys(groupedBeers).map((dateKey) => {
+          const groupItems = groupedBeers[dateKey];
+          // Use the most recent createdAt from items in the group, or firstDisplayed if available
+          const mostRecentDate = groupItems.reduce((latest, item) => {
+            const itemDate = item.createdAt || item.firstDisplayed || item.updatedAt;
+            return itemDate > latest ? itemDate : latest;
+          }, '');
+          return {
+            createdAt: mostRecentDate || dateKey.split(':')[0],
+            producerItems: groupItems,
+          };
+        });
+
+        // Ensure nearbyProducers have createdAt for consistent sorting
+        const nearbyProducersWithDate = (nearbyProducers || []).map((producer) => ({
+          ...producer,
+          createdAt: producer.createdAt || producer.updatedAt || producer.firstDisplayed || new Date(0).toISOString(),
         }));
 
-        const fullArrayWithBeerGrouped = [...withProducerProps.filter((producerItem) => !producerItem.price), ...groupedBeersArray, ...nearbyProducers];
+        const fullArrayWithBeerGrouped = [
+          ...withProducerProps.filter((producerItem) => !producerItem.price),
+          ...groupedBeersArray,
+          ...nearbyProducersWithDate,
+        ];
         const dateSorted = fullArrayWithBeerGrouped.sort((a, b) => {
-          if (a.createdAt > b.createdAt) return -1;
-          if (a.createdAt < b.createdAt) return 1;
-          return 0;
+          // Ensure we're comparing dates properly - convert to Date objects for reliable comparison
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          // Sort newest first (descending order)
+          return dateB - dateA;
         });
         console.log('SORTED', dateSorted);
 
@@ -64,6 +86,8 @@ const RetailerDashboardPageReducer = (state = initialState, action) => produce(s
     case FETCH_PRODUCER_FEED_ERROR:
       draftState.fetchingProducerFeedError = true;
       draftState.fetchingProducerFeed = false;
+      break;
+    default:
       break;
   }
 });

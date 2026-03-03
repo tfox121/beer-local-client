@@ -1,5 +1,5 @@
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   "env": {
       "browser": true,
       "es2020": true
@@ -13,7 +13,11 @@ module.exports = {
         "jsx": true
     },
     "ecmaVersion": 11,
-    "sourceType": "module"
+    "sourceType": "module",
+    "requireConfigFile": false,
+    "babelOptions": {
+      "presets": ["@babel/preset-react"]
+    }
   },
   "plugins": ['redux-saga', 'react', 'react-hooks', 'jsx-a11y'],
   rules: {
@@ -55,11 +59,25 @@ module.exports = {
     'newline-per-chained-call': 0,
     'no-confusing-arrow': 0,
     'no-console': 1,
-    'no-unused-vars': 2,
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'no-use-before-define': 0,
     'prefer-template': 2,
     'react/destructuring-assignment': 0,
+    'react/function-component-definition': 'off',
+    'react/no-unstable-nested-components': 'warn',
+    'react/jsx-no-useless-fragment': ['warn', { allowExpressions: true }],
+    'react/prop-types': 'warn',
     'react-hooks/rules-of-hooks': 'error',
+    'import/no-import-module-exports': 'off',
+    'import/order': 'off',
+    'import/extensions': ['error', 'ignorePackages', { js: 'never', jsx: 'never' }],
+    'arrow-parens': ['warn', 'as-needed'],
+    'operator-linebreak': 'off',
+    'implicit-arrow-linebreak': 'off',
+    'no-multiple-empty-lines': ['warn', { max: 2, maxEOF: 1 }],
+    'default-param-last': 'warn',
+    'default-case-last': 'warn',
+    'no-nested-ternary': 'warn',
     'react/jsx-closing-tag-location': 0,
     'react/forbid-prop-types': 0,
     'react/jsx-first-prop-new-line': [2, 'multiline'],
@@ -75,5 +93,14 @@ module.exports = {
     'require-yield': 0,
     'react/jsx-props-no-spreading': 0,
     'react/static-property-placement': 0,
+    'object-curly-newline': 'off',
+    'curly': 'off',
+    'nonblock-statement-body-position': 'off',
+    'semi': ['error', 'always'],
+    'function-paren-newline': 'off',
+    'react/jsx-curly-newline': 'off',
+    'no-plusplus': 'off',
+    'react/jsx-curly-brace-presence': 'off',
+    'consistent-return': 'off',
   },
 };

@@ -1,4 +1,3 @@
-
 /**
  *
  * MessageFeed
@@ -25,7 +24,13 @@ function MessageFeed({
           {messages.map((message) => (
             <Feed.Event key={message._id}>
               <Feed.Label>
-                <img alt="business avatar" src={message.author === user.sub ? user.avatarSource : (businessAvatar || '/images/avatars/blank-avatar.webp')} />
+                <img
+                  alt={message.author === user.sub ? `${user.businessName || 'User'} avatar` : `${business?.businessName || 'Business'} avatar`}
+                  src={message.author === user.sub ? (user.avatarSource || '/images/avatars/blank-avatar.webp') : (businessAvatar || business?.avatarSource || '/images/avatars/blank-avatar.webp')}
+                  onError={(e) => {
+                    e.target.src = '/images/avatars/blank-avatar.webp';
+                  }}
+                />
               </Feed.Label>
               <Feed.Content>
                 <Feed.Summary>

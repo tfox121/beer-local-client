@@ -4,7 +4,7 @@ import React, {
   useEffect, useState, useRef,
 } from 'react';
 import PropTypes from 'prop-types';
-import Geosuggest from 'react-geosuggest';
+import AddressAutocomplete from '../../components/AddressAutocomplete';
 import ayt from '../../utils/phoneNumberValidation';
 
 import MapMarker from '../../components/MapMarker';
@@ -74,11 +74,15 @@ const ProducerForm = ({
   const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
       console.log(suggestion);
-      const { location, gmaps } = suggestion;
+      const { location: locationArray, gmaps } = suggestion;
+      // Convert array [lat, lon] to object {lat, lng} format
+      const locationObj = Array.isArray(locationArray)
+        ? { lat: locationArray[0], lng: locationArray[1] }
+        : locationArray;
       const newErrors = { ...formErrors };
       delete newErrors.location;
       setFormErrors({ ...newErrors });
-      setFormValues({ ...formValues, location, address: gmaps.formatted_address });
+      setFormValues({ ...formValues, location: locationObj, address: gmaps.formatted_address });
     }
   };
 
@@ -91,7 +95,7 @@ const ProducerForm = ({
               <Form.Input
                 label="Brewery name"
                 name="businessName"
-                value={formValues.businessName}
+                value={formValues.businessName || ''}
                 required
                 onChange={handleChange}
                 error={
@@ -104,7 +108,7 @@ const ProducerForm = ({
               <Form.Input
                 label="Sales contact name"
                 name="primaryContactName"
-                value={formValues.primaryContactName}
+                value={formValues.primaryContactName || ''}
                 required
                 onChange={handleChange}
                 error={
@@ -118,7 +122,7 @@ const ProducerForm = ({
                 label="Sales email address"
                 name="salesEmail"
                 type="email"
-                value={formValues.salesEmail}
+                value={formValues.salesEmail || ''}
                 required
                 onChange={handleChange}
                 error={
@@ -132,7 +136,7 @@ const ProducerForm = ({
                 label="Sales contact number"
                 name="salesContactNumber"
                 type="tel"
-                value={formValues.salesContactNumber}
+                value={formValues.salesContactNumber || ''}
                 onChange={(e) => setUnformattedTel(e.target.value)}
                 error={
                   formErrors.salesContactNumber && {
@@ -145,26 +149,23 @@ const ProducerForm = ({
                 label="Website"
                 name="website"
                 type="url"
-                value={formValues.website}
+                value={formValues.website || ''}
                 onChange={handleChange}
               />
               <div
                 className={`${formErrors.location && 'error'} required field`}
               >
                 <SuggestBlockStyle>
-                  <Geosuggest
+                  <AddressAutocomplete
                     ref={geosuggestEl}
                     label="Location"
                     id="breweryLocation"
-                    location={
-                      // eslint-disable-next-line no-undef
-                      new google.maps.LatLng(mapCentre[0], mapCentre[1])
-                    }
-                    radius="1500"
-                    minlegnth="3"
+                    location={mapCentre}
+                    radius={1500}
+                    minlength={3}
                     country="gb"
                     onSuggestSelect={handleSuggestSelect}
-                    onBlur={() => geosuggestEl.current.selectSuggest()}
+                    onBlur={() => geosuggestEl.current?.selectSuggest()}
                     autoActivateFirstSuggest
                     required
                   />
@@ -183,7 +184,7 @@ const ProducerForm = ({
               <Form.TextArea
                 label="Intro"
                 placeholder="Tell us more about the brewery..."
-                value={formValues.intro}
+                value={formValues.intro || ''}
                 name="intro"
                 onChange={handleChange}
                 maxLength={INTRO_CHARACTER_LIMIT}

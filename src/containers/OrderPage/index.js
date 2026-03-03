@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -11,7 +11,7 @@ import {
   Header, Segment, Button, Grid, Message, TextArea,
 } from 'semantic-ui-react';
 import { Helmet } from 'react-helmet';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
 // import { loadSession, closeSession } from './actions';
@@ -39,6 +39,8 @@ const OrderPage = ({
   useInjectReducer({ key: 'OrderPage', reducer });
   useInjectSaga({ key: 'OrderPage', saga });
   const { isAuthenticated } = useAuth0();
+  const location = useLocation();
+  const notificationClearedRef = useRef(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -46,27 +48,39 @@ const OrderPage = ({
     }
     return () => {
       orderClear();
+      notificationClearedRef.current = false;
+      orderIdRef.current = null;
     };
-  }, [isAuthenticated, orderFetch, orderClear]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, location.pathname]);
 
   console.log('ORDER', orderInfo);
 
   const { role } = userProfile;
 
   const [editingOrder, setEditingOrder] = useState(false);
-  const [orderData, setOrderData] = useState({ ...orderInfo.order });
+  const [orderData, setOrderData] = useState(orderInfo?.order || {});
   const [orderItems, setOrderItems] = useState([]);
   const [availableStock, setAvailableStock] = useState([]);
   // const [orderEditPending, setOrderEditPending] = useState(false);
   // const [messageModalOpen, setMessageModalOpen] = useState(false);
   const [messageContent, setMessageContent] = useState('');
+  const orderIdRef = useRef(null);
 
   useEffect(() => {
-    if (orderInfo.order && orderInfo.order.items) {
-      setOrderData({ ...orderInfo.order });
-      setOrderItems([...orderInfo.order.items]);
+    // orderInfo is the order object itself (from selector), or it might have order/business structure
+    const order = orderInfo?.order || orderInfo;
+    const currentOrderId = order?._id;
+
+    // Only update if order ID changed or order is newly loaded
+    if (order && order.items && currentOrderId && currentOrderId !== orderIdRef.current) {
+      setOrderData({ ...order });
+      setOrderItems([...order.items]);
+      orderIdRef.current = currentOrderId;
+      notificationClearedRef.current = false; // Reset notification flag for new order
     }
-  }, [orderInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderInfo?.order?._id || orderInfo?._id, orderInfo?.order?.items?.length || orderInfo?.items?.length]);
 
   useEffect(() => {
     if (userProfile && userProfile.stock && orderItems.length) {
@@ -75,24 +89,41 @@ const OrderPage = ({
         .filter((stockItem) => stockItem.display === 'Show' && !orderIds.includes(stockItem.id))
         .map((stockItem) => ({ ...stockItem, value: stockItem.id, label: `${stockItem.name} ${stockItem.packSize} ${stockItem.availability}` })));
     }
-  }, [userProfile.stock, orderItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userProfile?.stock, orderItems.length]);
 
   useEffect(() => {
-    if (orderData) {
+    // Only clear notification once when order is first loaded
+    if (orderData?._id && !notificationClearedRef.current && orderIdRef.current === orderData._id) {
       const clearNotification = async () => {
-        const privateRoute = await getPrivateRoute();
-        if (role === 'producer' && orderData.producerNotification) {
-          privateRoute.patch(`/orders/${orderData._id}`, { producerNotification: false });
-        } else if (role === 'retailer' && orderData.retailerNotification) {
-          privateRoute.patch(`/orders/${orderData._id}`, { retailerNotification: false });
+        try {
+          const privateRoute = await getPrivateRoute();
+          if (role === 'producer' && orderData.producerNotification) {
+            await privateRoute.patch(`/orders/${orderData._id}`, { producerNotification: false });
+            notificationClearedRef.current = true;
+          } else if (role === 'retailer' && orderData.retailerNotification) {
+            await privateRoute.patch(`/orders/${orderData._id}`, { retailerNotification: false });
+            notificationClearedRef.current = true;
+          } else {
+            // No notification to clear, mark as done
+            notificationClearedRef.current = true;
+          }
+        } catch (err) {
+          console.error('Error clearing notification:', err);
+          // Don't retry on error to avoid loops
+          notificationClearedRef.current = true;
         }
       };
       clearNotification();
     }
-  }, [orderData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderData?._id, role, orderIdRef.current]);
 
   const handleCancelEdit = () => {
-    setOrderItems([...orderInfo.order.items]);
+    const order = orderInfo?.order || orderInfo;
+    if (order?.items) {
+      setOrderItems([...order.items]);
+    }
     setEditingOrder(false);
   };
 
@@ -248,8 +279,12 @@ const OrderPage = ({
     // console.log(response.data);
   };
 
-  if (!orderInfo.business || !orderItems || !Object.keys(orderData).length) {
-    console.log(!orderInfo.business, !orderItems, !Object.keys(orderData).length);
+  // orderInfo might be the order object itself, or have order/business structure
+  const order = orderInfo?.order || orderInfo;
+  const business = orderInfo?.business;
+
+  if (!business || !orderItems || !Object.keys(orderData).length) {
+    console.log('Waiting for data:', { business: !!business, orderItems: !!orderItems, orderData: !!Object.keys(orderData).length });
     return null;
   }
 
@@ -263,7 +298,7 @@ const OrderPage = ({
       </Helmet>
       <PageWrapper>
         <Segment basic className="primary wrapper">
-          <Header as="h1">{`Order #SO-${orderData.orderNumber.toString().padStart(6, '0')} from ${orderInfo.business.businessName}`}</Header>
+          <Header as="h1">{`Order #SO-${orderData.orderNumber.toString().padStart(6, '0')} from ${business.businessName}`}</Header>
           {(orderData.status === 'Cancelled' || orderData.status === 'Rejected') && (
             <Message negative>
               <Message.Header>{`This order has been ${orderData.status.toLowerCase()}.`}</Message.Header>
@@ -298,10 +333,10 @@ const OrderPage = ({
               <Message.Header>Awaiting order confirmation from the brewery.</Message.Header>
             </Message>
           )}
-          {((orderData.status === 'Pending' || orderData.status === 'Confirmed') && role === 'producer' && orderInfo.business.deliveryInstruction) && (
+          {((orderData.status === 'Pending' || orderData.status === 'Confirmed') && role === 'producer' && business.deliveryInstruction) && (
             <Message warning>
               <Message.Header>This customer has specific requirements for delivery.</Message.Header>
-              <p>{orderInfo.business.deliveryInstruction}</p>
+              <p>{business.deliveryInstruction}</p>
             </Message>
           )}
           <Button.Group>
@@ -338,8 +373,8 @@ const OrderPage = ({
             <Grid columns={2}>
               <Grid.Row>
                 <Grid.Column>
-                  <p>{orderInfo.business.businessName}</p>
-                  {orderInfo.business.address.split(',').map((addressLine) => (
+                  <p>{business.businessName}</p>
+                  {business.address.split(',').map((addressLine) => (
                     <p key={addressLine}>{addressLine}</p>
                   ))}
                 </Grid.Column>
@@ -347,14 +382,14 @@ const OrderPage = ({
                   <MapStyle>
                     <Map
                       className="profileViewMap"
-                      center={orderInfo.business.location}
+                      center={business.location}
                       zoom={12}
                       zoomControl={false}
                     >
                       <TileLayer
                         url={MAP_TILE_PROVIDER_URL}
                       />
-                      <MapMarker type="customer" location={orderInfo.business.location} name={orderInfo.business.businessName} />
+                      <MapMarker type="customer" location={business.location} name={business.businessName} />
                     </Map>
                   </MapStyle>
                 </Grid.Column>
@@ -369,7 +404,7 @@ const OrderPage = ({
             handleDeleteItem={handleDeleteItem}
             handleDecreaseQuant={handleDecreaseQuant}
             handleIncreaseQuant={handleIncreaseQuant}
-            businessName={orderInfo.business.businessName}
+            businessName={business.businessName}
             type="orderInfo"
           />
           <br />
@@ -389,9 +424,9 @@ const OrderPage = ({
                 )}
               />
             )}
-          <MessageFeed messages={orderData.messages} user={userProfile} business={orderInfo.business} businessAvatar={orderInfo.image} />
+          <MessageFeed messages={orderData.messages} user={userProfile} business={business} businessAvatar={orderInfo.image} />
           <MessageBoxStyle>
-            <TextArea maxLength={ORDER_MESSAGE_CHARACTER_LIMIT} value={messageContent} onChange={(e) => setMessageContent(e.target.value)} placeholder={`Write your message to ${orderInfo.business.primaryContactName} at ${orderInfo.business.businessName}...`} />
+            <TextArea maxLength={ORDER_MESSAGE_CHARACTER_LIMIT} value={messageContent} onChange={(e) => setMessageContent(e.target.value)} placeholder={`Write your message to ${business.primaryContactName} at ${business.businessName}...`} />
             <Button attached="right" primary content="Send" onClick={handleMessageSend} loading={messageSending} />
           </MessageBoxStyle>
           {!!messageContent.length && (

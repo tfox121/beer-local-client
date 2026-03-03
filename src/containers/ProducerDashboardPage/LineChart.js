@@ -1,9 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import moment from 'moment';
 
 import calcOrderTotal from '../../utils/calcOrderTotal';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+);
 
 const LineChart = ({
   data, period, step, status,
@@ -52,31 +70,29 @@ const LineChart = ({
   }, [period, step]);
 
   useEffect(() => {
-    if (data && data.length && dates.length) {
-      const mappedDates = mapDatesToTotals(dates, data, status, step);
-      setValues(mappedDates);
-      const mappedPrevDates = mapDatesToTotals(previousDates, data, status, step);
-      setPreviousValues(mappedPrevDates);
+    if (!dates.length) {
+      return;
     }
-  }, [data, dates]);
+    const orders = Array.isArray(data) ? data : [];
+    setValues(mapDatesToTotals(dates, orders, status, step));
+    setPreviousValues(mapDatesToTotals(previousDates, orders, status, step));
+  }, [data, dates, previousDates, status, step]);
 
   if (!values.length || !dates.length) {
     return null;
   }
 
+  const labels = dates.map((date) => moment(date).format('YYYY-MM-DD'));
+
   const dataObj = {
-    labels: dates,
+    labels,
     datasets: [
       {
         label: 'Current',
         fill: false,
-        lineTension: 0.1,
+        tension: 0.1,
         backgroundColor: 'rgba(75,192,192,0.4)',
         borderColor: 'rgba(75,192,192,1)',
-        borderCapStyle: 'butt',
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: 'miter',
         pointBorderColor: 'rgba(75,192,192,1)',
         pointBackgroundColor: '#fff',
         pointBorderWidth: 1,
@@ -94,13 +110,9 @@ const LineChart = ({
       {
         label: `Last ${period}`,
         fill: false,
-        lineTension: 0.1,
+        tension: 0.1,
         backgroundColor: 'rgba(75,192,192,0.4)',
         borderColor: '#cfcfcf',
-        borderCapStyle: 'butt',
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: 'miter',
         pointBorderColor: '#cfcfcf',
         pointBackgroundColor: '#fff',
         pointBorderWidth: 1,
@@ -122,57 +134,51 @@ const LineChart = ({
     day: 'ddd Do',
     week: '[Week from] Do MMM',
     month: 'MMM YYYY',
-    quarter: '[Q]Q \'YY',
+    year: 'YYYY',
   };
 
+  const maxCurrent = values.length ? Math.max(...values) : 0;
+  const maxPrevious = previousValues.length ? Math.max(...previousValues) : 0;
+  const suggestedMax = Math.max(maxCurrent, maxPrevious) * 1.01;
+
   const options = {
-    legend: {
-      display: false,
-    },
-    tooltips: {
-      callbacks: {
-        label: (tooltipItems) => `£${tooltipItems.value}`,
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => `£${context.parsed.y}`,
+        },
       },
     },
     scales: {
-      yAxes: [{
+      y: {
         id: 'y-axis',
         ticks: {
           min: 0,
           maxTicksLimit: 4,
           padding: 10,
-          suggestedMax: Math.max(values.reduce((a, b) => Math.max(a, b)), previousValues.reduce((a, b) => Math.max(a, b))) * 1.01,
-          callback(value) {
-            return `£${value}`;
-          },
+          suggestedMax,
+          callback: (value) => `£${value}`,
         },
         gridLines: {
           drawBorder: false,
           drawTicks: false,
         },
-      }],
-      xAxes: [{
+      },
+      x: {
         id: 'x-axis',
-        type: 'time',
-        time: {
-          isoWeekday: false,
-          unit: step,
-          tooltipFormat: toolTipFormat[step],
-          displayFormats: {
-            day: 'ddd Do',
-            week: 'Do MMM',
-            quarter: '[Q]Q \'YY',
-          },
-        },
         ticks: {
           padding: 5,
-          // min: moment(dates[0]).subtract(1, 'week').format(),
+          callback: (value) => moment(labels[value]).format(toolTipFormat[step] || 'ddd Do'),
         },
         gridLines: {
           zeroLineWidth: 0.5,
           intersect: false,
         },
-      }],
+      },
     },
   };
   return (

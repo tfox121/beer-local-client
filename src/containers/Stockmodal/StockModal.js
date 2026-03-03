@@ -52,6 +52,7 @@ export function StockModal({
   };
 
   const [stockData, setStockData] = useState([stockDataTemplate]);
+  const [originalStockData, setOriginalStockData] = useState(null);
   const [selected, setSelected] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [stockEditPending, setStockEditPending] = useState(false);
@@ -79,8 +80,43 @@ export function StockModal({
   useEffect(() => {
     if (stock && stock.length) {
       setStockData(stock);
+      // Store original data when modal opens or stock changes
+      if (modalOpen) {
+        setOriginalStockData(JSON.parse(JSON.stringify(stock)));
+      }
     }
-  }, [stock]);
+  }, [stock, modalOpen]);
+
+  // Compare current data with original to detect actual changes
+  const hasChanges = () => {
+    if (!originalStockData) return false;
+
+    // Normalize data for comparison (remove _id and other transient fields)
+    const normalizeStockItem = (item) => {
+      const normalized = { ...item };
+      delete normalized._id;
+      // Convert numeric fields to numbers for comparison
+      if (normalized.abv !== undefined) normalized.abv = Number(normalized.abv);
+      if (normalized.price !== undefined) normalized.price = Number(normalized.price);
+      return normalized;
+    };
+
+    const normalizedOriginal = originalStockData.map(normalizeStockItem);
+    const normalizedCurrent = stockData.map(normalizeStockItem);
+
+    // Compare lengths
+    if (normalizedOriginal.length !== normalizedCurrent.length) {
+      return true;
+    }
+
+    // Deep compare each item
+    return normalizedOriginal.some((original, i) => {
+      const current = normalizedCurrent[i];
+      // Compare all keys
+      const allKeys = new Set([...Object.keys(original), ...Object.keys(current)]);
+      return Array.from(allKeys).some((key) => original[key] !== current[key]);
+    });
+  };
 
   const moveStockLineUp = () => {
     const rows = Object.keys(selected);
@@ -156,6 +192,8 @@ export function StockModal({
       }
       stockUpdate(stockData);
       setStockEditPending(false);
+      // Update original data after successful save
+      setOriginalStockData(JSON.parse(JSON.stringify(stockData)));
       while (updatingStock) {
         console.log('Updating stock');
       }
@@ -166,10 +204,12 @@ export function StockModal({
   };
 
   const handleModalClose = () => {
-    if (stockEditPending) {
+    // Only show warning if there are actual changes
+    if (hasChanges()) {
       return setConfirmOpen(true);
     }
     setIncompleteStockItem(false);
+    setStockEditPending(false);
     return setModalOpen(false);
   };
 
@@ -182,10 +222,15 @@ export function StockModal({
     setModalOpen(false);
     setIncompleteStockItem(false);
     setStockEditPending(false);
-    if (stock && stock.length) {
-      return setStockData(stock);
+    // Reset to original data
+    if (originalStockData && originalStockData.length) {
+      setStockData(JSON.parse(JSON.stringify(originalStockData)));
+    } else if (stock && stock.length) {
+      setStockData(stock);
+    } else {
+      setStockData([stockDataTemplate]);
     }
-    return setStockData([stockDataTemplate]);
+    setOriginalStockData(null);
   };
 
   return (
@@ -194,9 +239,24 @@ export function StockModal({
         size="large"
         open={modalOpen}
         onClose={handleModalClose}
-        closeOnDimmerClick={!stockEditPending}
+        closeOnDimmerClick={!hasChanges()}
         closeIcon
-        trigger={<Button primary onClick={() => setModalOpen(true)}>Edit</Button>}
+        trigger={(
+          <Button
+            primary
+            onClick={() => {
+              setModalOpen(true);
+              // Store original data when modal opens
+              if (stock && stock.length) {
+                setOriginalStockData(JSON.parse(JSON.stringify(stock)));
+              } else {
+                setOriginalStockData(null);
+              }
+            }}
+          >
+            Edit
+          </Button>
+        )}
       >
         <Modal.Header>
           <StockModalMenu

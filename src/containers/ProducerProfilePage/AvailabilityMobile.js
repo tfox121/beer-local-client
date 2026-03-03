@@ -87,7 +87,7 @@ const TableRows = ({
                                   </Grid.Column>
                                   <Grid.Column width={15} className="name-cell">
                                     {cell.render('Cell')}
-                                    <p style={{ fontSize: '0.8em' }}>{PACK_SIZES[data[index].packSize]}</p>
+                                    <p style={{ fontSize: '0.8em' }}>{PACK_SIZES[data[index].packSize] || data[index].packSize}</p>
                                   </Grid.Column>
                                 </Grid.Row>
                               </Grid>

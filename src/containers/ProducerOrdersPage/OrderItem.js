@@ -100,7 +100,15 @@ const OrderItem = ({
           <Table.Cell>{`SO-${order.orderNumber.toString().padStart(6, '0')}`}</Table.Cell>
           <Table.Cell>{moment(order.createdAt).format('DD/MM/YYYY')}</Table.Cell>
           <Table.Cell>
-            <Image style={{ marginLeft: '0.5em' }} src={ordersInfo.businesses[index].avatarSource || '/images/avatars/blank-avatar.webp'} alt="user avatar" avatar />
+            <Image
+              style={{ marginLeft: '0.5em' }}
+              src={ordersInfo.businesses[index]?.avatarSource || '/images/avatars/blank-avatar.webp'}
+              alt={`${ordersInfo.businesses[index]?.businessName || 'Business'} avatar`}
+              avatar
+              onError={(e) => {
+                e.target.src = '/images/avatars/blank-avatar.webp';
+              }}
+            />
             {userProfile.role === 'retailer'
               ? <Link to={`/brewery/${ordersInfo.businesses[index].businessId}`}>{ordersInfo.businesses[index].businessName}</Link>
               : <>{ordersInfo.businesses[index].businessName}</>}

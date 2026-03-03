@@ -16,7 +16,7 @@ import PhoneNumber from 'awesome-phonenumber';
 // import { useInjectSaga } from '../../utils/injectSaga';
 // import { useInjectReducer } from '../../utils/injectReducer';
 import NumberFormat from 'react-number-format';
-import Geosuggest from 'react-geosuggest';
+import AddressAutocomplete from '../../components/AddressAutocomplete';
 import L from 'leaflet';
 import { Map, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
@@ -130,7 +130,7 @@ const ProfileEditModal = ({
   useEffect(() => {
     if (!avatar && !banner) {
       setImageResizeModalOpen(false);
-    } else if (avatar.name || banner.name) {
+    } else if ((avatar && avatar.name) || (banner && banner.name)) {
       setImageResizeModalOpen(true);
     }
   }, [avatar, banner]);
@@ -157,11 +157,11 @@ const ProfileEditModal = ({
   const handleApply = () => {
     if (editorRef.current) {
       const canvasScaled = editorRef.current.getImageScaledToCanvas();
-      if (avatar.name) {
+      if (avatar && avatar.name) {
         setAvatar({});
         setAvatarSaved(canvasScaled.toDataURL());
       }
-      if (banner.name) {
+      if (banner && banner.name) {
         setBanner({});
         setBannerSaved(canvasScaled.toDataURL());
       }
@@ -204,10 +204,15 @@ const ProfileEditModal = ({
 
   const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
+      const { location: locationArray, gmaps } = suggestion;
+      // Convert array [lat, lon] to object {lat, lng} format
+      const locationObj = Array.isArray(locationArray)
+        ? { lat: locationArray[0], lng: locationArray[1] }
+        : locationArray;
       const newErrors = { ...formErrors };
       delete newErrors.location;
       setFormErrors({ ...newErrors });
-      setUserFormValues({ ...userFormValues, location: suggestion.location, address: suggestion.gmaps.formatted_address });
+      setUserFormValues({ ...userFormValues, location: locationObj, address: gmaps.formatted_address });
     }
   };
 
@@ -309,7 +314,14 @@ const ProfileEditModal = ({
               <Grid.Row>
                 <Grid.Column width={16}>
                   <div className="button-image-container">
-                    <Image className="banner-image" src={bannerSaved || bannerSource || '/images/banners/blank-banner.png'} centered />
+                    <Image
+                      className="banner-image"
+                      src={bannerSaved || bannerSource || '/images/banners/blank-banner.png'}
+                      centered
+                      onError={(e) => {
+                        e.target.src = '/images/banners/blank-banner.png';
+                      }}
+                    />
                     <Button inverted style={{ zIndex: 2 }} circular basic className="image-button" icon="camera" onClick={() => bannerRef.current.click()} />
                     <input
                       id="bannerUpload"
@@ -317,7 +329,10 @@ const ProfileEditModal = ({
                       type="file"
                       accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
                       hidden
-                      onChange={(e) => setBanner(e.target.files[0])}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        setBanner(file || {});
+                      }}
                     />
                   </div>
                 </Grid.Column>
@@ -328,7 +343,17 @@ const ProfileEditModal = ({
                 <Grid.Row>
                   <Grid.Column width={4}>
                     <div className="button-image-container">
-                      <Image className="profile-image" src={avatarSaved || avatarSource || '/images/avatars/blank-avatar.webp'} size="small" bordered centered circular />
+                      <Image
+                        className="profile-image"
+                        src={avatarSaved || avatarSource || '/images/avatars/blank-avatar.webp'}
+                        size="small"
+                        bordered
+                        centered
+                        circular
+                        onError={(e) => {
+                          e.target.src = '/images/avatars/blank-avatar.webp';
+                        }}
+                      />
                       <Button inverted circular basic className="image-button" icon="camera" onClick={() => avatarRef.current.click()} />
                       <input
                         id="avatarUpload"
@@ -336,7 +361,10 @@ const ProfileEditModal = ({
                         type="file"
                         accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
                         hidden
-                        onChange={(e) => setAvatar(e.target.files[0])}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          setAvatar(file || {});
+                        }}
                       />
                     </div>
                   </Grid.Column>
@@ -352,7 +380,7 @@ const ProfileEditModal = ({
               <Form.Input
                 label="Brewery name"
                 name="businessName"
-                value={userFormValues.businessName || businessName}
+                value={userFormValues.businessName || businessName || ''}
                 required
                 onChange={handleUserInfoChange}
                 error={
@@ -365,7 +393,7 @@ const ProfileEditModal = ({
               <Form.Input
                 label="Sales contact name"
                 name="primaryContactName"
-                value={userFormValues.primaryContactName || primaryContactName}
+                value={userFormValues.primaryContactName || primaryContactName || ''}
                 required
                 onChange={handleUserInfoChange}
                 error={
@@ -378,7 +406,7 @@ const ProfileEditModal = ({
               <Form.Input
                 label="Sales email address"
                 name="salesEmail"
-                value={producerFormValues.salesEmail || salesEmail}
+                value={producerFormValues.salesEmail || salesEmail || ''}
                 required
                 type="email"
                 onChange={handleProducerInfoChange}
@@ -392,7 +420,7 @@ const ProfileEditModal = ({
               <Form.Input
                 label="Sales contact number"
                 name="salesContactNumber"
-                value={producerFormValues.salesContactNumber || new PhoneNumber(salesContactNumber, 'GB').getNumber('national')}
+                value={producerFormValues.salesContactNumber || (salesContactNumber ? new PhoneNumber(salesContactNumber, 'GB').getNumber('national') : '')}
                 type="tel"
                 onChange={(e) => setUnformattedTel(e.target.value)}
                 error={
@@ -405,14 +433,14 @@ const ProfileEditModal = ({
               <Form.Input
                 label="Website"
                 name="website"
-                value={userFormValues.website || website}
+                value={userFormValues.website || website || ''}
                 type="url"
                 onChange={handleUserInfoChange}
               />
               <Form.TextArea
                 label="Intro"
                 name="intro"
-                value={producerFormValues.intro || intro}
+                value={producerFormValues.intro || intro || ''}
                 onChange={handleProducerInfoChange}
               />
 
@@ -420,21 +448,17 @@ const ProfileEditModal = ({
                 className={`${formErrors.location && 'error'} required field`}
               >
                 <SuggestBlockStyle>
-                  <Geosuggest
+                  <AddressAutocomplete
                     ref={geosuggestEl}
                     label="Location"
                     id="breweryLocation"
                     initialValue={userFormValues.address || address}
-                    // eslint-disable-next-line no-undef
-                    location={
-                      // eslint-disable-next-line no-undef
-                      new google.maps.LatLng(location[0], location[1])
-                    }
-                    radius="1500"
-                    minlegnth="3"
+                    location={location}
+                    radius={1500}
+                    minlength={3}
                     country="gb"
                     onSuggestSelect={handleSuggestSelect}
-                    onBlur={() => geosuggestEl.current.selectSuggest()}
+                    onBlur={() => geosuggestEl.current?.selectSuggest()}
                     required
                     autoActivateFirstSuggest
                   />
@@ -546,9 +570,9 @@ const ProfileEditModal = ({
             </Modal.Header>
             <AvatarEditor
               ref={editorRef}
-              image={avatar.name ? avatar : banner.name ? banner : undefined}
-              width={avatar.name ? 300 : 750}
-              height={avatar.name ? 300 : 250}
+              image={(avatar && avatar.name) ? avatar : (banner && banner.name) ? banner : undefined}
+              width={(avatar && avatar.name) ? 300 : 750}
+              height={(avatar && avatar.name) ? 300 : 250}
               border={25}
               scale={zoom}
               color={[255, 255, 255, 0.6]}

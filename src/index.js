@@ -6,7 +6,8 @@
  */
 
 // Needed for redux-saga es6 generator support
-import '@babel/polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
 // Import all the third party stuff
 import React from 'react';
@@ -75,7 +76,7 @@ if (!window.Intl) {
   new Promise((resolve) => {
     resolve(import('intl'));
   })
-    .then(() => Promise.all([import('intl/locale-data/jsonp/en.js')]))
+    .then(() => Promise.all([import('intl/locale-data/jsonp/en')]))
     .then(() => render(translationMessages))
     .catch((err) => {
       throw err;

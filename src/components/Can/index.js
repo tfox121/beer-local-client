@@ -38,9 +38,10 @@ const check = (rules, role, action, data) => {
 
 const Can = ({
   role, perform, data, yes, no,
-}) =>
+}) => (
   // console.log('NAV', role, perform, data);
-  check(rbacRules, role, perform, data) ? yes() : no();
+  check(rbacRules, role, perform, data) ? yes() : no()
+);
 
 Can.defaultProps = {
   yes: () => null,

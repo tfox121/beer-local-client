@@ -24,11 +24,19 @@ import { NOTIFICATION_TYPES } from '../../utils/constants';
 import timeAgo from '../../utils/timeAgo';
 
 function Notification({ notification }) {
-  const [notificationObj, setNotificationObj] = useState({});
+  const [notificationObj, setNotificationObj] = useState(notification || {});
 
   useEffect(() => {
-    if (notification) {
-      setNotificationObj({ ...notification });
+    // Only update if notification exists and has required properties
+    // This prevents flickering when notification is being updated
+    if (notification && notification.type && notification._id) {
+      // Only update if it's actually different to prevent unnecessary re-renders
+      setNotificationObj((prev) => {
+        if (prev._id !== notification._id || prev.type !== notification.type) {
+          return { ...notification };
+        }
+        return prev;
+      });
     }
   }, [notification]);
 
@@ -40,6 +48,11 @@ function Notification({ notification }) {
   };
 
   const notificationCopy = (notificationType, author) => {
+    // Don't show "Loading..." if we don't have a type yet - just return empty or null
+    if (!notificationType) {
+      return null;
+    }
+
     let message;
     switch (notificationType) {
       case NOTIFICATION_TYPES.newOrder:
@@ -75,7 +88,8 @@ function Notification({ notification }) {
         );
         break;
       default:
-        message = 'You have a new notification. And this is it...';
+        // Only show loading message if we have a notification but unknown type
+        message = notificationObj._id ? 'You have a new notification.' : null;
         break;
     }
     return message;
@@ -120,6 +134,16 @@ function Notification({ notification }) {
     margin-top: 0.5em;
   `;
 
+  // Don't render if we don't have the required notification data
+  if (!notificationObj.type || !notificationObj._id) {
+    return null;
+  }
+
+  const message = notificationCopy(notificationObj.type, notificationObj.name);
+  if (!message) {
+    return null;
+  }
+
   return (
     <NotificationLinkStyled onClick={handleClick} to={`/order/${notificationObj.resourceId}`}>
       <NotificationDropdownStyled>
@@ -128,8 +152,10 @@ function Notification({ notification }) {
             <Image src={notificationObj.image || '/images/avatars/blank-avatar.webp'} alt="user avatar" avatar />
           </Grid.Column>
           <Grid.Column width={14}>
-            <div className="notification-text-content">{notificationCopy(notificationObj.type, notificationObj.name)}</div>
-            <NotificationTimeStyled className="notification-time">{timeAgo.format(Date.parse(notification.updatedAt))}</NotificationTimeStyled>
+            <div className="notification-text-content">{message}</div>
+            {notification?.updatedAt && (
+              <NotificationTimeStyled className="notification-time">{timeAgo.format(Date.parse(notification.updatedAt))}</NotificationTimeStyled>
+            )}
           </Grid.Column>
         </Grid>
       </NotificationDropdownStyled>
