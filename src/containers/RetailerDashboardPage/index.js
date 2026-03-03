@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -8,36 +8,20 @@ import { createStructuredSelector } from 'reselect';
 import {
   Header, Segment, Feed, Dimmer, Loader,
 } from 'semantic-ui-react';
-import { useInjectReducer } from '../../utils/injectReducer';
-import { useInjectSaga } from '../../utils/injectSaga';
-import reducer from './reducer';
-import saga from './saga';
 
 import PageWrapper from '../../components/PageWrapper';
 import { makeSelectUser } from '../App/selectors';
 import RetailerDashboardStyle from './RetailerDashboardStyle';
 import FeedItem from './FeedItem';
-import { fetchProducerFeed } from './actions';
-import { makeSelectProducerFeed, makeSelectProducerFeedFetching } from './selectors';
+import { useRetailerFeedQuery } from '../../queries/retailerFeed';
 
 const RetailerDashboardPage = ({
   userProfile,
-  producerFeedFetch,
-  producerFeed,
-  producerFeedFetching,
 }) => {
-  useInjectReducer({ key: 'RetailerDashboardPage', reducer });
-  useInjectSaga({ key: 'RetailerDashboardPage', saga });
-  const hasFetchedRef = useRef(false);
-
-  useEffect(() => {
-    // Only fetch once when component mounts
-    if (!hasFetchedRef.current) {
-      producerFeedFetch();
-      hasFetchedRef.current = true;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    data: producerFeed = [],
+    isLoading: producerFeedFetching,
+  } = useRetailerFeedQuery();
 
   if (!producerFeed) {
     return null;
@@ -74,27 +58,12 @@ const RetailerDashboardPage = ({
 
 RetailerDashboardPage.propTypes = {
   userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  producerFeedFetch: PropTypes.func,
-  producerFeed: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
-  producerFeedFetching: PropTypes.bool,
 };
 
 const mapStateToProps = createStructuredSelector({
   userProfile: makeSelectUser(),
-  producerFeed: makeSelectProducerFeed(),
-  producerFeedFetching: makeSelectProducerFeedFetching(),
 });
-
-function mapDispatchToProps(dispatch) {
-  return {
-    producerFeedFetch: () => dispatch(fetchProducerFeed()),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
+const withConnect = connect(mapStateToProps);
 
 export default compose(
   withConnect,
