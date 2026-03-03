@@ -1,30 +1,25 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
 import {
   Header, Segment, Table, Dropdown, Grid,
 } from 'semantic-ui-react';
-import { createStructuredSelector } from 'reselect';
 
 import { Helmet } from 'react-helmet';
 import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
 import PageWrapper from '../../components/PageWrapper';
 import ProducerListPageStyle from './ProducerListPageStyle';
-import { makeSelectUser } from '../App/selectors';
 import ProducerListItem from './ProducerListItem';
 import { useProducersQuery } from '../../queries/producers';
+import { useUserQuery } from '../../queries/user';
 
-const ProducerListPage = ({
-  user,
-}) => {
+const ProducerListPage = () => {
   const { data: producers = [] } = useProducersQuery();
+  const { data: user } = useUserQuery();
 
   // const [areaFilterToggle, setareaFilterToggle] = useState(true);
   // const [followedFilterToggle, setfollowedFilterToggle] = useState(false);
   const [filter, setFilter] = useState(['area']);
 
-  const followedProducers = !!user && user.followedProducers.map((producer) => producer.sub);
+  const followedProducers = !!user && (user.followedProducers || []).map((producer) => producer.sub);
 
   const followedFilter = (producer) => followedProducers.includes(producer.sub);
 
@@ -106,16 +101,4 @@ const ProducerListPage = ({
   );
 };
 
-ProducerListPage.propTypes = {
-  user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-};
-
-const mapStateToProps = createStructuredSelector({
-  user: makeSelectUser(),
-});
-
-const withConnect = connect(mapStateToProps);
-
-export default compose(
-  withConnect,
-)(ProducerListPage);
+export default ProducerListPage;
