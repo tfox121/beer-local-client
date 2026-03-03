@@ -5,21 +5,17 @@ import {
 } from 'semantic-ui-react';
 import moment from 'moment';
 import NumberFormat from 'react-number-format';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router-dom';
 
 import calcOrderTotal from '../../utils/calcOrderTotal';
 import OrderModalContent from '../../components/OrderModalContent';
 import Can from '../../components/Can';
-import { editOrder } from './actions';
-import { makeSelectUser } from '../App/selectors';
-import { makeSelectEditingOrder } from './selectors';
+import { useEditProducerOrderMutation } from '../../queries/orders';
 
 const OrderItem = ({
-  userProfile, ordersInfo, order, index, orderEdit, orderEditing,
+  userProfile, ordersInfo, order, index,
 }) => {
+  const { mutate: orderEdit, isLoading: orderEditing } = useEditProducerOrderMutation();
   const [orderData, setOrderData] = useState({ ...order });
 
   const { role } = userProfile;
@@ -184,28 +180,28 @@ const OrderItem = ({
               role={role}
               perform="orders:confirm"
               yes={() => (orderData.status === 'Pending' || orderData.status === 'Confirmed') && (
-                <Button loading={orderEditing === orderData._id} onClick={handleConfirm} basic={orderData.status !== 'Confirmed'} color="green" icon="check" title="Confirm order" />
+                <Button loading={orderEditing} onClick={handleConfirm} basic={orderData.status !== 'Confirmed'} color="green" icon="check" title="Confirm order" />
               )}
             />
             <Can
               role={role}
               perform="orders:changes-confirm"
               yes={() => (orderData.status === 'Changes pending') && (
-                <Button loading={orderEditing === orderData._id} onClick={handleChangesConfirm} color="green" icon="check" title="Approve changes" />
+                <Button loading={orderEditing} onClick={handleChangesConfirm} color="green" icon="check" title="Approve changes" />
               )}
             />
             <Can
               role={role}
               perform="orders:reject"
               yes={() => (orderData.status === 'Changes pending' || orderData.status === 'Pending' || orderData.status === 'Rejected') && (
-                <Button loading={orderEditing === orderData._id} onClick={handleReject} basic={orderData.status !== 'Rejected'} color="red" icon="ban" title="Reject order" />
+                <Button loading={orderEditing} onClick={handleReject} basic={orderData.status !== 'Rejected'} color="red" icon="ban" title="Reject order" />
               )}
             />
             <Can
               role={role}
               perform="orders:cancel"
               yes={() => (orderData.status === 'Changes pending' || orderData.status === 'Pending') && (
-                <Button loading={orderEditing === orderData._id} onClick={handleCancel} basic={orderData.status !== 'Cancelled'} color="red" icon="close" title="Cancel order" />
+                <Button loading={orderEditing} onClick={handleCancel} basic={orderData.status !== 'Cancelled'} color="red" icon="close" title="Cancel order" />
               )}
             />
           </Table.Cell>
@@ -231,27 +227,7 @@ OrderItem.propTypes = {
   ordersInfo: PropTypes.object,
   order: PropTypes.object,
   index: PropTypes.number,
-  orderEdit: PropTypes.func,
   role: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  orderEditing: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
-const mapStateToProps = createStructuredSelector({
-  userProfile: makeSelectUser(),
-  orderEditing: makeSelectEditingOrder(),
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    orderEdit: (editObj) => dispatch(editOrder(editObj)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(
-  withConnect,
-)(OrderItem);
+export default OrderItem;
