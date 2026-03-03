@@ -1,29 +1,15 @@
 /* eslint-disable no-param-reassign */
 import React, { useEffect, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Map, TileLayer } from 'react-leaflet';
 
-import { createStructuredSelector } from 'reselect';
 import {
   Header, Segment, Button, Grid, Message, TextArea,
 } from 'semantic-ui-react';
 import { Helmet } from 'react-helmet';
 import { Link, useLocation } from 'react-router-dom';
-import { useInjectReducer } from '../../utils/injectReducer';
-import { useInjectSaga } from '../../utils/injectSaga';
-// import { loadSession, closeSession } from './actions';
-import reducer from './reducer';
-import saga from './saga';
-import {
-  fetchOrder, clearOrder, editOrder, sendMessage,
-} from './actions';
 
 import PageWrapper from '../../components/PageWrapper';
-import { makeSelectUser } from '../App/selectors';
-import { makeSelectOrder, makeSelectEditingOrder, makeSelectSendingMessage } from './selectors';
 import OrderModalContent from '../../components/OrderModalContent';
 import { getPrivateRoute } from '../../utils/api';
 import MessageFeed from '../../components/MessageFeed';
@@ -32,29 +18,25 @@ import MapStyle from './MapStyle';
 import MapMarker from '../../components/MapMarker';
 import MessageBoxStyle from './MessageBoxStyle';
 import { ORDER_MESSAGE_CHARACTER_LIMIT, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
+import { useOrderQuery, useEditOrderMutation, useSendOrderMessageMutation } from '../../queries/orders';
+import { useUserQuery } from '../../queries/user';
 
-const OrderPage = ({
-  orderInfo, orderFetch, orderClear, userProfile, orderEdit, orderEditing, messageSend, messageSending,
-}) => {
-  useInjectReducer({ key: 'OrderPage', reducer });
-  useInjectSaga({ key: 'OrderPage', saga });
+const OrderPage = () => {
   const { isAuthenticated } = useAuth0();
   const location = useLocation();
+  const orderId = location.pathname.split('/')[2];
+  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
+  const { data: orderInfo } = useOrderQuery(orderId, { enabled: isAuthenticated && !!orderId });
+  const { mutate: orderEdit, isLoading: orderEditing } = useEditOrderMutation(orderId);
+  const { mutate: messageSend, isLoading: messageSending } = useSendOrderMessageMutation(orderId);
   const notificationClearedRef = useRef(false);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      orderFetch();
-    }
-    return () => {
-      orderClear();
-      notificationClearedRef.current = false;
-      orderIdRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => () => {
+    notificationClearedRef.current = false;
+    orderIdRef.current = null;
   }, [isAuthenticated, location.pathname]);
 
-  const { role } = userProfile;
+  const { role } = userProfile || {};
 
   const [editingOrder, setEditingOrder] = useState(false);
   const [orderData, setOrderData] = useState(orderInfo?.order || {});
@@ -292,7 +274,7 @@ const OrderPage = ({
   const order = orderInfo?.order || orderInfo;
   const business = orderInfo?.business;
 
-  if (!business || !orderItems || !Object.keys(orderData).length) {
+  if (!userProfile || !business || !orderItems || !Object.keys(orderData).length) {
     return null;
   }
 
@@ -471,38 +453,4 @@ const OrderPage = ({
   );
 };
 
-OrderPage.propTypes = {
-  orderInfo: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  orderFetch: PropTypes.func,
-  orderClear: PropTypes.func,
-  userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  orderEdit: PropTypes.func,
-  orderEditing: PropTypes.bool,
-  messageSend: PropTypes.func,
-  messageSending: PropTypes.bool,
-};
-
-const mapStateToProps = createStructuredSelector({
-  orderInfo: makeSelectOrder(),
-  userProfile: makeSelectUser(),
-  orderEditing: makeSelectEditingOrder(),
-  messageSending: makeSelectSendingMessage(),
-});
-
-function mapDispatchToProps(dispatch, { location }) {
-  return {
-    orderFetch: () => dispatch(fetchOrder(location.pathname)),
-    orderEdit: (editObj) => dispatch(editOrder(editObj)),
-    orderClear: () => dispatch(clearOrder()),
-    messageSend: (messageContent) => dispatch(sendMessage(messageContent)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(
-  withConnect,
-)(OrderPage);
+export default OrderPage;
