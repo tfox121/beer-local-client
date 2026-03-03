@@ -63,7 +63,7 @@ const OrderPage = () => {
     }
 
     // Same order ID but fresh server data (for example, new messages): keep local order metadata in sync.
-    setOrderData((prevOrderData) => {
+    setOrderData(prevOrderData => {
       const prevMessageCount = prevOrderData?.messages?.length || 0;
       const nextMessageCount = order?.messages?.length || 0;
       if (prevMessageCount === nextMessageCount && prevOrderData?.status === order?.status) {
@@ -75,10 +75,10 @@ const OrderPage = () => {
 
   useEffect(() => {
     if (userProfile && userProfile.stock && orderItems.length) {
-      const orderIds = orderItems.map((orderItem) => orderItem.id);
+      const orderIds = orderItems.map(orderItem => orderItem.id);
       setAvailableStock(userProfile.stock
-        .filter((stockItem) => stockItem.display === 'Show' && !orderIds.includes(stockItem.id))
-        .map((stockItem) => ({ ...stockItem, value: stockItem.id, label: `${stockItem.name} ${stockItem.packSize} ${stockItem.availability}` })));
+        .filter(stockItem => stockItem.display === 'Show' && !orderIds.includes(stockItem.id))
+        .map(stockItem => ({ ...stockItem, value: stockItem.id, label: `${stockItem.name} ${stockItem.packSize} ${stockItem.availability}` })));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile?.stock, orderItems.length]);
@@ -135,8 +135,8 @@ const OrderPage = () => {
   const handleChangesConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
     const itemsApproved = orderItems
-      .filter((orderItem) => orderItem.orderChange !== 'delete')
-      .map((orderItem) => ({ ...orderItem, orderChange: '' }));
+      .filter(orderItem => orderItem.orderChange !== 'delete')
+      .map(orderItem => ({ ...orderItem, orderChange: '' }));
     const pendingOrder = { _id: orderData._id, status: 'Pending', items: itemsApproved };
     orderEdit(pendingOrder);
 
@@ -182,9 +182,9 @@ const OrderPage = () => {
     // }
   };
 
-  const handleDeleteItem = (id) => {
+  const handleDeleteItem = id => {
     // setOrderEditPending(true);
-    setOrderItems(orderItems.map((orderItem) => {
+    setOrderItems(orderItems.map(orderItem => {
       if (orderItem.id === id && orderItem.orderChange === 'delete') {
         return { ...orderItem, orderChange: '' };
       }
@@ -195,7 +195,7 @@ const OrderPage = () => {
     }));
   };
 
-  const handleAddItem = (newItem) => {
+  const handleAddItem = newItem => {
     // setOrderEditPending(true);
     const item = newItem;
     delete item.label;
@@ -205,12 +205,12 @@ const OrderPage = () => {
     setOrderItems([...orderItems, item]);
   };
 
-  const handleDecreaseQuant = (id) => {
+  const handleDecreaseQuant = id => {
     // setOrderEditPending(true);
-    const orderItemsEdit = orderItems.map((orderItem) => {
+    const orderItemsEdit = orderItems.map(orderItem => {
       if (orderItem.id === id && orderItem.orderQuant > 1) {
         const decreasedItem = { ...orderItem, orderQuant: orderItem.orderQuant - 1 };
-        const originalItem = orderData.items.filter((origOrderItem) => origOrderItem.id === id)[0];
+        const originalItem = orderData.items.filter(origOrderItem => origOrderItem.id === id)[0];
         if (orderItem.orderChange !== 'add') {
           if (originalItem && decreasedItem.orderQuant < originalItem.orderQuant) {
             decreasedItem.orderChange = 'decrease';
@@ -225,12 +225,12 @@ const OrderPage = () => {
     setOrderItems(orderItemsEdit);
   };
 
-  const handleIncreaseQuant = (id) => {
+  const handleIncreaseQuant = id => {
     // setOrderEditPending(true);
-    const orderItemsEdit = orderItems.map((orderItem) => {
+    const orderItemsEdit = orderItems.map(orderItem => {
       if (orderItem.id === id) {
         const increasedItem = { ...orderItem, orderQuant: orderItem.orderQuant + 1 };
-        const originalItem = orderData.items.filter((origOrderItem) => origOrderItem.id === id)[0];
+        const originalItem = orderData.items.filter(origOrderItem => origOrderItem.id === id)[0];
         if (orderItem.orderChange !== 'add') {
           if (originalItem && increasedItem.orderQuant > originalItem.orderQuant) {
             increasedItem.orderChange = 'increase';
@@ -362,7 +362,7 @@ const OrderPage = () => {
               <Grid.Row>
                 <Grid.Column>
                   <p>{business.businessName}</p>
-                  {business.address.split(',').map((addressLine) => (
+                  {business.address.split(',').map(addressLine => (
                     <p key={addressLine}>{addressLine}</p>
                   ))}
                 </Grid.Column>
@@ -414,7 +414,7 @@ const OrderPage = () => {
             )}
           <MessageFeed messages={order?.messages || orderData?.messages} user={userProfile} business={business} businessAvatar={orderInfo.image} />
           <MessageBoxStyle>
-            <TextArea maxLength={ORDER_MESSAGE_CHARACTER_LIMIT} value={messageContent} onChange={(e) => setMessageContent(e.target.value)} placeholder={`Write your message to ${business.primaryContactName} at ${business.businessName}...`} />
+            <TextArea maxLength={ORDER_MESSAGE_CHARACTER_LIMIT} value={messageContent} onChange={e => setMessageContent(e.target.value)} placeholder={`Write your message to ${business.primaryContactName} at ${business.businessName}...`} />
             <Button attached="right" primary content="Send" onClick={handleMessageSend} loading={messageSending} />
           </MessageBoxStyle>
           {!!messageContent.length && (

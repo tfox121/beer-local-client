@@ -66,7 +66,7 @@ const ProfileEditModal = ({
     min: 0.5,
     max: 3,
     step: 0.05,
-    onChange: (value) => {
+    onChange: value => {
       setZoom(value);
     },
   };
@@ -179,7 +179,7 @@ const ProfileEditModal = ({
     if (checked) {
       activeModules.push(name);
     } else {
-      activeModules = activeModules.filter((moduleName) => moduleName !== name);
+      activeModules = activeModules.filter(moduleName => moduleName !== name);
     }
     setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, activeModules } });
   };
@@ -201,7 +201,7 @@ const ProfileEditModal = ({
     setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, distantPurchasingConditions: { [name]: value } } });
   };
 
-  const handleSuggestSelect = (suggestion) => {
+  const handleSuggestSelect = suggestion => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
@@ -217,18 +217,18 @@ const ProfileEditModal = ({
 
   let editableFG = null;
 
-  const onFeatureGroupReady = (reactFGref) => {
+  const onFeatureGroupReady = reactFGref => {
     if (reactFGref) {
       // if (savedPolygons.features && savedPolygons.features.length > 0) {
       const customGeoJSON = new L.GeoJSON(savedPolygons);
 
       const leafletFG = reactFGref.leafletElement;
 
-      leafletFG.eachLayer((layer) => {
+      leafletFG.eachLayer(layer => {
         leafletFG.removeLayer(layer);
       });
 
-      customGeoJSON.eachLayer((layer) => {
+      customGeoJSON.eachLayer(layer => {
         leafletFG.addLayer(layer);
       });
       // }
@@ -333,7 +333,7 @@ const ProfileEditModal = ({
                       className="banner-image"
                       src={bannerSaved || bannerSource || '/images/banners/blank-banner.png'}
                       centered
-                      onError={(e) => {
+                      onError={e => {
                         e.target.src = '/images/banners/blank-banner.png';
                       }}
                     />
@@ -344,7 +344,7 @@ const ProfileEditModal = ({
                       type="file"
                       accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
                       hidden
-                      onChange={(e) => {
+                      onChange={e => {
                         const file = e.target.files?.[0];
                         setBanner(file || {});
                       }}
@@ -365,7 +365,7 @@ const ProfileEditModal = ({
                         bordered
                         centered
                         circular
-                        onError={(e) => {
+                        onError={e => {
                           e.target.src = '/images/avatars/blank-avatar.webp';
                         }}
                       />
@@ -376,7 +376,7 @@ const ProfileEditModal = ({
                         type="file"
                         accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
                         hidden
-                        onChange={(e) => {
+                        onChange={e => {
                           const file = e.target.files?.[0];
                           setAvatar(file || {});
                         }}
@@ -437,7 +437,7 @@ const ProfileEditModal = ({
                 name="salesContactNumber"
                 value={producerFormValues.salesContactNumber || (salesContactNumber ? new PhoneNumber(salesContactNumber, 'GB').getNumber('national') : '')}
                 type="tel"
-                onChange={(e) => setUnformattedTel(e.target.value)}
+                onChange={e => setUnformattedTel(e.target.value)}
                 error={
                   formErrors.salesContactNumber && {
                     content: formErrors.salesContactNumber,
@@ -496,7 +496,7 @@ const ProfileEditModal = ({
                     />
                     <MapMarker location={userFormValues.location || location} />
                     <FeatureGroup
-                      ref={(reactFGref) => {
+                      ref={reactFGref => {
                         onFeatureGroupReady(reactFGref);
                       }}
                     >
@@ -552,7 +552,7 @@ const ProfileEditModal = ({
                       fixedDecimalScale
                       placeholder="For orders more than..."
                       prefix="£"
-                      onValueChange={(values) => handleDistantPurchasingOptionsChange(null, { name: 'minSpend', value: values.floatValue })}
+                      onValueChange={values => handleDistantPurchasingOptionsChange(null, { name: 'minSpend', value: values.floatValue })}
                       allowNegative={false}
                       value={(producerFormValues.profileOptions.distantPurchasingConditions && producerFormValues.profileOptions.distantPurchasingConditions.minSpend) || undefined}
                     />
@@ -627,8 +627,8 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch, { location }) {
   return {
-    userUpdate: (updateObj) => dispatch(updateUser(updateObj, location.pathname)),
-    profileUpdate: (updateObj) => dispatch(updateProfile(updateObj)),
+    userUpdate: updateObj => dispatch(updateUser(updateObj, location.pathname)),
+    profileUpdate: updateObj => dispatch(updateProfile(updateObj)),
   };
 }
 

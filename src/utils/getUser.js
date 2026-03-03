@@ -1,6 +1,6 @@
 import createAuth0Client from '@auth0/auth0-spa-js';
 
-const fetchUser = (authSession) => authSession.getUser();
+const fetchUser = authSession => authSession.getUser();
 
 export default function getUser() {
   return createAuth0Client({

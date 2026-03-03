@@ -1,25 +1,25 @@
 module.exports = {
   parser: '@babel/eslint-parser',
-  "env": {
-      "browser": true,
-      "es2020": true
+  env: {
+    browser: true,
+    es2020: true,
   },
-  "extends": [
-      "plugin:react/recommended",
-      "airbnb"
+  extends: [
+    'plugin:react/recommended',
+    'airbnb',
   ],
-  "parserOptions": {
-    "ecmaFeatures": {
-        "jsx": true
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
     },
-    "ecmaVersion": 11,
-    "sourceType": "module",
-    "requireConfigFile": false,
-    "babelOptions": {
-      "presets": ["@babel/preset-react"]
-    }
+    ecmaVersion: 11,
+    sourceType: 'module',
+    requireConfigFile: false,
+    babelOptions: {
+      presets: ['@babel/preset-react'],
+    },
   },
-  "plugins": ['redux-saga', 'react', 'react-hooks', 'jsx-a11y'],
+  plugins: ['redux-saga', 'react', 'react-hooks', 'jsx-a11y'],
   rules: {
     'no-underscore-dangle': 0,
     'arrow-body-style': [2, 'as-needed'],
@@ -94,9 +94,9 @@ module.exports = {
     'react/jsx-props-no-spreading': 0,
     'react/static-property-placement': 0,
     'object-curly-newline': 'off',
-    'curly': 'off',
+    curly: 'off',
     'nonblock-statement-body-position': 'off',
-    'semi': ['error', 'always'],
+    semi: ['error', 'always'],
     'function-paren-newline': 'off',
     'react/jsx-curly-newline': 'off',
     'no-plusplus': 'off',

@@ -52,9 +52,9 @@ const LineChart = ({
     }
   }
 
-  const mapDatesToTotals = (datesArr, orders, statusString, stepString) => datesArr.map((date) => {
+  const mapDatesToTotals = (datesArr, orders, statusString, stepString) => datesArr.map(date => {
     let stepTotal = 0;
-    orders.forEach((orderItem) => {
+    orders.forEach(orderItem => {
       if (orderItem.status === statusString && moment(orderItem.createdAt).isSame(date, stepString)) {
         stepTotal += calcOrderTotal(orderItem.items);
       }
@@ -82,7 +82,7 @@ const LineChart = ({
     return null;
   }
 
-  const labels = dates.map((date) => moment(date).format('YYYY-MM-DD'));
+  const labels = dates.map(date => moment(date).format('YYYY-MM-DD'));
 
   const dataObj = {
     labels,
@@ -149,7 +149,7 @@ const LineChart = ({
       },
       tooltip: {
         callbacks: {
-          label: (context) => `£${context.parsed.y}`,
+          label: context => `£${context.parsed.y}`,
         },
       },
     },
@@ -161,7 +161,7 @@ const LineChart = ({
           maxTicksLimit: 4,
           padding: 10,
           suggestedMax,
-          callback: (value) => `£${value}`,
+          callback: value => `£${value}`,
         },
         gridLines: {
           drawBorder: false,
@@ -172,7 +172,7 @@ const LineChart = ({
         id: 'x-axis',
         ticks: {
           padding: 5,
-          callback: (value) => moment(labels[value]).format(toolTipFormat[step] || 'ddd Do'),
+          callback: value => moment(labels[value]).format(toolTipFormat[step] || 'ddd Do'),
         },
         gridLines: {
           zeroLineWidth: 0.5,

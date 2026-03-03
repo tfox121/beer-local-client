@@ -19,17 +19,17 @@ const ProducerListPage = () => {
   // const [followedFilterToggle, setfollowedFilterToggle] = useState(false);
   const [filter, setFilter] = useState(['area']);
 
-  const followedProducers = !!user && (user.followedProducers || []).map((producer) => producer.sub);
+  const followedProducers = !!user && (user.followedProducers || []).map(producer => producer.sub);
 
-  const followedFilter = (producer) => followedProducers.includes(producer.sub);
+  const followedFilter = producer => followedProducers.includes(producer.sub);
 
-  const areaFilter = (producer) => geoJsonContainsCoords(producer.distributionAreas, user.location);
+  const areaFilter = producer => geoJsonContainsCoords(producer.distributionAreas, user.location);
 
-  const distantPurchasingFilter = (producer) => (producer.profileOptions.distantPurchasing || geoJsonContainsCoords(producer.distributionAreas, user.location));
+  const distantPurchasingFilter = producer => (producer.profileOptions.distantPurchasing || geoJsonContainsCoords(producer.distributionAreas, user.location));
 
   // const filteredProducers = !!producers && !!user && producers.filter();
 
-  const filterCombine = (producerArr) => {
+  const filterCombine = producerArr => {
     let filteredProducers = [...producerArr];
     if (filter.includes('area')) {
       filteredProducers = filteredProducers.filter(areaFilter);
@@ -87,7 +87,7 @@ const ProducerListPage = () => {
             </Grid>
             <Table basic unstackable>
               <Table.Body>
-                {producers && filterCombine(producers).map((producer) => (
+                {producers && filterCombine(producers).map(producer => (
                   <React.Fragment key={producer._id}>
                     <ProducerListItem user={user} producer={producer} />
                   </React.Fragment>

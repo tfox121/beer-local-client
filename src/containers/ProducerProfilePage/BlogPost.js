@@ -52,7 +52,7 @@ const BlogPost = ({
           {/* <Item.Image src="https://react.semantic-ui.com/images/wireframe/image.png" /> */}
           <Item.Content>
             {editingBlog
-              ? <Form.Input label="Title" fluid width={7} value={blogMeta.title} onChange={(e) => setBlogMeta({ ...blogMeta, title: e.target.value })} placeholder="Post title..." />
+              ? <Form.Input label="Title" fluid width={7} value={blogMeta.title} onChange={e => setBlogMeta({ ...blogMeta, title: e.target.value })} placeholder="Post title..." />
               : <Item.Header style={{ fontSize: '1.5em' }}>{blogMeta.title}</Item.Header>}
             <Item.Meta>
               by
@@ -65,18 +65,18 @@ const BlogPost = ({
                 toolbarClassName={editingBlog ? 'blog-editor-toolbar' : ''}
                 wrapperClassName={editingBlog ? 'blog-editor-wrapper' : ''}
                 editorClassName={editingBlog ? 'blog-editor' : ''}
-                onEditorStateChange={(editorState) => setBlogData(editorState)}
+                onEditorStateChange={editorState => setBlogData(editorState)}
                 readOnly={!editingBlog}
                 toolbarHidden={!editingBlog}
                 toolbar={BLOG_EDITOR_TOOLBAR}
-                handleBeforeInput={(val) => {
+                handleBeforeInput={val => {
                   const textLength = blogData.getCurrentContent().getPlainText().length;
                   if (val && textLength >= BLOG_CHARACTER_LIMIT) {
                     return 'handled';
                   }
                   return 'not-handled';
                 }}
-                handlePastedText={(val) => {
+                handlePastedText={val => {
                   const textLength = blogData.getCurrentContent().getPlainText().length;
                   return ((val.length + textLength) >= BLOG_CHARACTER_LIMIT);
                 }}
@@ -146,7 +146,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    blogEdit: (blogPost) => dispatch(editBlog(blogPost)),
+    blogEdit: blogPost => dispatch(editBlog(blogPost)),
   };
 }
 

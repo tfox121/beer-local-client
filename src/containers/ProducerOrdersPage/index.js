@@ -20,8 +20,8 @@ const ProducerOrdersPage = () => {
 
   useEffect(() => {
     if (ordersInfo && ordersInfo.orders) {
-      const statuses = [...new Set(ordersInfo && ordersInfo.orders.map((order) => order.status))];
-      setOrderStatuses(statuses.map((status) => ({ label: status, value: status })));
+      const statuses = [...new Set(ordersInfo && ordersInfo.orders.map(order => order.status))];
+      setOrderStatuses(statuses.map(status => ({ label: status, value: status })));
     }
   }, [ordersInfo]);
 
@@ -61,7 +61,7 @@ const ProducerOrdersPage = () => {
             </Table.Header>
             <Table.Body>
               {ordersInfo && ordersInfo.businesses && ordersInfo.orders
-                .filter((order) => statusFilter ? order.status === statusFilter : true)
+                .filter(order => statusFilter ? order.status === statusFilter : true)
                 .map((order, index) => (
                   <React.Fragment key={order._id}>
                     <OrderItem ordersInfo={ordersInfo} order={order} index={index} userProfile={userProfile} />

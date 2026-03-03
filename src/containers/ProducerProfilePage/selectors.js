@@ -5,16 +5,16 @@ import { initialState } from './reducer';
  * Direct selector to the producerProfilePage state domain
  */
 
-const selectProducerProfilePageDomain = (state) => state.producerProfilePage || initialState;
+const selectProducerProfilePageDomain = state => state.producerProfilePage || initialState;
 
 /**
  * Other specific selectors
  */
-const selectGlobal = (state) => state.global || initialState;
+const selectGlobal = state => state.global || initialState;
 
 const makeSelectUser = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.user,
+  globalState => globalState.user,
 );
 /**
  * Default selector used by ProducerProfilePage
@@ -22,27 +22,27 @@ const makeSelectUser = () => createSelector(
 
 const makeSelectProducerProfilePage = () => createSelector(
   selectProducerProfilePageDomain,
-  (substate) => substate,
+  substate => substate,
 );
 
 const makeSelectProducerProfile = () => createSelector(
   selectProducerProfilePageDomain,
-  (substate) => substate.profile,
+  substate => substate.profile,
 );
 
 const makeSelectOrderSending = () => createSelector(
   selectProducerProfilePageDomain,
-  (substate) => substate.sendingOrder,
+  substate => substate.sendingOrder,
 );
 
 const makeSelectBlogPosting = () => createSelector(
   selectProducerProfilePageDomain,
-  (substate) => substate.postingBlog,
+  substate => substate.postingBlog,
 );
 
 const makeSelectStockUpdating = () => createSelector(
   selectProducerProfilePageDomain,
-  (substate) => substate.updatingStock,
+  substate => substate.updatingStock,
 );
 
 export default makeSelectProducerProfilePage;

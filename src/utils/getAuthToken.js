@@ -1,6 +1,6 @@
 import createAuth0Client from '@auth0/auth0-spa-js';
 
-const getToken = (authSession) => authSession.getTokenSilently();
+const getToken = authSession => authSession.getTokenSilently();
 
 export default function getAuthToken() {
   return createAuth0Client({

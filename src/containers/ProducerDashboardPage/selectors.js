@@ -5,7 +5,7 @@ import { initialState } from './reducer';
  * Direct selector to the ProducerDashboardPage state domain
  */
 
-const selectProducerDashboardPageDomain = (state) => state.ProducerDashboardPage || initialState;
+const selectProducerDashboardPageDomain = state => state.ProducerDashboardPage || initialState;
 
 /**
  * Other specific selectors
@@ -13,22 +13,22 @@ const selectProducerDashboardPageDomain = (state) => state.ProducerDashboardPage
 
 const makeSelectProducerDashboardOrders = () => createSelector(
   selectProducerDashboardPageDomain,
-  (substate) => substate.dashboardOrders,
+  substate => substate.dashboardOrders,
 );
 
 const makeSelectProducerDashboardRetailers = () => createSelector(
   selectProducerDashboardPageDomain,
-  (substate) => substate.dashboardRetailers,
+  substate => substate.dashboardRetailers,
 );
 
 const makeSelectProducerDashboardFetching = () => createSelector(
   selectProducerDashboardPageDomain,
-  (substate) => substate.fetchingProducerDashboard,
+  substate => substate.fetchingProducerDashboard,
 );
 
 const makeSelectProducerDashboardFetchError = () => createSelector(
   selectProducerDashboardPageDomain,
-  (substate) => substate.fetchingProducerDashboardError,
+  substate => substate.fetchingProducerDashboardError,
 );
 
 /**
@@ -37,7 +37,7 @@ const makeSelectProducerDashboardFetchError = () => createSelector(
 
 const makeSelectProducerDashboardPage = () => createSelector(
   selectProducerDashboardPageDomain,
-  (substate) => substate,
+  substate => substate,
 );
 
 export default makeSelectProducerDashboardPage;

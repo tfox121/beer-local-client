@@ -5,27 +5,27 @@ import { initialState } from './reducer';
  * Direct selector to the profileEditModal state domain
  */
 
-const ProfileEditModalDomain = (state) => state.profileEditModal || initialState;
+const ProfileEditModalDomain = state => state.profileEditModal || initialState;
 
 /**
  * Other specific selectors
  */
-const selectGlobal = (state) => state.global || initialState;
-const selectProducerProfilePage = (state) => state.producerProfilePage || initialState;
+const selectGlobal = state => state.global || initialState;
+const selectProducerProfilePage = state => state.producerProfilePage || initialState;
 
 const makeSelectUser = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.user,
+  globalState => globalState.user,
 );
 
 const makeSelectUpdatingUser = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.updatingUser,
+  globalState => globalState.updatingUser,
 );
 
 const makeSelectProducerProfile = () => createSelector(
   selectProducerProfilePage,
-  (substate) => substate.profile,
+  substate => substate.profile,
 );
 /**
  * Default selector used by ProfileEditModal
@@ -33,7 +33,7 @@ const makeSelectProducerProfile = () => createSelector(
 
 const makeProfileEditModal = () => createSelector(
   ProfileEditModalDomain,
-  (substate) => substate,
+  substate => substate,
 );
 
 export default makeProfileEditModal;

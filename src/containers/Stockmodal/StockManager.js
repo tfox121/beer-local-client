@@ -44,7 +44,7 @@ const EditableCell = ({
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
 
-  const onChange = (e) => {
+  const onChange = e => {
     setValue(e.target.value);
   };
 
@@ -54,11 +54,11 @@ const EditableCell = ({
     updateMyData(index, id, value === 'Show' ? 'Hide' : 'Show' || 0);
   };
 
-  const onValueChange = (values) => {
+  const onValueChange = values => {
     setValue(values.floatValue || 0);
   };
 
-  const onSelectChange = (selectedOption) => {
+  const onSelectChange = selectedOption => {
     setValue(selectedOption);
     updateMyData(index, id, selectedOption.value || 0);
   };
@@ -119,21 +119,21 @@ const EditableCell = ({
 
   if (id === 'packSize') {
     const customStyles = {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-      dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
+      menuPortal: base => ({ ...base, zIndex: 9999 }),
+      dropdownIndicator: base => ({ ...base, padding: '4px' }),
       indicatorSeparator: () => ({ display: 'none' }),
-      container: (base) => ({ ...base, border: 'none' }),
-      control: (base) => ({ ...base, minHeight: 'unset', border: 'none' }),
-      valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-      singleValue: (base) => ({ ...base, padding: '3px' }),
+      container: base => ({ ...base, border: 'none' }),
+      control: base => ({ ...base, minHeight: 'unset', border: 'none' }),
+      valueContainer: base => ({ ...base, justifyContent: 'center' }),
+      singleValue: base => ({ ...base, padding: '3px' }),
     };
 
-    const packSizeArr = Object.keys(PACK_SIZES).map((key) => ({ value: key, label: PACK_SIZES[key] }));
+    const packSizeArr = Object.keys(PACK_SIZES).map(key => ({ value: key, label: PACK_SIZES[key] }));
     element = (
       <Select
         options={packSizeArr}
         onChange={onSelectChange}
-        value={packSizeArr.filter((option) => option.value === value)[0] || ''}
+        value={packSizeArr.filter(option => option.value === value)[0] || ''}
         placeholder="Select size"
         menuPortalTarget={document.body}
         styles={customStyles}
@@ -169,7 +169,7 @@ function DefaultColumnFilter({
       className="filter-input"
       style={{ maxWidth: '160px' }}
       value={filterValue || ''}
-      onChange={(e) => {
+      onChange={e => {
         setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
       }}
       placeholder={`Search ${count} records...`}
@@ -188,24 +188,24 @@ function SelectColumnFilter({
   // using the preFilteredRows
   const options = React.useMemo(() => {
     const filterOptions = new Set();
-    preFilteredRows.forEach((row) => {
+    preFilteredRows.forEach(row => {
       filterOptions.add(row.values[id]);
     });
-    const filteredArr = [...filterOptions.values()].map((value) => ({ value, label: value }));
+    const filteredArr = [...filterOptions.values()].map(value => ({ value, label: value }));
     filteredArr.unshift({ label: 'All', value: '' });
 
     return filteredArr;
   }, [id, preFilteredRows]);
 
   const customStyles = {
-    dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
+    dropdownIndicator: base => ({ ...base, padding: '4px' }),
     indicatorSeparator: () => ({ display: 'none' }),
-    container: (base) => ({
+    container: base => ({
       ...base, border: 'none', width: '100%', minWidth: '100px',
     }),
-    control: (base) => ({ ...base, minHeight: 'unset' }),
-    valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-    singleValue: (base) => ({ ...base, padding: '3px' }),
+    control: base => ({ ...base, minHeight: 'unset' }),
+    valueContainer: base => ({ ...base, justifyContent: 'center' }),
+    singleValue: base => ({ ...base, padding: '3px' }),
   };
   // Render a multi-select box
   return (
@@ -214,8 +214,8 @@ function SelectColumnFilter({
       options={options}
       defaultValue={options[0]}
       styles={customStyles}
-      value={options.filter((option) => option.value === filterValue)[0]}
-      onChange={(e) => {
+      value={options.filter(option => option.value === filterValue)[0]}
+      onChange={e => {
         setFilter(e.value || undefined);
       }}
     />
@@ -236,7 +236,7 @@ function SliderColumnFilter({
   const [min, max] = React.useMemo(() => {
     let filterMin = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
     let filterMax = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
-    preFilteredRows.forEach((row) => {
+    preFilteredRows.forEach(row => {
       filterMin = Math.min(row.values[id], filterMin);
       filterMax = Math.max(row.values[id], filterMax);
     });
@@ -250,7 +250,7 @@ function SliderColumnFilter({
         min={min}
         max={Math.ceil(max)}
         value={filterValue || Math.ceil(max)}
-        onChange={(e) => {
+        onChange={e => {
           setFilter(parseFloat(e.target.value));
         }}
       />
@@ -263,11 +263,11 @@ function SliderColumnFilter({
 }
 
 function fuzzyTextFilterFn(rows, id, filterValue) {
-  return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
+  return matchSorter(rows, filterValue, { keys: [row => row.values[id]] });
 }
 
 // Let the table remove the filter if the string is empty
-fuzzyTextFilterFn.autoRemove = (val) => !val;
+fuzzyTextFilterFn.autoRemove = val => !val;
 
 // Be sure to pass our updateMyData and the skipReset option
 const MyTable = ({
@@ -279,7 +279,7 @@ const MyTable = ({
       fuzzyText: fuzzyTextFilterFn,
       // Or, override the default text filter to use
       // "startWith"
-      text: (rows, id, filterValue) => rows.filter((row) => {
+      text: (rows, id, filterValue) => rows.filter(row => {
         const rowValue = row.values[id];
         return rowValue !== undefined
           ? String(rowValue)
@@ -345,8 +345,8 @@ const MyTable = ({
     usePagination,
     useRowSelect,
     // Here we will use a plugin to add our selection column
-    (hooks) => {
-      hooks.visibleColumns.push((tableColumns) => [
+    hooks => {
+      hooks.visibleColumns.push(tableColumns => [
         {
           id: 'selection',
           // Make this column a groupByBoundary. This ensures that groupBy columns
@@ -373,14 +373,14 @@ const MyTable = ({
   );
 
   const customStyles = {
-    dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
+    dropdownIndicator: base => ({ ...base, padding: '4px' }),
     indicatorSeparator: () => ({ display: 'none' }),
-    container: (base) => ({
+    container: base => ({
       ...base, border: 'none', width: '100px',
     }),
-    control: (base) => ({ ...base, minHeight: 'unset' }),
-    valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-    singleValue: (base) => ({ ...base, padding: '3px' }),
+    control: base => ({ ...base, minHeight: 'unset' }),
+    valueContainer: base => ({ ...base, justifyContent: 'center' }),
+    singleValue: base => ({ ...base, padding: '3px' }),
   };
 
   // track selected rows
@@ -524,7 +524,7 @@ const MyTable = ({
             className="pagination-input"
             type="number"
             defaultValue={pageIndex + 1}
-            onChange={(e) => {
+            onChange={e => {
               const toPage = e.target.value ? Number(e.target.value) - 1 : 0;
               gotoPage(toPage);
             }}
@@ -535,10 +535,10 @@ const MyTable = ({
           defaultValue={{ value: 10, label: 'Show 10' }}
           value={{ value: pageSize, label: `Show ${pageSize}` }}
           styles={customStyles}
-          onChange={(e) => {
+          onChange={e => {
             setPageSize(Number(e.value));
           }}
-          options={[10, 20, 30, 40, 50].map((value) => ({ value, label: `Show ${value}` }))}
+          options={[10, 20, 30, 40, 50].map(value => ({ value, label: `Show ${value}` }))}
         />
         {/* {[10, 20, 30, 40, 50].map((pageSizeVal) => (
             <option key={pageSizeVal} value={pageSizeVal}>
@@ -555,14 +555,14 @@ const MyTable = ({
 
 // Define a custom filter filter function!
 function filterGreaterThan(rows, id, filterValue) {
-  return rows.filter((row) => {
+  return rows.filter(row => {
     const rowValue = row.values[id];
     return rowValue >= filterValue;
   });
 }
 
 function filterLesserThan(rows, id, filterValue) {
-  return rows.filter((row) => {
+  return rows.filter(row => {
     const rowValue = row.values[id];
     return rowValue <= filterValue;
   });
@@ -572,7 +572,7 @@ function filterLesserThan(rows, id, filterValue) {
 // when given the new filter value and returns true, the filter
 // will be automatically removed. Normally this is just an undefined
 // check, but here, we want to remove the filter if it's not a number
-filterGreaterThan.autoRemove = (val) => typeof val !== 'number';
+filterGreaterThan.autoRemove = val => typeof val !== 'number';
 
 const IndeterminateCheckbox = React.forwardRef(
   ({ indeterminate, ...rest }, ref) => {
@@ -584,9 +584,7 @@ const IndeterminateCheckbox = React.forwardRef(
     }, [resolvedRef, indeterminate]);
 
     return (
-      <>
-        <input type="checkbox" ref={resolvedRef} {...rest} />
-      </>
+      <input type="checkbox" ref={resolvedRef} {...rest} />
     );
   },
 );
@@ -661,7 +659,7 @@ const StockManager = ({
     // We also turn on the flag to not reset the page
     skipResetRef.current = true;
     setStockEditPending(true);
-    setData((old) => old.map((row, index) => {
+    setData(old => old.map((row, index) => {
       if (index === rowIndex) {
         const newRow = {
           ...row,

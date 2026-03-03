@@ -3,7 +3,7 @@ import React from 'react';
 
 import { PACK_SIZES } from './constants';
 
-const minSpendPromoCopy = (value) => (
+const minSpendPromoCopy = value => (
   <>
     If you spend at least
     {' '}
@@ -29,7 +29,7 @@ const multibuyPromoCopy = (quantity, item) => (
   </>
 );
 
-const moneyOffDiscountCopy = (value) => (
+const moneyOffDiscountCopy = value => (
   <>
     {' '}
     you will get a
@@ -59,7 +59,7 @@ const freeItemDiscountCopy = (quantity, item) => (
   </>
 );
 
-const percentageOffDiscountCopy = (percentage) => (
+const percentageOffDiscountCopy = percentage => (
   <>
     {' '}
     you will get a
@@ -74,20 +74,20 @@ const percentageOffDiscountCopy = (percentage) => (
 );
 
 const promotionCopySelection = (promotionObj, availableStockArr) => {
-  if (promotionObj.multibuyType === 'product' && !availableStockArr.filter((stockItem) => stockItem.key === promotionObj.multibuyProduct).length) {
+  if (promotionObj.multibuyType === 'product' && !availableStockArr.filter(stockItem => stockItem.key === promotionObj.multibuyProduct).length) {
     return null;
   }
   if (promotionObj.multibuyType === 'packageType' && !PACK_SIZES[promotionObj.multibuyPackageType]) {
     return null;
   }
-  if (promotionObj.discountType === 'freeItems' && !availableStockArr.filter((stockItem) => stockItem.key === promotionObj.freeItemProduct).length) {
+  if (promotionObj.discountType === 'freeItems' && !availableStockArr.filter(stockItem => stockItem.key === promotionObj.freeItemProduct).length) {
     return null;
   }
   return (
     <>
       {promotionObj.condition === 'multibuy' ? (
         promotionObj.multibuyType === 'product'
-          ? multibuyPromoCopy(promotionObj.multibuyQuantity, availableStockArr.filter((stockItem) => stockItem.key === promotionObj.multibuyProduct)[0].text)
+          ? multibuyPromoCopy(promotionObj.multibuyQuantity, availableStockArr.filter(stockItem => stockItem.key === promotionObj.multibuyProduct)[0].text)
           : multibuyPromoCopy(promotionObj.multibuyQuantity, PACK_SIZES[promotionObj.multibuyPackageType])
       ) : (
         minSpendPromoCopy(promotionObj.minSpend)
@@ -99,7 +99,7 @@ const promotionCopySelection = (promotionObj, availableStockArr) => {
         percentageOffDiscountCopy(promotionObj.percentageOff)
       )}
       {promotionObj.discountType === 'freeItems' && (
-        freeItemDiscountCopy(promotionObj.freeItemQuantity, availableStockArr.filter((stockItem) => stockItem.key === promotionObj.freeItemProduct)[0].text)
+        freeItemDiscountCopy(promotionObj.freeItemQuantity, availableStockArr.filter(stockItem => stockItem.key === promotionObj.freeItemProduct)[0].text)
       )}
     </>
   );

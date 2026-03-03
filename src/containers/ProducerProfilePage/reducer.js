@@ -54,7 +54,7 @@ export const initialState = {
 };
 
 /* eslint-disable default-case, no-param-reassign */
-const producerProfilePageReducer = (state = initialState, action) => produce(state, (draftState) => {
+const producerProfilePageReducer = (state = initialState, action) => produce(state, draftState => {
   switch (action.type) {
     case FETCH_PROFILE:
       draftState.fetchProfileError = false;

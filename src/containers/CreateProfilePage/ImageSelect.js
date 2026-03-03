@@ -28,7 +28,7 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
     min: 0.5,
     max: 3,
     step: 0.05,
-    onChange: (value) => {
+    onChange: value => {
       setZoom(value);
     },
   };
@@ -61,7 +61,7 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
           type="file"
           accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
           hidden
-          onChange={(e) => setAvatar(e.target.files[0])}
+          onChange={e => setAvatar(e.target.files[0])}
         />
       </ImageSelectStyle>
       <Modal className="image-resizer" open={imageResizeModalOpen} onClose={handleModalClose}>

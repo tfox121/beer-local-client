@@ -29,8 +29,8 @@ const ProducerBlogEditor = ({ blogPost }) => {
         <Modal.Description>
           <Form>
             <Form.Group>
-              <Form.Input label="Title" fluid width={7} value={blogMeta.title} onChange={(e) => setBlogMeta({ ...blogMeta, title: e.target.value })} placeholder="Post title..." />
-              <Form.Input label="Author" fluid width={5} value={blogMeta.author} onChange={(e) => setBlogMeta({ ...blogMeta, author: e.target.value })} placeholder="Author" />
+              <Form.Input label="Title" fluid width={7} value={blogMeta.title} onChange={e => setBlogMeta({ ...blogMeta, title: e.target.value })} placeholder="Post title..." />
+              <Form.Input label="Author" fluid width={5} value={blogMeta.author} onChange={e => setBlogMeta({ ...blogMeta, author: e.target.value })} placeholder="Author" />
             </Form.Group>
           </Form>
           <Editor
@@ -38,16 +38,16 @@ const ProducerBlogEditor = ({ blogPost }) => {
             toolbarClassName="blog-editor-toolbar"
             wrapperClassName="blog-editor-wrapper"
             editorClassName="blog-editor"
-            onEditorStateChange={(editorState) => setBlogEditor(editorState)}
+            onEditorStateChange={editorState => setBlogEditor(editorState)}
             toolbar={BLOG_EDITOR_TOOLBAR}
-            handleBeforeInput={(val) => {
+            handleBeforeInput={val => {
               const textLength = blogEditor.getCurrentContent().getPlainText().length;
               if (val && textLength >= BLOG_CHARACTER_LIMIT) {
                 return 'handled';
               }
               return 'not-handled';
             }}
-            handlePastedText={(val) => {
+            handlePastedText={val => {
               const textLength = blogEditor.getCurrentContent().getPlainText().length;
               return ((val.length + textLength) >= BLOG_CHARACTER_LIMIT);
             }}
@@ -74,7 +74,7 @@ ProducerBlogEditor.propTypes = {
 
 function mapDispatchToProps(dispatch) {
   return {
-    blogPost: (blogPost) => dispatch(postBlog(blogPost)),
+    blogPost: blogPost => dispatch(postBlog(blogPost)),
   };
 }
 

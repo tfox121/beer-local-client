@@ -18,7 +18,7 @@ export const initialState = {
 };
 
 /* eslint-disable default-case, no-param-reassign */
-const producerListPageReducer = (state = initialState, action) => produce(state, (draftState) => {
+const producerListPageReducer = (state = initialState, action) => produce(state, draftState => {
   switch (action.type) {
     default:
       break;

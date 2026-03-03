@@ -20,7 +20,7 @@ function OrderModalContent({
   const [newItem, setNewItem] = useState({});
   const [addingItem, setAddingItem] = useState(false);
 
-  const handleSelectChange = (selectedOption) => {
+  const handleSelectChange = selectedOption => {
     setNewItem(selectedOption);
   };
 
@@ -55,7 +55,7 @@ function OrderModalContent({
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {orderItems.filter((stockItem) => stockItem.orderQuant).map((stockItem) => (
+          {orderItems.filter(stockItem => stockItem.orderQuant).map(stockItem => (
             <React.Fragment key={stockItem.id}>
               <OrderLine orderLine={stockItem} editingOrder={editingOrder} handleDeleteItem={handleDeleteItem} handleDecreaseQuant={handleDecreaseQuant} handleIncreaseQuant={handleIncreaseQuant} />
             </React.Fragment>

@@ -18,7 +18,7 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
 
   const fileInputRef = createRef();
 
-  const fileChange = (e) => {
+  const fileChange = e => {
     setFormValues({
       ...formValues,
       pictureFile: e.target.files[0],

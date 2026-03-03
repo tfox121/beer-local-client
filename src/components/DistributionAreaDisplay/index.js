@@ -9,7 +9,7 @@ import { FeatureGroup } from 'react-leaflet';
 import PropTypes from 'prop-types';
 
 const DistributionAreaDisplay = ({ distributionAreas }) => {
-  const onFeatureGroupReady = (reactFGref) => {
+  const onFeatureGroupReady = reactFGref => {
     setTimeout(() => {
       if (reactFGref) {
         if (
@@ -25,11 +25,11 @@ const DistributionAreaDisplay = ({ distributionAreas }) => {
           const leafletFG = reactFGref.leafletElement;
 
           if (leafletFG) {
-            leafletFG.eachLayer((layer) => {
+            leafletFG.eachLayer(layer => {
               leafletFG.removeLayer(layer);
             });
 
-            customGeoJSON.eachLayer((layer) => {
+            customGeoJSON.eachLayer(layer => {
               leafletFG.addLayer(layer);
             });
           }
@@ -40,7 +40,7 @@ const DistributionAreaDisplay = ({ distributionAreas }) => {
 
   return (
     <FeatureGroup
-      ref={(reactFGref) => {
+      ref={reactFGref => {
         onFeatureGroupReady(reactFGref);
       }}
     />

@@ -14,7 +14,7 @@ export const initialState = {
 };
 
 /* eslint-disable default-case, no-param-reassign */
-const ProducerDashboardPageReducer = (state = initialState, action) => produce(state, (draftState) => {
+const ProducerDashboardPageReducer = (state = initialState, action) => produce(state, draftState => {
   switch (action.type) {
     default:
       break;
@@ -24,7 +24,7 @@ const ProducerDashboardPageReducer = (state = initialState, action) => produce(s
       break;
     case FETCH_PRODUCER_DASHBOARD_SUCCESS:
       if (action.producerDashboard) {
-        const orders = merge(action.producerDashboard.orders.orders, action.producerDashboard.orders.businesses.map((business) => pick(business, ['businessName', 'businessId', 'avatarSource', 'location'])));
+        const orders = merge(action.producerDashboard.orders.orders, action.producerDashboard.orders.businesses.map(business => pick(business, ['businessName', 'businessId', 'avatarSource', 'location'])));
         const { retailers } = action.producerDashboard.retailers;
         draftState.dashboardOrders = orders;
         draftState.dashboardRetailers = retailers;

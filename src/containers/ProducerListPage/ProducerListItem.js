@@ -27,7 +27,7 @@ const ProducerListItem = ({
     setFollowButtonClicked(true);
   };
 
-  const handleClick = (businessId) => {
+  const handleClick = businessId => {
     history.push(`/brewery/${businessId}`);
   };
 

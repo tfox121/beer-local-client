@@ -70,7 +70,7 @@ const RetailerForm = ({
     setFormValues({ ...formValues, terms: !formValues.terms });
   };
 
-  const handleSuggestSelect = (suggestion) => {
+  const handleSuggestSelect = suggestion => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
@@ -135,7 +135,7 @@ const RetailerForm = ({
                 name="purchasingContactNumber"
                 type="tel"
                 value={formValues.purchasingContactNumber || ''}
-                onChange={(e) => setUnformattedTel(e.target.value)}
+                onChange={e => setUnformattedTel(e.target.value)}
                 error={
                   formErrors.purchasingContactNumber && {
                     content: formErrors.purchasingContactNumber,

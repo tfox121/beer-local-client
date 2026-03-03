@@ -21,13 +21,13 @@ function MessageFeed({
     <Segment className="message-feed">
       <MessageFeedStyle>
         <Feed size="small">
-          {messages.map((message) => (
+          {messages.map(message => (
             <Feed.Event key={message._id}>
               <Feed.Label>
                 <img
                   alt={message.author === user.sub ? `${user.businessName || 'User'} avatar` : `${business?.businessName || 'Business'} avatar`}
                   src={message.author === user.sub ? (user.avatarSource || '/images/avatars/blank-avatar.webp') : (businessAvatar || business?.avatarSource || '/images/avatars/blank-avatar.webp')}
-                  onError={(e) => {
+                  onError={e => {
                     e.target.src = '/images/avatars/blank-avatar.webp';
                   }}
                 />

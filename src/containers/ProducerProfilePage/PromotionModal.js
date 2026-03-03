@@ -44,13 +44,13 @@ const PromotionModal = ({
   useEffect(() => {
     if (userProfile && userProfile.stock) {
       setAvailableStock(userProfile.stock
-        .filter((stockItem) => stockItem.display === 'Show')
-        .map((stockItem) => ({
+        .filter(stockItem => stockItem.display === 'Show')
+        .map(stockItem => ({
           key: stockItem.id, value: stockItem.id, text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]} - ${stockItem.availability}`,
         })));
       setAvailablePackageTypes(userProfile.stock
-        .filter((stockItem) => stockItem.display === 'Show')
-        .map((stockItem) => ({
+        .filter(stockItem => stockItem.display === 'Show')
+        .map(stockItem => ({
           key: stockItem.packSize, value: stockItem.packSize, text: PACK_SIZES[stockItem.packSize],
         })));
     }
@@ -155,7 +155,7 @@ const PromotionModal = ({
                     fixedDecimalScale
                     placeholder="£ ####"
                     prefix="£"
-                    onValueChange={(values) => { handleChange(null, { name: 'minSpend', value: values.floatValue }); setConditionsComplete(true); }}
+                    onValueChange={values => { handleChange(null, { name: 'minSpend', value: values.floatValue }); setConditionsComplete(true); }}
                     allowNegative={false}
                     value={promotionSelectedValues.minSpend || undefined}
                     className="spend-input"
@@ -223,7 +223,7 @@ const PromotionModal = ({
                   fixedDecimalScale
                   placeholder="£ ####"
                   prefix="£"
-                  onValueChange={(values) => { handleChange(null, { name: 'moneyOff', value: values.floatValue }); setDiscountsComplete(true); }}
+                  onValueChange={values => { handleChange(null, { name: 'moneyOff', value: values.floatValue }); setDiscountsComplete(true); }}
                   allowNegative={false}
                   value={promotionSelectedValues.moneyOff || undefined}
                   className="discount-value-input"
@@ -241,7 +241,7 @@ const PromotionModal = ({
                   fixedDecimalScale
                   placeholder="%"
                   suffix="%"
-                  onValueChange={(values) => { handleChange(null, { name: 'percentageOff', value: values.floatValue }); setDiscountsComplete(true); }}
+                  onValueChange={values => { handleChange(null, { name: 'percentageOff', value: values.floatValue }); setDiscountsComplete(true); }}
                   allowNegative={false}
                   value={promotionSelectedValues.percentageOff || undefined}
                   className="discount-percentage-input"
@@ -315,8 +315,8 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    profileFetch: (location) => dispatch(fetchProfile(location.pathname)),
-    promotionAdd: (promotionAddData) => dispatch(addPromotion(promotionAddData)),
+    profileFetch: location => dispatch(fetchProfile(location.pathname)),
+    promotionAdd: promotionAddData => dispatch(addPromotion(promotionAddData)),
   };
 }
 

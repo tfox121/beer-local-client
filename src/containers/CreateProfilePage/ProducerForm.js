@@ -71,7 +71,7 @@ const ProducerForm = ({
     setFormValues({ ...formValues, terms: !formValues.terms });
   };
 
-  const handleSuggestSelect = (suggestion) => {
+  const handleSuggestSelect = suggestion => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
@@ -136,7 +136,7 @@ const ProducerForm = ({
                 name="salesContactNumber"
                 type="tel"
                 value={formValues.salesContactNumber || ''}
-                onChange={(e) => setUnformattedTel(e.target.value)}
+                onChange={e => setUnformattedTel(e.target.value)}
                 error={
                   formErrors.salesContactNumber && {
                     content: formErrors.salesContactNumber,

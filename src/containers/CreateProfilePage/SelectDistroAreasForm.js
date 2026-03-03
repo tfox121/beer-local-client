@@ -29,7 +29,7 @@ const SelectDistroAreasForm = ({
 
   let editableFG = null;
 
-  const onFeatureGroupReady = (reactFGref) => {
+  const onFeatureGroupReady = reactFGref => {
     if (reactFGref) {
       editableFG = reactFGref;
     }
@@ -51,7 +51,7 @@ const SelectDistroAreasForm = ({
     onChange();
   };
 
-  const onCreated = (e) => {
+  const onCreated = e => {
     const type = e.layerType;
 
     onChange();
@@ -81,7 +81,7 @@ const SelectDistroAreasForm = ({
               />
               <MapMarker location={formValues.location} />
               <FeatureGroup
-                ref={(reactFGref) => {
+                ref={reactFGref => {
                   onFeatureGroupReady(reactFGref);
                 }}
               >

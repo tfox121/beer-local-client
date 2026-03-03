@@ -185,7 +185,7 @@ const mapStateToProps = createStructuredSelector({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    pushRoute: (path) => dispatch(push(path)),
+    pushRoute: path => dispatch(push(path)),
   };
 }
 

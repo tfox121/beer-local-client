@@ -31,7 +31,7 @@ const MetadataModal = ({ cell, updateMyData }) => {
     min: 0.5,
     max: 3,
     step: 0.05,
-    onChange: (value) => {
+    onChange: value => {
       setZoom(value);
     },
   };
@@ -119,7 +119,7 @@ const MetadataModal = ({ cell, updateMyData }) => {
                   size="small"
                   bordered
                   centered
-                  onError={(e) => {
+                  onError={e => {
                     e.target.src = '/images/products/blank-product.png';
                   }}
                 />
@@ -130,7 +130,7 @@ const MetadataModal = ({ cell, updateMyData }) => {
                   type="file"
                   accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
                   hidden
-                  onChange={(e) => {
+                  onChange={e => {
                     const file = e.target.files?.[0];
                     setProductImage(file || undefined);
                   }}

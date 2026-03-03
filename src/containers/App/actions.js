@@ -24,27 +24,27 @@ export const fetchUser = () => ({
   type: FETCH_USER,
 });
 
-export const userFetched = (user) => ({
+export const userFetched = user => ({
   type: FETCH_USER_SUCCESS,
   user,
 });
 
-export const userFetchError = (error) => ({
+export const userFetchError = error => ({
   type: FETCH_USER_ERROR,
   error,
 });
 
-export const saveUser = (profileData) => ({
+export const saveUser = profileData => ({
   type: SAVE_USER,
   profileData,
 });
 
-export const userSaved = (profile) => ({
+export const userSaved = profile => ({
   type: SAVE_USER_SUCCESS,
   profile,
 });
 
-export const userSaveError = (error) => ({
+export const userSaveError = error => ({
   type: SAVE_USER_ERROR,
   error,
 });
@@ -59,17 +59,17 @@ export const updateUser = (updateObj, pathname) => ({
   pathname,
 });
 
-export const userUpdated = (user) => ({
+export const userUpdated = user => ({
   type: UPDATE_USER_SUCCESS,
   user,
 });
 
-export const userUpdateError = (error) => ({
+export const userUpdateError = error => ({
   type: UPDATE_USER_ERROR,
   error,
 });
 
-export const followProducer = (producerSub) => ({
+export const followProducer = producerSub => ({
   type: FOLLOW_PRODUCER,
   producerSub,
 });
@@ -79,7 +79,7 @@ export const producerFollowed = ({ followedProducers }) => ({
   followedProducers,
 });
 
-export const producerFollowError = (error) => ({
+export const producerFollowError = error => ({
   type: FOLLOW_PRODUCER_ERROR,
   error,
 });

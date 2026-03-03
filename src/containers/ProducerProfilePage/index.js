@@ -103,7 +103,7 @@ export function ProducerProfilePage({
 
   useEffect(() => {
     if (followedProducers && sub) {
-      const followedProducerList = followedProducers.map((producer) => producer.sub);
+      const followedProducerList = followedProducers.map(producer => producer.sub);
       if (followedProducerList.includes(sub)) {
         setProducerFollowed(true);
       }
@@ -129,14 +129,14 @@ export function ProducerProfilePage({
     producerFollow(producerProfile.sub);
   };
 
-  const handleDeletePromo = async (id) => {
+  const handleDeletePromo = async id => {
     // const privateRoute = await getPrivateRoute();
     // const response = await privateRoute.delete(`/producer/promotion/${id}`);
     // console.log(response);
     promotionDelete(id);
   };
 
-  const blogRender = (blogArray, page) => blogArray.filter((blogPost) => blogPost.display === true || (user && user.businessId === businessId)).map((blogPost, index) => {
+  const blogRender = (blogArray, page) => blogArray.filter(blogPost => blogPost.display === true || (user && user.businessId === businessId)).map((blogPost, index) => {
     if (index < (page * BLOG_ITEMS_PER_PAGE) - BLOG_ITEMS_PER_PAGE || index >= page * BLOG_ITEMS_PER_PAGE) {
       return null;
     }
@@ -162,7 +162,7 @@ export function ProducerProfilePage({
                   className="banner-image"
                   src={bannerSource || '/images/banners/blank-banner.png'}
                   centered
-                  onError={(e) => {
+                  onError={e => {
                     e.target.src = '/images/banners/blank-banner.png';
                   }}
                 />
@@ -180,7 +180,7 @@ export function ProducerProfilePage({
                     bordered
                     centered
                     circular
-                    onError={(e) => {
+                    onError={e => {
                       e.target.src = '/images/avatars/blank-avatar.webp';
                     }}
                   />
@@ -193,7 +193,7 @@ export function ProducerProfilePage({
                     </Modal>
                   )}
                   {(user && user.role === 'retailer') && (
-                    <Button loading={producerFollowing} positive={followedProducers.map((producer) => producer.sub).includes(sub)} icon={followedProducers.map((producer) => producer.sub).includes(sub) ? 'check' : 'plus'} content={producerFollowed ? 'Following' : 'Follow'} onClick={handleFollowClick} />
+                    <Button loading={producerFollowing} positive={followedProducers.map(producer => producer.sub).includes(sub)} icon={followedProducers.map(producer => producer.sub).includes(sub) ? 'check' : 'plus'} content={producerFollowed ? 'Following' : 'Follow'} onClick={handleFollowClick} />
                   )}
                 </Grid.Column>
               </Grid.Row>
@@ -267,7 +267,7 @@ export function ProducerProfilePage({
                       onPageChange={(e, { activePage }) => setBlogPage(activePage)}
                       totalPages={
                         blog
-                          ? Math.ceil(blog.filter((blogPost) => blogPost.display === true || (user && user.businessId === businessId)).length / BLOG_ITEMS_PER_PAGE)
+                          ? Math.ceil(blog.filter(blogPost => blogPost.display === true || (user && user.businessId === businessId)).length / BLOG_ITEMS_PER_PAGE)
                           : 0
                       }
                     />
@@ -287,19 +287,17 @@ export function ProducerProfilePage({
               <Grid.Column width={8} textAlign="right">
                 {(user && user.businessId === businessId)
                 && (
-                  <>
-                    <PromotionModal />
-                  </>
+                  <PromotionModal />
                 )}
               </Grid.Column>
             </Grid>
             <Segment>
               {(producerProfile.promotions && producerProfile.promotions.length) ? (
                 <Item.Group divided>
-                  {producerProfile.promotions.map((promotion) => {
+                  {producerProfile.promotions.map(promotion => {
                     const promotionCopy = promotionCopySelection(promotion, producerProfile.stock
-                      .filter((stockItem) => stockItem.display === 'Show')
-                      .map((stockItem) => ({
+                      .filter(stockItem => stockItem.display === 'Show')
+                      .map(stockItem => ({
                         key: stockItem.id, value: stockItem.id, text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]}`,
                       })));
                     if (!promotionCopy) {
@@ -392,8 +390,8 @@ function mapDispatchToProps(dispatch, { location }) {
   return {
     profileFetch: () => dispatch(fetchProfile(location.pathname)),
     profileClear: () => dispatch(clearProfile()),
-    producerFollow: (producerSub) => dispatch(followProducer(producerSub)),
-    promotionDelete: (promotionId) => dispatch(deletePromotion(promotionId)),
+    producerFollow: producerSub => dispatch(followProducer(producerSub)),
+    promotionDelete: promotionId => dispatch(deletePromotion(promotionId)),
   };
 }
 

@@ -5,14 +5,14 @@ import { initialState } from './reducer';
  * Direct selector to the ProducerListPage state domain
  */
 
-const selectProducerListPageDomain = (state) => state.ProducerListPage || initialState;
+const selectProducerListPageDomain = state => state.ProducerListPage || initialState;
 
 /**
  * Other specific selectors
  */
 const makeSelectProducerList = () => createSelector(
   selectProducerListPageDomain,
-  (substate) => substate.producers,
+  substate => substate.producers,
 );
 
 /**
@@ -21,7 +21,7 @@ const makeSelectProducerList = () => createSelector(
 
 const makeSelectProducerListPage = () => createSelector(
   selectProducerListPageDomain,
-  (substate) => substate,
+  substate => substate,
 );
 
 export default makeSelectProducerListPage;

@@ -69,7 +69,7 @@ function Notification({ notification }) {
     // This prevents flickering when notification is being updated
     if (notification && notification.type && notification._id) {
       // Only update if it's actually different to prevent unnecessary re-renders
-      setNotificationObj((prev) => {
+      setNotificationObj(prev => {
         if (prev._id !== notification._id || prev.type !== notification.type) {
           return { ...notification };
         }
@@ -186,7 +186,7 @@ const mapStateToProps = createStructuredSelector({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    pushRoute: (path) => dispatch(push(path)),
+    pushRoute: path => dispatch(push(path)),
   };
 }
 

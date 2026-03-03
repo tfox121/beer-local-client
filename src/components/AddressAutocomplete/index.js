@@ -50,7 +50,7 @@ const AddressAutocomplete = forwardRef(({
     setQuery(initialValue);
   }, [initialValue]);
 
-  const searchNominatim = async (searchQuery) => {
+  const searchNominatim = async searchQuery => {
     if (!searchQuery || searchQuery.length < minlength) {
       setSuggestions([]);
       setShowSuggestions(false);
@@ -107,7 +107,7 @@ const AddressAutocomplete = forwardRef(({
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { value } = e.target;
     setQuery(value);
     setSelectedIndex(-1);
@@ -122,7 +122,7 @@ const AddressAutocomplete = forwardRef(({
     }, 300);
   };
 
-  const handleSelectSuggestion = (suggestion) => {
+  const handleSelectSuggestion = suggestion => {
     setQuery(suggestion.label);
     setShowSuggestions(false);
     setSuggestions([]);
@@ -133,7 +133,7 @@ const AddressAutocomplete = forwardRef(({
     }
   };
 
-  const handleInputBlur = (e) => {
+  const handleInputBlur = e => {
     // Delay to allow click on suggestion
     setTimeout(() => {
       setShowSuggestions(false);
@@ -149,15 +149,15 @@ const AddressAutocomplete = forwardRef(({
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = e => {
     if (!showSuggestions || suggestions.length === 0) return;
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev));
+      setSelectedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0) {
@@ -214,7 +214,7 @@ const AddressAutocomplete = forwardRef(({
                 key={suggestionId}
                 className={`geosuggest__item ${index === selectedIndex ? 'geosuggest__item--active' : ''}`}
                 onClick={() => handleSelectSuggestion(suggestion)}
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     handleSelectSuggestion(suggestion);

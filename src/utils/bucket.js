@@ -12,7 +12,7 @@ export const getPresignedRoute = async (type, productId) => {
 export const imageToBucket = async (presignedRoute, imageDataURI) => {
   const formData = new FormData();
 
-  Object.keys(presignedRoute.fields).forEach((formKey) => {
+  Object.keys(presignedRoute.fields).forEach(formKey => {
     formData.set(formKey, presignedRoute.fields[formKey]);
   });
   formData.set('file', dataURItoBlob(imageDataURI));

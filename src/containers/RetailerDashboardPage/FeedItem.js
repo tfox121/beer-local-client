@@ -28,7 +28,7 @@ const FeedItem = ({
     setFollowButtonClicked(true);
   };
 
-  const multiNewItemRender = (itemGroup) => {
+  const multiNewItemRender = itemGroup => {
     const vowelRegex = '^[aieouAIEOU].*';
     if (itemGroup.producerItems.length === 1) {
       return (
@@ -119,7 +119,7 @@ const FeedItem = ({
     );
   };
 
-  const newBlogRender = (item) => (
+  const newBlogRender = item => (
     <Feed.Event key={item._id}>
       <Feed.Label>
         <img src={item.avatarSource || '/images/avatars/blank-avatar.webp'} alt="producer avatar" />
@@ -146,7 +146,7 @@ const FeedItem = ({
     </Feed.Event>
   );
 
-  const newProducerRender = (producer) => (
+  const newProducerRender = producer => (
     <Feed.Event key={producer.businessId}>
       <Feed.Label>
         <img src="/images/site-logo.png" alt="producer avatar" />
@@ -183,18 +183,18 @@ const FeedItem = ({
                 size="mini"
                 loading={followButtonClicked}
                 positive={userProfile.followedProducers
-                  .map((followedProducer) => followedProducer.sub)
+                  .map(followedProducer => followedProducer.sub)
                   .includes(producer.sub)}
                 icon={
                   userProfile.followedProducers
-                    .map((followedProducer) => followedProducer.sub)
+                    .map(followedProducer => followedProducer.sub)
                     .includes(producer.sub)
                     ? 'check'
                     : 'plus'
                 }
                 content={
                   userProfile.followedProducers
-                    .map((followedProducer) => followedProducer.sub)
+                    .map(followedProducer => followedProducer.sub)
                     .includes(producer.sub)
                     ? 'Following'
                     : 'Follow'

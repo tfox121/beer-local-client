@@ -25,7 +25,7 @@ const TableRows = ({
   data, rows, prepareRow, storedCategory, index, categories, handleCategoryChange, handleRemoveCategory, producerProfile, user, activeIndex, handleRowClick,
 }) => {
   const [category, setCategory] = useState(storedCategory);
-  const onSelectChange = (selectedOption) => {
+  const onSelectChange = selectedOption => {
     setCategory(selectedOption.value);
     handleCategoryChange(index, selectedOption.value);
   };
@@ -56,11 +56,9 @@ const TableRows = ({
             </>
           )
           : (
-            <>
-              <Table.Cell colSpan={user.role === 'producer' ? 2 : 3} textAlign="left">
-                <Header textAlign="left">{category || 'All'}</Header>
-              </Table.Cell>
-            </>
+            <Table.Cell colSpan={user.role === 'producer' ? 2 : 3} textAlign="left">
+              <Header textAlign="left">{category || 'All'}</Header>
+            </Table.Cell>
           )}
       </Table.Row>
       {rows.map(
@@ -153,7 +151,7 @@ const EditableCell = ({
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
 
-  const onChange = (e) => {
+  const onChange = e => {
     setValue(e.target.value);
   };
 
@@ -228,7 +226,7 @@ const AvailibilityTable = ({
   const isInitialMount = useRef(true);
   const [activeIndex, setActiveIndex] = useState(null);
 
-  const handleRowClick = (rowIndex) => {
+  const handleRowClick = rowIndex => {
     if (rowIndex === activeIndex) {
       setActiveIndex(null);
       return;
@@ -237,12 +235,12 @@ const AvailibilityTable = ({
   };
 
   const handleAddCategory = () => {
-    if (stockCategories.length < [...new Set(data.map((stockItem) => stockItem.category))].length) {
+    if (stockCategories.length < [...new Set(data.map(stockItem => stockItem.category))].length) {
       setStockCategories([...stockCategories, '']);
     }
   };
 
-  const handleRemoveCategory = (index) => {
+  const handleRemoveCategory = index => {
     const newCats = [...stockCategories];
     newCats.splice(index, 1);
     setStockCategories([...newCats]);
@@ -263,7 +261,7 @@ const AvailibilityTable = ({
   }, [stockCategories, profileOptionsUpdate]);
 
   useEffect(() => {
-    setCategories([...new Set(data.map((stockItem) => stockItem.category))].filter((category) => !!category && !stockCategories.includes(category)).map((category) => ({ value: category, label: category })));
+    setCategories([...new Set(data.map(stockItem => stockItem.category))].filter(category => !!category && !stockCategories.includes(category)).map(category => ({ value: category, label: category })));
   }, [data, stockCategories]);
 
   const handleModalOpen = () => {
@@ -291,7 +289,7 @@ const AvailibilityTable = ({
       )}
       <Table {...getTableProps()} unstackable>
         <Table.Header>
-          {headerGroups.map((headerGroup) => (
+          {headerGroups.map(headerGroup => (
             <Table.Row {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column, index) => {
                 if (column.Header === 'Order #' && ((user && user.role !== 'retailer') || !user)) {
@@ -391,15 +389,15 @@ AvailibilityTable.propTypes = {
 const AvailabilityMobile = ({
   data, producerProfile, profileOptionsUpdate, user, orderSend, orderSending,
 }) => {
-  const [orderItems, setOrderItems] = useState([...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })));
+  const [orderItems, setOrderItems] = useState([...data].map(stockItem => ({ ...stockItem, orderQuant: 0 })));
 
   const handleSubmit = async () => {
-    const order = orderItems.filter((stockItem) => stockItem.orderQuant);
+    const order = orderItems.filter(stockItem => stockItem.orderQuant);
     orderSend({ orderItems: order, producerSub: producerProfile.sub });
   };
 
   useEffect(() => {
-    setOrderItems([...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })));
+    setOrderItems([...data].map(stockItem => ({ ...stockItem, orderQuant: 0 })));
   }, [data]);
 
   const columns = React.useMemo(
@@ -412,7 +410,7 @@ const AvailabilityMobile = ({
       {
         Header: 'List Price',
         accessor: 'price',
-        Cell: (properties) => (
+        Cell: properties => (
           <NumberFormat
             displayType="text"
             thousandSeparator
@@ -437,7 +435,7 @@ const AvailabilityMobile = ({
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
     skipResetRef.current = true;
-    setOrderItems((old) => old.map((row, index) => {
+    setOrderItems(old => old.map((row, index) => {
       if (index === rowIndex) {
         const newRow = {
           ...row,
@@ -492,8 +490,8 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    profileOptionsUpdate: (updateObj) => dispatch(updateProfileOptions(updateObj)),
-    orderSend: (orderInfo) => dispatch(sendOrder(orderInfo)),
+    profileOptionsUpdate: updateObj => dispatch(updateProfileOptions(updateObj)),
+    orderSend: orderInfo => dispatch(sendOrder(orderInfo)),
 
   };
 }

@@ -108,10 +108,10 @@ export function CreateProfilePage({ userSave, savingUser }) {
 
   useEffect(() => {
     if (localStorage.businessName) {
-      setFormValues((prevFormValues) => ({ ...prevFormValues, businessName: localStorage.businessName }));
+      setFormValues(prevFormValues => ({ ...prevFormValues, businessName: localStorage.businessName }));
     }
     if (localStorage.businessType) {
-      setFormValues((prevFormValues) => ({ ...prevFormValues, type: localStorage.businessType }));
+      setFormValues(prevFormValues => ({ ...prevFormValues, type: localStorage.businessType }));
       setProfileStage(1);
     }
   }, [localStorage]);
@@ -275,7 +275,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    userSave: (profileData) => dispatch(saveUser(profileData)),
+    userSave: profileData => dispatch(saveUser(profileData)),
   };
 }
 

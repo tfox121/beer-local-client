@@ -60,17 +60,17 @@ const ProducerDashboardPage = ({
     let orderCount = 0;
     let itemCount = 0;
 
-    ordersArr.forEach((order) => {
+    ordersArr.forEach(order => {
       if (previous && order.status === status && moment(order.createdAt).isBetween(moment().subtract(2, period), moment().subtract(1, period))) {
         total += calcOrderTotal(order.items);
         orderCount += 1;
-        order.items.forEach((orderItem) => {
+        order.items.forEach(orderItem => {
           itemCount += orderItem.orderQuant;
         });
       } else if (!previous && order.status === status && moment(order.createdAt).isAfter(moment().subtract(1, period))) {
         total += calcOrderTotal(order.items);
         orderCount += 1;
-        order.items.forEach((orderItem) => {
+        order.items.forEach(orderItem => {
           itemCount += orderItem.orderQuant;
         });
       }
@@ -107,7 +107,7 @@ const ProducerDashboardPage = ({
       const itemList = ordersArr.reduce((items, order) => {
         const itemsObj = items;
         if (order.status === status && moment(order.createdAt).isAfter(moment().subtract(1, period))) {
-          order.items.forEach((item) => {
+          order.items.forEach(item => {
             if (!itemsObj[item.id]) {
               itemsObj[item.id] = {
                 id: item.id,
@@ -321,7 +321,7 @@ const ProducerDashboardPage = ({
               Top Customers
             </Header>
             <Grid columns={2}>
-              {topCustomers.length ? topCustomers.map((customer) => (
+              {topCustomers.length ? topCustomers.map(customer => (
                 <Grid.Row key={customer.businessId}>
                   <Grid.Column width={12}>
                     <Image style={{ marginRight: '0.5em' }} avatar bordered centered src={customer.avatarSource || '/images/avatars/blank-avatar.webp'} alt="user avatar" />
@@ -350,7 +350,7 @@ const ProducerDashboardPage = ({
               Top Items
             </Header>
             <Grid columns={2} verticalAlign="middle">
-              {topItems.length ? topItems.map((item) => (
+              {topItems.length ? topItems.map(item => (
                 <Grid.Row key={item.id}>
                   <Grid.Column width={8}>
                     <Image style={{ marginRight: '0.5em' }} avatar bordered centered src={item.imageSource || '/images/products/blank-product.png'} alt="product" />
@@ -394,10 +394,10 @@ const ProducerDashboardPage = ({
                 distributionAreas={userProfile.distributionAreas}
               />
               <MapMarker location={userProfile.location} />
-              {topCustomers.map((customer) => (
+              {topCustomers.map(customer => (
                 <MapMarker key={customer.businessName} type="customer" location={customer.location} name={customer.businessName} />
               ))}
-              {dashBoardRetailers.filter((customer) => !topCustomers.map((customerObj) => customerObj.businessName).includes(customer.businessName)).map((customer) => (
+              {dashBoardRetailers.filter(customer => !topCustomers.map(customerObj => customerObj.businessName).includes(customer.businessName)).map(customer => (
                 <MapMarker key={customer.businessName} type="not-customer" location={customer.location} name={customer.businessName} />
               ))}
             </Map>

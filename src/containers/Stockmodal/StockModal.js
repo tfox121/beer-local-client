@@ -91,7 +91,7 @@ export function StockModal({
     if (!originalStockData) return false;
 
     // Normalize data for comparison (remove _id and other transient fields)
-    const normalizeStockItem = (item) => {
+    const normalizeStockItem = item => {
       const normalized = { ...item };
       delete normalized._id;
       // Convert numeric fields to numbers for comparison
@@ -113,7 +113,7 @@ export function StockModal({
       const current = normalizedCurrent[i];
       // Compare all keys
       const allKeys = new Set([...Object.keys(original), ...Object.keys(current)]);
-      return Array.from(allKeys).some((key) => original[key] !== current[key]);
+      return Array.from(allKeys).some(key => original[key] !== current[key]);
     });
   };
 
@@ -123,7 +123,7 @@ export function StockModal({
       return;
     }
     let tempArr = [...stockData];
-    rows.forEach((row) => {
+    rows.forEach(row => {
       tempArr = arrayMove(tempArr, Number(row), Number(row) - 1);
     });
     // const newSelected = rows.reduce((obj, val) => { obj[Number(val) - 1] = true; return obj; }, {});
@@ -136,7 +136,7 @@ export function StockModal({
       return;
     }
     let tempArr = [...stockData];
-    rows.reverse().forEach((row) => {
+    rows.reverse().forEach(row => {
       tempArr = arrayMove(tempArr, Number(row), Number(row) + 1);
     });
     setStockData(tempArr);
@@ -162,7 +162,7 @@ export function StockModal({
   const copyStockItems = async () => {
     const rows = Object.keys(selected);
     const filteredData = stockData.filter((row, index) => rows.includes(index.toString()));
-    const duplicateRows = filteredData.map((row) => {
+    const duplicateRows = filteredData.map(row => {
       const newRow = {
         ...row,
         id: shortid.generate(),
@@ -176,7 +176,7 @@ export function StockModal({
   const handleStockSave = async () => {
     let complete = true;
 
-    stockData.forEach((stockItem) => {
+    stockData.forEach(stockItem => {
       const {
         name, abv, packSize, price,
       } = stockItem;
@@ -320,7 +320,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    stockUpdate: (stockData) => dispatch(updateStock(stockData)),
+    stockUpdate: stockData => dispatch(updateStock(stockData)),
   };
 }
 

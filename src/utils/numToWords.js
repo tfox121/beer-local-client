@@ -13,7 +13,7 @@ const dg = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh
 const tn = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 const tw = ['twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
-const numToWords = (number) => {
+const numToWords = number => {
   let s = number;
   s = s.toString();
   s = s.replace(/[, ]/g, '');

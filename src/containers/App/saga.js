@@ -59,7 +59,7 @@ function* saveUser({ profileData }) {
     const privateRoute = yield call(getPrivateRoute);
 
 
-    const saveUserData = (formValues) => privateRoute.post(
+    const saveUserData = formValues => privateRoute.post(
       '/user', formValues,
     );
 

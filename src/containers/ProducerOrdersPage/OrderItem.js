@@ -41,8 +41,8 @@ const OrderItem = ({
   const handleChangesConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
     const itemsApproved = order.items
-      .filter((orderItem) => orderItem.orderChange !== 'delete')
-      .map((orderItem) => ({ ...orderItem, orderChange: '' }));
+      .filter(orderItem => orderItem.orderChange !== 'delete')
+      .map(orderItem => ({ ...orderItem, orderChange: '' }));
     const pendingOrder = { _id: orderData._id, status: 'Pending', items: itemsApproved };
 
     orderEdit(pendingOrder);
@@ -101,7 +101,7 @@ const OrderItem = ({
               src={ordersInfo.businesses[index]?.avatarSource || '/images/avatars/blank-avatar.webp'}
               alt={`${ordersInfo.businesses[index]?.businessName || 'Business'} avatar`}
               avatar
-              onError={(e) => {
+              onError={e => {
                 e.target.src = '/images/avatars/blank-avatar.webp';
               }}
             />
@@ -208,13 +208,11 @@ const OrderItem = ({
         </Table.Row>
       )}
       content={(
-        <>
-          <OrderModalContent
-            orderItems={order.items}
-            businessName={ordersInfo.businesses[index].businessName}
-            type="orderInfo"
-          />
-        </>
+        <OrderModalContent
+          orderItems={order.items}
+          businessName={ordersInfo.businesses[index].businessName}
+          type="orderInfo"
+        />
       )}
       basic
       wide="very"

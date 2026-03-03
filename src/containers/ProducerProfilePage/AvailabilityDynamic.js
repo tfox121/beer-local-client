@@ -30,7 +30,7 @@ const EditableCell = ({
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
 
-  const onChange = (e) => {
+  const onChange = e => {
     setValue(e.target.value);
   };
 
@@ -111,9 +111,9 @@ const AvailibilityTable = ({
   return (
     <Table {...getTableProps()}>
       <Table.Header>
-        {headerGroups.map((headerGroup) => (
+        {headerGroups.map(headerGroup => (
           <Table.Row {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
+            {headerGroup.headers.map(column => (
               // Add the sorting props to control sorting. For this example
               // we can add them into the header props
               <Table.HeaderCell {...column.getHeaderProps(column.getSortByToggleProps())}>
@@ -133,12 +133,12 @@ const AvailibilityTable = ({
       </Table.Header>
       <Table.Body {...getTableBodyProps()}>
         {rows.map(
-          (row) => {
+          row => {
             if (row.original.display === 'Show') {
               prepareRow(row);
               return (
                 <Table.Row {...row.getRowProps()}>
-                  {row.cells.map((cell) => (
+                  {row.cells.map(cell => (
                     <Table.Cell {...cell.getCellProps()}>
                       {cell.column.id === 'orderQuant'
                         ? cell.render('Cell', { editable: true })
@@ -189,10 +189,10 @@ AvailibilityTable.propTypes = {
 const AvailabilityDynamic = ({
   data, producerProfile, orderSend, orderSending,
 }) => {
-  const [orderItems, setOrderItems] = useState([...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })));
+  const [orderItems, setOrderItems] = useState([...data].map(stockItem => ({ ...stockItem, orderQuant: 0 })));
 
   const handleSubmit = async () => {
-    const order = orderItems.filter((stockItem) => stockItem.orderQuant);
+    const order = orderItems.filter(stockItem => stockItem.orderQuant);
     orderSend({ orderItems: order, producerSub: producerProfile.sub });
     // const privateRoute = await getPrivateRoute();
     // try {
@@ -209,7 +209,7 @@ const AvailabilityDynamic = ({
   };
 
   useEffect(() => {
-    setOrderItems([...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })));
+    setOrderItems([...data].map(stockItem => ({ ...stockItem, orderQuant: 0 })));
   }, [data]);
 
   const columns = React.useMemo(
@@ -226,7 +226,7 @@ const AvailabilityDynamic = ({
       {
         Header: 'ABV',
         accessor: 'abv',
-        Cell: (properties) => (
+        Cell: properties => (
           <NumberFormat
             displayType="text"
             decimalScale={1}
@@ -239,7 +239,7 @@ const AvailabilityDynamic = ({
       {
         Header: 'Pack Size',
         accessor: 'packSize',
-        Cell: (properties) => {
+        Cell: properties => {
           if (!properties.value) {
             return '';
           }
@@ -249,7 +249,7 @@ const AvailabilityDynamic = ({
       {
         Header: 'List Price',
         accessor: 'price',
-        Cell: (properties) => (
+        Cell: properties => (
           <NumberFormat
             displayType="text"
             thousandSeparator
@@ -278,7 +278,7 @@ const AvailabilityDynamic = ({
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
     skipResetRef.current = true;
-    setOrderItems((old) => old.map((row, index) => {
+    setOrderItems(old => old.map((row, index) => {
       if (index === rowIndex) {
         const newRow = {
           ...row,
@@ -328,7 +328,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    orderSend: (orderObj) => dispatch(sendOrder(orderObj)),
+    orderSend: orderObj => dispatch(sendOrder(orderObj)),
   };
 }
 
