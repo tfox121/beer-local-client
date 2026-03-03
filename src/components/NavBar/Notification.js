@@ -23,6 +23,44 @@ import { makeSelectUser } from './selectors';
 import { NOTIFICATION_TYPES } from '../../utils/constants';
 import timeAgo from '../../utils/timeAgo';
 
+const NotificationLinkStyled = styled(Link)`
+  &&& {
+    color: ${({ $isRead }) => ($isRead ? 'black' : '')};
+  }
+`;
+
+const NotificationDropdownStyled = styled(Dropdown.Item)`
+  &&& {
+    background-color: ${({ $isRead }) => ($isRead ? '' : '#edf2fa !important')};
+    border-bottom: 1px solid #d9d9d9;
+
+    div.ui.grid {
+      div.two.wide.column {
+        padding-left: 0.5em;
+        padding-right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      div.fourteen.wide.column {
+        padding-left: 0.5em;
+
+        .notification-text-content {
+          white-space: normal;
+          min-width: 300px;
+          padding-right: 15px
+        }
+      }
+    }
+  }
+`;
+
+const NotificationTimeStyled = styled.div`
+  font-size: 10px;
+  margin-top: 0.5em;
+`;
+
 function Notification({ notification }) {
   const [notificationObj, setNotificationObj] = useState(notification || {});
 
@@ -95,45 +133,6 @@ function Notification({ notification }) {
     return message;
   };
 
-  const NotificationLinkStyled = styled(Link)`
-  &&& {
-    color: ${() => notification.read ? 'black' : ''};
-  }
-  `;
-
-  const NotificationDropdownStyled = styled(Dropdown.Item)`
-    &&& {
-      background-color: ${() => notification.read ? '' : '#edf2fa !important'};
-      border-bottom: 1px solid #d9d9d9;
-
-      div.ui.grid {
-
-        div.two.wide.column {
-          padding-left: 0.5em;
-          padding-right: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        div.fourteen.wide.column {
-          padding-left: 0.5em;
-
-          .notification-text-content {
-            white-space: normal;
-            min-width: 300px;
-            padding-right: 15px
-          }
-        }
-      }
-    }
-  `;
-
-  const NotificationTimeStyled = styled.div`
-    font-size: 10px;
-    margin-top: 0.5em;
-  `;
-
   // Don't render if we don't have the required notification data
   if (!notificationObj.type || !notificationObj._id) {
     return null;
@@ -145,8 +144,8 @@ function Notification({ notification }) {
   }
 
   return (
-    <NotificationLinkStyled onClick={handleClick} to={`/order/${notificationObj.resourceId}`}>
-      <NotificationDropdownStyled>
+    <NotificationLinkStyled onClick={handleClick} to={`/order/${notificationObj.resourceId}`} $isRead={notificationObj.read}>
+      <NotificationDropdownStyled $isRead={notificationObj.read}>
         <Grid width={16}>
           <Grid.Column width={2}>
             <Image src={notificationObj.image || '/images/avatars/blank-avatar.webp'} alt="user avatar" avatar />

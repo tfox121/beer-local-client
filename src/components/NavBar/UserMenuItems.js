@@ -11,6 +11,36 @@ import messages from './messages';
 import Notification from './Notification';
 import { getPrivateRoute } from '../../utils/api';
 
+const NotificationCircle = styled.div`
+  position: absolute;
+  display: flex;
+  right: 10px;
+  bottom: 8.5px;
+  background-color: red;
+  height: 12px;
+  width: 12px;
+  font-size: 10px;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+`;
+
+const StyledDropdownMenu = styled(Dropdown.Menu)`
+  &&& {
+    @media only screen and (max-width: 425px) {
+      left: 0;
+      right: 0;
+      top: 50px;
+      position: fixed;
+
+      .item {
+        white-space: normal;
+      }
+    }
+  }
+`;
+
 export default function UserMenuItems({ avatarSource, notifications, businessName }) {
   const {
     user, isAuthenticated, loginWithRedirect, logout,
@@ -40,36 +70,6 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
       setNotificationsArr([...response.data.notifications]);
     }
   };
-
-  const NotificationCircle = styled.div`
-    position: absolute;
-    display: flex;
-    right: 10px;
-    bottom: 8.5px;
-    background-color: red;
-    height: 12px;
-    width: 12px;
-    font-size: 10px;
-    color: white;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-  `;
-
-  const StyledDropdownMenu = styled(Dropdown.Menu)`
-    &&& {
-      @media only screen and (max-width: 425px) {
-        left: 0;
-        right: 0;
-        top: 50px;
-        position: fixed;
-
-        .item {
-          white-space: normal;
-        }
-      }
-    }
-  `;
 
   if (isAuthenticated) {
     // eslint-disable-next-line no-unused-expressions
