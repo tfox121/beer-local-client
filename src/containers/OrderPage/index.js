@@ -69,16 +69,27 @@ const OrderPage = ({
     // orderInfo is the order object itself (from selector), or it might have order/business structure
     const order = orderInfo?.order || orderInfo;
     const currentOrderId = order?._id;
+    if (!order || !order.items || !currentOrderId) return;
 
-    // Only update if order ID changed or order is newly loaded
-    if (order && order.items && currentOrderId && currentOrderId !== orderIdRef.current) {
+    // On first load or when navigating to a different order, hydrate all local state.
+    if (currentOrderId !== orderIdRef.current) {
       setOrderData({ ...order });
       setOrderItems([...order.items]);
       orderIdRef.current = currentOrderId;
       notificationClearedRef.current = false; // Reset notification flag for new order
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderInfo?.order?._id || orderInfo?._id, orderInfo?.order?.items?.length || orderInfo?.items?.length]);
+
+    // Same order ID but fresh server data (for example, new messages): keep local order metadata in sync.
+    setOrderData((prevOrderData) => {
+      const prevMessageCount = prevOrderData?.messages?.length || 0;
+      const nextMessageCount = order?.messages?.length || 0;
+      if (prevMessageCount === nextMessageCount && prevOrderData?.status === order?.status) {
+        return prevOrderData;
+      }
+      return { ...order };
+    });
+  }, [orderInfo]);
 
   useEffect(() => {
     if (userProfile && userProfile.stock && orderItems.length) {
@@ -419,7 +430,7 @@ const OrderPage = ({
                 )}
               />
             )}
-          <MessageFeed messages={orderData.messages} user={userProfile} business={business} businessAvatar={orderInfo.image} />
+          <MessageFeed messages={order?.messages || orderData?.messages} user={userProfile} business={business} businessAvatar={orderInfo.image} />
           <MessageBoxStyle>
             <TextArea maxLength={ORDER_MESSAGE_CHARACTER_LIMIT} value={messageContent} onChange={(e) => setMessageContent(e.target.value)} placeholder={`Write your message to ${business.primaryContactName} at ${business.businessName}...`} />
             <Button attached="right" primary content="Send" onClick={handleMessageSend} loading={messageSending} />
