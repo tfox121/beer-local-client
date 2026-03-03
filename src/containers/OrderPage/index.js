@@ -54,8 +54,6 @@ const OrderPage = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, location.pathname]);
 
-  console.log('ORDER', orderInfo);
-
   const { role } = userProfile;
 
   const [editingOrder, setEditingOrder] = useState(false);
@@ -284,11 +282,8 @@ const OrderPage = ({
   const business = orderInfo?.business;
 
   if (!business || !orderItems || !Object.keys(orderData).length) {
-    console.log('Waiting for data:', { business: !!business, orderItems: !!orderItems, orderData: !!Object.keys(orderData).length });
     return null;
   }
-
-  console.log('ITEMS', orderItems);
 
   return (
     <>
