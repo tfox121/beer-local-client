@@ -7,10 +7,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Feed, Segment } from 'semantic-ui-react';
-
 import timeAgo from '../../utils/timeAgo';
 import MessageFeedStyle from './MessageFeedStyle';
-
+import { tr } from '../../utils/i18nRuntime';
 function MessageFeed({ messages, user, business, businessAvatar }) {
   if (!messages || !messages.length) {
     return null;
@@ -25,8 +24,8 @@ function MessageFeed({ messages, user, business, businessAvatar }) {
                 <img
                   alt={
                     message.author === user.sub
-                      ? `${user.businessName || 'User'} avatar`
-                      : `${business?.businessName || 'Business'} avatar`
+                      ? `${user.businessName || tr('components.messagefeed.index.user', 'User')} avatar`
+                      : `${business?.businessName || tr('components.messagefeed.index.business', 'Business')} avatar`
                   }
                   src={
                     message.author === user.sub
@@ -65,12 +64,10 @@ function MessageFeed({ messages, user, business, businessAvatar }) {
     </Segment>
   );
 }
-
 MessageFeed.propTypes = {
   messages: PropTypes.array,
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   business: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   businessAvatar: PropTypes.string,
 };
-
 export default MessageFeed;

@@ -4,15 +4,13 @@ import { Modal, Button, TextArea, Form, Image, Grid } from 'semantic-ui-react';
 import { Slider } from 'react-semantic-ui-range';
 import AvatarEditor from 'react-avatar-editor';
 import { useAuth0 } from '@auth0/auth0-react';
-
 import MetadataModalStyle from './MetadataModalStyle';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
 import { PRODUCT_DESCRIPTION_CHARACTER_LIMIT } from '../../utils/constants';
-
+import { tr } from '../../utils/i18nRuntime';
 const MetadataModal = ({ cell, updateMyData }) => {
   const { user } = useAuth0();
-
   const [itemMetadata, setItemMetadata] = useState({});
   const [productImage, setProductImage] = useState(undefined);
   const [productImageRoute, setProuctImageRoute] = useState({});
@@ -20,11 +18,9 @@ const MetadataModal = ({ cell, updateMyData }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [imageResizeModalOpen, setImageResizeModalOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
-
   const productImageRef = createRef();
   const editorRef = createRef();
   const productId = cell?.row?.original?.id;
-
   const sliderSettings = {
     start: 1,
     min: 0.5,
@@ -34,16 +30,16 @@ const MetadataModal = ({ cell, updateMyData }) => {
       setZoom(value);
     },
   };
-
   useEffect(() => {
     if (cell.row) {
-      setItemMetadata({ ...cell.row.original });
+      setItemMetadata({
+        ...cell.row.original,
+      });
     }
     return () => {
       setItemMetadata({});
     };
   }, [cell]);
-
   useEffect(() => {
     if (!productImage) {
       setImageResizeModalOpen(false);
@@ -51,7 +47,6 @@ const MetadataModal = ({ cell, updateMyData }) => {
       setImageResizeModalOpen(true);
     }
   }, [productImage]);
-
   useEffect(() => {
     if (productImageSaved && productId) {
       const setBannerRouteAsync = async () => {
@@ -63,11 +58,12 @@ const MetadataModal = ({ cell, updateMyData }) => {
       setProuctImageRoute({});
     };
   }, [productId, productImageSaved]);
-
   const handleChange = (e, { name, value }) => {
-    setItemMetadata({ ...itemMetadata, [name]: value });
+    setItemMetadata({
+      ...itemMetadata,
+      [name]: value,
+    });
   };
-
   const handleApply = () => {
     if (editorRef.current) {
       const canvasScaled = editorRef.current.getImageScaledToCanvas();
@@ -78,12 +74,10 @@ const MetadataModal = ({ cell, updateMyData }) => {
     }
     setImageResizeModalOpen(false);
   };
-
   const handleModalClose = () => {
     setProductImage(undefined);
     setImageResizeModalOpen(false);
   };
-
   const handleSave = async () => {
     let imageSource;
     if (productImageSaved) {
@@ -97,16 +91,14 @@ const MetadataModal = ({ cell, updateMyData }) => {
     }
     updateMyData(cell.row.index, 'imageSource', imageSource);
     updateMyData(cell.row.index, 'description', itemMetadata.description);
-
     setModalOpen(false);
   };
-
   return (
     <Modal
       open={modalOpen}
       trigger={
         <Button onClick={() => setModalOpen(true)} basic>
-          Edit
+          {tr('containers.stockmodal.metadatamodal.edit', 'Edit')}
         </Button>
       }
     >
@@ -152,12 +144,21 @@ const MetadataModal = ({ cell, updateMyData }) => {
               </div>
             </Grid.Column>
             <Grid.Column width={10}>
-              <Form style={{ height: '100%' }}>
+              <Form
+                style={{
+                  height: '100%',
+                }}
+              >
                 <TextArea
                   maxLength={PRODUCT_DESCRIPTION_CHARACTER_LIMIT}
-                  style={{ height: '100%' }}
+                  style={{
+                    height: '100%',
+                  }}
                   name='description'
-                  label='Description'
+                  label={tr(
+                    'containers.stockmodal.metadatamodal.description',
+                    'Description',
+                  )}
                   value={itemMetadata.description || ''}
                   onChange={handleChange}
                 />
@@ -191,11 +192,11 @@ const MetadataModal = ({ cell, updateMyData }) => {
               icon='left arrow'
               onClick={() => setImageResizeModalOpen(false)}
             />
-            Resize{' '}
+            {tr('containers.stockmodal.metadatamodal.resize', 'Resize')}{' '}
             <Button
               primary
               floated='right'
-              content='Apply'
+              content={tr('containers.stockmodal.metadatamodal.apply', 'Apply')}
               onClick={handleApply}
             />
           </Modal.Header>
@@ -214,16 +215,21 @@ const MetadataModal = ({ cell, updateMyData }) => {
         </Modal>
       </Modal.Content>
       <Modal.Actions>
-        <Button content='Cancel' onClick={() => setModalOpen(false)} />
-        <Button primary content='Apply' onClick={handleSave} />
+        <Button
+          content={tr('containers.stockmodal.metadatamodal.cancel', 'Cancel')}
+          onClick={() => setModalOpen(false)}
+        />
+        <Button
+          primary
+          content={tr('containers.stockmodal.metadatamodal.apply', 'Apply')}
+          onClick={handleSave}
+        />
       </Modal.Actions>
     </Modal>
   );
 };
-
 MetadataModal.propTypes = {
   cell: PropTypes.object,
   updateMyData: PropTypes.func,
 };
-
 export default MetadataModal;

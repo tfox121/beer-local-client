@@ -4,15 +4,13 @@ import { Image, Button, Modal } from 'semantic-ui-react';
 import { Slider } from 'react-semantic-ui-range';
 import AvatarEditor from 'react-avatar-editor';
 import ImageSelectStyle from './ImageSelectStyle';
-
+import { tr } from '../../utils/i18nRuntime';
 const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
   const [avatar, setAvatar] = useState({});
   const [zoom, setZoom] = useState(1);
   const [imageResizeModalOpen, setImageResizeModalOpen] = useState(false);
-
   const editorRef = createRef();
   const avatarRef = createRef();
-
   useEffect(() => {
     if (!avatar) {
       setImageResizeModalOpen(false);
@@ -20,7 +18,6 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
       setImageResizeModalOpen(true);
     }
   }, [avatar]);
-
   const sliderSettings = {
     start: 1,
     min: 0.5,
@@ -30,12 +27,10 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
       setZoom(value);
     },
   };
-
   const handleModalClose = () => {
     setAvatar({});
     setImageResizeModalOpen(false);
   };
-
   const handleApply = () => {
     if (editorRef.current) {
       const canvasScaled = editorRef.current.getImageScaledToCanvas();
@@ -46,10 +41,14 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
     }
     setImageResizeModalOpen(false);
   };
-
   return (
     <>
-      <strong>Profile Picture</strong>
+      <strong>
+        {tr(
+          'containers.createprofilepage.imageselect.profile.picture',
+          'Profile Picture',
+        )}
+      </strong>
       <ImageSelectStyle>
         <Image
           className='profile-image'
@@ -88,11 +87,17 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
             icon='left arrow'
             onClick={() => setImageResizeModalOpen(false)}
           />
-          Edit picture{' '}
+          {tr(
+            'containers.createprofilepage.imageselect.edit.picture',
+            'Edit picture',
+          )}{' '}
           <Button
             primary
             floated='right'
-            content='Apply'
+            content={tr(
+              'containers.createprofilepage.imageselect.apply',
+              'Apply',
+            )}
             onClick={handleApply}
           />
         </Modal.Header>
@@ -112,10 +117,8 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
     </>
   );
 };
-
 ImageSelect.propTypes = {
   avatarSaved: PropTypes.string,
   setAvatarSaved: PropTypes.func,
 };
-
 export default ImageSelect;

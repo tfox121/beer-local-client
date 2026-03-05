@@ -5,24 +5,22 @@ import { useTable, useSortBy } from 'react-table';
 import { Table, Input, Menu, Modal, Button } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
-
 import { useHistory } from 'react-router-dom';
 import { PACK_SIZES } from '../../utils/constants';
-
 import AvailabilityStyle from './AvailabilityStyle';
 import OrderModalContent from '../../components/OrderModalContent';
 import { useSendOrderMutation } from '../../queries/producerProfile';
-
+import { tr } from '../../utils/i18nRuntime';
 const EditableCell = ({
   value: initialValue,
   row: { index },
   column: { id },
-  updateMyData, // This is a custom function that we supplied to our table instance
+  updateMyData,
+  // This is a custom function that we supplied to our table instance
   editable,
 }) => {
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
-
   const onChange = (e) => {
     setValue(e.target.value);
   };
@@ -36,11 +34,9 @@ const EditableCell = ({
   React.useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
-
   if (!editable) {
     return `${initialValue}`;
   }
-
   return (
     <Input
       className='table-input'
@@ -54,7 +50,6 @@ const EditableCell = ({
     />
   );
 };
-
 EditableCell.propTypes = {
   value: PropTypes.node,
   row: PropTypes.object,
@@ -62,7 +57,6 @@ EditableCell.propTypes = {
   updateMyData: PropTypes.func,
   editable: PropTypes.bool,
 };
-
 const AvailibilityTable = ({
   columns,
   data,
@@ -79,7 +73,6 @@ const AvailibilityTable = ({
     }),
     [],
   );
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
       {
@@ -92,14 +85,11 @@ const AvailibilityTable = ({
       },
       useSortBy,
     );
-
   const [modalOpen, setModalOpen] = useState(false);
-
   const handleSendOrder = async () => {
     await handleSubmit();
     setModalOpen(false);
   };
-
   return (
     <Table {...getTableProps()}>
       <Table.Header>
@@ -130,7 +120,9 @@ const AvailibilityTable = ({
                 {row.cells.map((cell) => (
                   <Table.Cell {...cell.getCellProps()}>
                     {cell.column.id === 'orderQuant'
-                      ? cell.render('Cell', { editable: true })
+                      ? cell.render('Cell', {
+                          editable: true,
+                        })
                       : cell.render('Cell')}
                   </Table.Cell>
                 ))}
@@ -154,7 +146,12 @@ const AvailibilityTable = ({
                 }
                 open={modalOpen}
               >
-                <Modal.Header>Confirm Order</Modal.Header>
+                <Modal.Header>
+                  {tr(
+                    'containers.producerprofilepage.availabilitydynamic.confirm.order',
+                    'Confirm Order',
+                  )}
+                </Modal.Header>
                 <OrderModalContent
                   orderItems={data}
                   businessName={producerProfile.businessName}
@@ -162,12 +159,18 @@ const AvailibilityTable = ({
                 />
                 <Modal.Actions>
                   <Button
-                    content='Cancel'
+                    content={tr(
+                      'containers.producerprofilepage.availabilitydynamic.cancel',
+                      'Cancel',
+                    )}
                     onClick={() => setModalOpen(false)}
                   />
                   <Button
                     primary
-                    content='Confirm'
+                    content={tr(
+                      'containers.producerprofilepage.availabilitydynamic.confirm',
+                      'Confirm',
+                    )}
                     loading={orderSending}
                     onClick={handleSendOrder}
                   />
@@ -180,7 +183,6 @@ const AvailibilityTable = ({
     </Table>
   );
 };
-
 AvailibilityTable.propTypes = {
   columns: PropTypes.array,
   data: PropTypes.array,
@@ -191,15 +193,16 @@ AvailibilityTable.propTypes = {
   skipReset: PropTypes.bool,
   orderSending: PropTypes.bool,
 };
-
 const AvailabilityDynamic = ({ data, producerProfile }) => {
   const history = useHistory();
   const { mutateAsync: orderSend, isLoading: orderSending } =
     useSendOrderMutation();
   const [orderItems, setOrderItems] = useState(
-    [...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })),
+    [...data].map((stockItem) => ({
+      ...stockItem,
+      orderQuant: 0,
+    })),
   );
-
   const handleSubmit = async () => {
     const order = orderItems.filter((stockItem) => stockItem.orderQuant);
     const response = await orderSend({
@@ -222,13 +225,14 @@ const AvailabilityDynamic = ({ data, producerProfile }) => {
     //   console.error(err);
     // }
   };
-
   useEffect(() => {
     setOrderItems(
-      [...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })),
+      [...data].map((stockItem) => ({
+        ...stockItem,
+        orderQuant: 0,
+      })),
     );
   }, [data]);
-
   const columns = React.useMemo(
     () => [
       {
@@ -287,9 +291,7 @@ const AvailabilityDynamic = ({ data, producerProfile }) => {
     ],
     [],
   );
-
   const skipResetRef = React.useRef(false);
-
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
     skipResetRef.current = true;
@@ -306,15 +308,12 @@ const AvailabilityDynamic = ({ data, producerProfile }) => {
       }),
     );
   };
-
   React.useEffect(() => {
     skipResetRef.current = false;
   }, [orderItems]);
-
   if (!orderItems) {
     return null;
   }
-
   return (
     <AvailabilityStyle>
       <AvailibilityTable
@@ -330,10 +329,8 @@ const AvailabilityDynamic = ({ data, producerProfile }) => {
     </AvailabilityStyle>
   );
 };
-
 AvailabilityDynamic.propTypes = {
   data: PropTypes.array,
   producerProfile: PropTypes.object,
 };
-
 export default AvailabilityDynamic;

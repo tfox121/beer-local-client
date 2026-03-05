@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import AddressAutocomplete from '../../components/AddressAutocomplete';
 import ayt from '../../utils/phoneNumberValidation';
-
 import MapMarker from '../../components/MapMarker';
 import SuggestBlockStyle from './SuggestBlockStyle';
 import MarkerMapStyle from './MarkerMapStyle';
@@ -13,7 +12,7 @@ import {
   INTRO_CHARACTER_LIMIT,
   MAP_TILE_PROVIDER_URL,
 } from '../../utils/constants';
-
+import { tr } from '../../utils/i18nRuntime';
 const ProducerForm = ({
   formValues,
   setFormValues,
@@ -29,7 +28,6 @@ const ProducerForm = ({
   const [visible, setVisible] = useState(false);
   const [unformattedTel, setUnformattedTel] = useState('');
   const geosuggestEl = useRef(null);
-
   useEffect(() => {
     if (profileStage === 1 && formValues.type === 'producer') {
       setVisible(true);
@@ -37,17 +35,17 @@ const ProducerForm = ({
     }
     setVisible(false);
   }, [formValues.type, profileStage]);
-
   useEffect(() => {
     if (formValues.location && formValues.location.lat) {
       setMapCentre([formValues.location.lat, formValues.location.lng]);
       setZoomLevel(15);
     }
   }, [setMapCentre, formValues.location]);
-
   useEffect(() => {
     setFormErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
+      const newErrors = {
+        ...prevErrors,
+      };
       delete newErrors.salesContactNumber;
       return newErrors;
     });
@@ -65,31 +63,49 @@ const ProducerForm = ({
       }));
     }
   }, [setFormErrors, setFormValues, unformattedTel]);
-
   const handleChange = (e, { name, value }) => {
-    const newErrors = { ...formErrors };
+    const newErrors = {
+      ...formErrors,
+    };
     delete newErrors[name];
-    setFormErrors({ ...newErrors });
-    setFormValues({ ...formValues, [name]: value });
+    setFormErrors({
+      ...newErrors,
+    });
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
   };
-
   const handleCheckboxChange = () => {
-    const newErrors = { ...formErrors };
+    const newErrors = {
+      ...formErrors,
+    };
     delete newErrors.terms;
-    setFormErrors({ ...newErrors });
-    setFormValues({ ...formValues, terms: !formValues.terms });
+    setFormErrors({
+      ...newErrors,
+    });
+    setFormValues({
+      ...formValues,
+      terms: !formValues.terms,
+    });
   };
-
   const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
       const locationObj = Array.isArray(locationArray)
-        ? { lat: locationArray[0], lng: locationArray[1] }
+        ? {
+            lat: locationArray[0],
+            lng: locationArray[1],
+          }
         : locationArray;
-      const newErrors = { ...formErrors };
+      const newErrors = {
+        ...formErrors,
+      };
       delete newErrors.location;
-      setFormErrors({ ...newErrors });
+      setFormErrors({
+        ...newErrors,
+      });
       setFormValues({
         ...formValues,
         location: locationObj,
@@ -97,7 +113,6 @@ const ProducerForm = ({
       });
     }
   };
-
   return (
     visible && (
       <Grid centered columns={2}>
@@ -105,7 +120,10 @@ const ProducerForm = ({
           <Grid.Column width={10}>
             <Form>
               <Form.Input
-                label='Brewery name'
+                label={tr(
+                  'containers.createprofilepage.producerform.brewery.name',
+                  'Brewery name',
+                )}
                 name='businessName'
                 value={formValues.businessName || ''}
                 required
@@ -118,7 +136,10 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
-                label='Sales contact name'
+                label={tr(
+                  'containers.createprofilepage.producerform.sales.contact.name',
+                  'Sales contact name',
+                )}
                 name='primaryContactName'
                 value={formValues.primaryContactName || ''}
                 required
@@ -131,7 +152,10 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
-                label='Sales email address'
+                label={tr(
+                  'containers.createprofilepage.producerform.sales.email.address',
+                  'Sales email address',
+                )}
                 name='salesEmail'
                 type='email'
                 value={formValues.salesEmail || ''}
@@ -145,7 +169,10 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
-                label='Sales contact number'
+                label={tr(
+                  'containers.createprofilepage.producerform.sales.contact.number',
+                  'Sales contact number',
+                )}
                 name='salesContactNumber'
                 type='tel'
                 value={formValues.salesContactNumber || ''}
@@ -158,7 +185,10 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
-                label='Website'
+                label={tr(
+                  'containers.createprofilepage.producerform.website',
+                  'Website',
+                )}
                 name='website'
                 type='url'
                 value={formValues.website || ''}
@@ -170,7 +200,10 @@ const ProducerForm = ({
                 <SuggestBlockStyle>
                   <AddressAutocomplete
                     ref={geosuggestEl}
-                    label='Location'
+                    label={tr(
+                      'containers.createprofilepage.producerform.location',
+                      'Location',
+                    )}
                     id='breweryLocation'
                     location={mapCentre}
                     radius={1500}
@@ -188,26 +221,43 @@ const ProducerForm = ({
                     role='alert'
                     aria-atomic='true'
                   >
-                    This field is required
+                    {tr(
+                      'containers.createprofilepage.producerform.this.field.is.required',
+                      'This field is required',
+                    )}
                   </div>
                 )}
               </div>
               <br />
               <Form.TextArea
-                label='Intro'
-                placeholder='Tell us more about the brewery...'
+                label={tr(
+                  'containers.createprofilepage.producerform.intro',
+                  'Intro',
+                )}
+                placeholder={tr(
+                  'containers.createprofilepage.producerform.tell.us.more.about.the.brewery',
+                  'Tell us more about the brewery...',
+                )}
                 value={formValues.intro || ''}
                 name='intro'
                 onChange={handleChange}
                 maxLength={INTRO_CHARACTER_LIMIT}
               />
               {formValues.intro && !!formValues.intro.length && (
-                <p style={{ textAlign: 'right', fontSize: '10px' }}>
+                <p
+                  style={{
+                    textAlign: 'right',
+                    fontSize: '10px',
+                  }}
+                >
                   {formValues.intro.length}/{INTRO_CHARACTER_LIMIT}
                 </p>
               )}
               <Form.Checkbox
-                label='I agree to the Terms and Conditions'
+                label={tr(
+                  'containers.createprofilepage.producerform.i.agree.to.the.terms.and.conditions',
+                  'I agree to the Terms and Conditions',
+                )}
                 name='terms'
                 // value={formValues.terms}
                 checked={formValues.terms}
@@ -241,7 +291,6 @@ const ProducerForm = ({
     )
   );
 };
-
 ProducerForm.propTypes = {
   formValues: PropTypes.object,
   setFormValues: PropTypes.func,
@@ -253,5 +302,4 @@ ProducerForm.propTypes = {
   avatarSaved: PropTypes.string,
   setAvatarSaved: PropTypes.func,
 };
-
 export default ProducerForm;

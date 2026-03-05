@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Header } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-
 import BusinessTypeSelectionStyle from './BusinessTypeSelectionStyle';
-
+import { tr } from '../../utils/i18nRuntime';
 const BusinessTypeSelection = ({
   profileStage,
   formValues,
@@ -12,15 +11,19 @@ const BusinessTypeSelection = ({
 }) => {
   const [visible, setVisible] = useState(true);
   const handleProducerClick = () => {
-    setFormValues({ ...formValues, type: 'producer' });
+    setFormValues({
+      ...formValues,
+      type: 'producer',
+    });
     setProfileStage(1);
   };
-
   const handleRetailerClick = () => {
-    setFormValues({ ...formValues, type: 'retailer' });
+    setFormValues({
+      ...formValues,
+      type: 'retailer',
+    });
     setProfileStage(1);
   };
-
   useEffect(() => {
     if (profileStage === 0) {
       setVisible(true);
@@ -28,7 +31,6 @@ const BusinessTypeSelection = ({
     }
     setVisible(false);
   }, [profileStage]);
-
   return (
     visible && (
       <BusinessTypeSelectionStyle>
@@ -41,7 +43,12 @@ const BusinessTypeSelection = ({
               textAlign='center'
               onClick={handleProducerClick}
             >
-              <Header as='h1'>Producer</Header>
+              <Header as='h1'>
+                {tr(
+                  'containers.createprofilepage.businesstypeselection.producer',
+                  'Producer',
+                )}
+              </Header>
             </Grid.Column>
             <Grid.Column width={1} />
             <Grid.Column
@@ -51,7 +58,12 @@ const BusinessTypeSelection = ({
               textAlign='center'
               onClick={handleRetailerClick}
             >
-              <Header as='h1'>Retailer</Header>
+              <Header as='h1'>
+                {tr(
+                  'containers.createprofilepage.businesstypeselection.retailer',
+                  'Retailer',
+                )}
+              </Header>
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -59,12 +71,10 @@ const BusinessTypeSelection = ({
     )
   );
 };
-
 BusinessTypeSelection.propTypes = {
   profileStage: PropTypes.number,
   formValues: PropTypes.object,
   setFormValues: PropTypes.func,
   setProfileStage: PropTypes.func,
 };
-
 export default BusinessTypeSelection;

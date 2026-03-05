@@ -11,7 +11,6 @@
 import React from 'react';
 import NumberFormat from 'react-number-format';
 import Select from 'react-select';
-
 import {
   useTable,
   usePagination,
@@ -27,35 +26,38 @@ import { Table, Button, Icon } from 'semantic-ui-react';
 
 // import { FormattedMessage } from 'react-intl';
 import { PACK_SIZES } from '../../utils/constants';
-
 import StockTableStyle from './StockTableStyle';
 import MetadataModal from './MetadataModal';
 
 // Create an editable cell renderer
+import { tr } from '../../utils/i18nRuntime';
 const EditableCell = ({
   value: initialValue,
   row: { index },
   column: { id },
-  updateMyData, // This is a custom function that we supplied to our table instance
+  updateMyData,
+  // This is a custom function that we supplied to our table instance
   editable,
 }) => {
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
-
   const onChange = (e) => {
     setValue(e.target.value);
   };
-
   const onCheckboxChange = () => {
     value === 'Show' ? setValue('Hide') : setValue('Show');
     setValue('Show');
-    updateMyData(index, id, value === 'Show' ? 'Hide' : 'Show' || 0);
+    updateMyData(
+      index,
+      id,
+      value === 'Show'
+        ? tr('containers.stockmodal.stockmanager.hide', 'Hide')
+        : 'Show' || 0,
+    );
   };
-
   const onValueChange = (values) => {
     setValue(values.floatValue || 0);
   };
-
   const onSelectChange = (selectedOption) => {
     setValue(selectedOption);
     updateMyData(index, id, selectedOption.value || 0);
@@ -70,11 +72,9 @@ const EditableCell = ({
   React.useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
-
   if (!editable) {
     return `${initialValue}`;
   }
-
   let element = (
     <input
       className='table-input'
@@ -83,7 +83,6 @@ const EditableCell = ({
       onBlur={onBlur}
     />
   );
-
   if (id === 'price') {
     element = (
       <NumberFormat
@@ -99,7 +98,6 @@ const EditableCell = ({
       />
     );
   }
-
   if (id === 'abv') {
     element = (
       <NumberFormat
@@ -114,18 +112,37 @@ const EditableCell = ({
       />
     );
   }
-
   if (id === 'packSize') {
     const customStyles = {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-      dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
-      indicatorSeparator: () => ({ display: 'none' }),
-      container: (base) => ({ ...base, border: 'none' }),
-      control: (base) => ({ ...base, minHeight: 'unset', border: 'none' }),
-      valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-      singleValue: (base) => ({ ...base, padding: '3px' }),
+      menuPortal: (base) => ({
+        ...base,
+        zIndex: 9999,
+      }),
+      dropdownIndicator: (base) => ({
+        ...base,
+        padding: '4px',
+      }),
+      indicatorSeparator: () => ({
+        display: 'none',
+      }),
+      container: (base) => ({
+        ...base,
+        border: 'none',
+      }),
+      control: (base) => ({
+        ...base,
+        minHeight: 'unset',
+        border: 'none',
+      }),
+      valueContainer: (base) => ({
+        ...base,
+        justifyContent: 'center',
+      }),
+      singleValue: (base) => ({
+        ...base,
+        padding: '3px',
+      }),
     };
-
     const packSizeArr = Object.keys(PACK_SIZES).map((key) => ({
       value: key,
       label: PACK_SIZES[key],
@@ -135,13 +152,15 @@ const EditableCell = ({
         options={packSizeArr}
         onChange={onSelectChange}
         value={packSizeArr.filter((option) => option.value === value)[0] || ''}
-        placeholder='Select size'
+        placeholder={tr(
+          'containers.stockmodal.stockmanager.select.size',
+          'Select size',
+        )}
         menuPortalTarget={document.body}
         styles={customStyles}
       />
     );
   }
-
   if (id === 'display') {
     element = (
       <input
@@ -155,7 +174,6 @@ const EditableCell = ({
       />
     );
   }
-
   return element;
 };
 
@@ -164,11 +182,12 @@ function DefaultColumnFilter({
   column: { filterValue, preFilteredRows, setFilter },
 }) {
   const count = preFilteredRows.length;
-
   return (
     <input
       className='filter-input'
-      style={{ maxWidth: '160px' }}
+      style={{
+        maxWidth: '160px',
+      }}
       value={filterValue || ''}
       onChange={(e) => {
         setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
@@ -194,23 +213,38 @@ function SelectColumnFilter({
       value,
       label: value,
     }));
-    filteredArr.unshift({ label: 'All', value: '' });
-
+    filteredArr.unshift({
+      label: 'All',
+      value: '',
+    });
     return filteredArr;
   }, [id, preFilteredRows]);
-
   const customStyles = {
-    dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
-    indicatorSeparator: () => ({ display: 'none' }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      padding: '4px',
+    }),
+    indicatorSeparator: () => ({
+      display: 'none',
+    }),
     container: (base) => ({
       ...base,
       border: 'none',
       width: '100%',
       minWidth: '100px',
     }),
-    control: (base) => ({ ...base, minHeight: 'unset' }),
-    valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-    singleValue: (base) => ({ ...base, padding: '3px' }),
+    control: (base) => ({
+      ...base,
+      minHeight: 'unset',
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      justifyContent: 'center',
+    }),
+    singleValue: (base) => ({
+      ...base,
+      padding: '3px',
+    }),
   };
   // Render a multi-select box
   return (
@@ -245,7 +279,6 @@ function SliderColumnFilter({
     });
     return [filterMin, filterMax];
   }, [id, preFilteredRows]);
-
   return (
     <>
       <input
@@ -259,14 +292,15 @@ function SliderColumnFilter({
       />
       {/* <Button size="mini" type="button" onClick={() => setFilter(undefined)}>
         Off
-      </Button> */}
+       </Button> */}
       <Icon name='cancel' onClick={() => setFilter(undefined)} />
     </>
   );
 }
-
 function fuzzyTextFilterFn(rows, id, filterValue) {
-  return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
+  return matchSorter(rows, filterValue, {
+    keys: [(row) => row.values[id]],
+  });
 }
 
 // Let the table remove the filter if the string is empty
@@ -292,7 +326,6 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
     }),
     [],
   );
-
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
@@ -309,7 +342,8 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    page, // Instead of using 'rows', we'll use page,
+    page,
+    // Instead of using 'rows', we'll use page,
     // which has only the rows for the active page
 
     // The rest of these things are super handy, too ;)
@@ -373,18 +407,31 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
       ]);
     },
   );
-
   const customStyles = {
-    dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
-    indicatorSeparator: () => ({ display: 'none' }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      padding: '4px',
+    }),
+    indicatorSeparator: () => ({
+      display: 'none',
+    }),
     container: (base) => ({
       ...base,
       border: 'none',
       width: '100px',
     }),
-    control: (base) => ({ ...base, minHeight: 'unset' }),
-    valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-    singleValue: (base) => ({ ...base, padding: '3px' }),
+    control: (base) => ({
+      ...base,
+      minHeight: 'unset',
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      justifyContent: 'center',
+    }),
+    singleValue: (base) => ({
+      ...base,
+      padding: '3px',
+    }),
   };
 
   // track selected rows
@@ -444,17 +491,22 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
                           <span {...row.getToggleRowExpandedProps()}>
                             {row.isExpanded ? 'ðŸ‘‡' : 'ðŸ‘‰'}
                           </span>{' '}
-                          {cell.render('Cell', { editable: false })} (
-                          {row.subRows.length})
+                          {cell.render('Cell', {
+                            editable: false,
+                          })}{' '}
+                          ({row.subRows.length})
                         </>
-                      ) : cell.isPlaceholder ? null : cell.column.id === // Otherwise, just render the regular cell // For cells with repeated values, render null
+                      ) : cell.isPlaceholder ? null : cell.column.id ===
+                        // Otherwise, just render the regular cell // For cells with repeated values, render null
                         'metadata' ? (
                         <MetadataModal
                           cell={cell}
                           updateMyData={updateMyData}
                         />
                       ) : (
-                        cell.render('Cell', { editable: true })
+                        cell.render('Cell', {
+                          editable: true,
+                        })
                       )}
                     </Table.Cell>
                   ))}
@@ -464,9 +516,9 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
           </Table.Body>
         </Table>
         {/*
-        Pagination can be built however you'd like.
-        This is just a very basic UI implementation:
-      */}
+         Pagination can be built however you'd like.
+         This is just a very basic UI implementation:
+         */}
       </StockTableStyle>
 
       <div className='pagination'>
@@ -503,13 +555,13 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
           <Icon name='angle double right' />
         </Button>{' '}
         <span>
-          Page{' '}
+          {tr('containers.stockmodal.stockmanager.page', 'Page')}{' '}
           <strong>
             {pageIndex + 1} of {pageOptions.length}
           </strong>{' '}
         </span>
         <span>
-          &nbsp;| Go to page:{' '}
+          {tr('containers.stockmodal.stockmanager.go.to.page', '| Go to page:')}{' '}
           <input
             className='pagination-input'
             type='number'
@@ -522,8 +574,14 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
         </span>
         &nbsp;
         <Select
-          defaultValue={{ value: 10, label: 'Show 10' }}
-          value={{ value: pageSize, label: `Show ${pageSize}` }}
+          defaultValue={{
+            value: 10,
+            label: 'Show 10',
+          }}
+          value={{
+            value: pageSize,
+            label: `Show ${pageSize}`,
+          }}
           styles={customStyles}
           onChange={(e) => {
             setPageSize(Number(e.value));
@@ -540,7 +598,7 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
               {pageSizeVal}
             </option>
           ))}
-        </Select> */}
+         </Select> */}
       </div>
     </>
   );
@@ -553,7 +611,6 @@ function filterGreaterThan(rows, id, filterValue) {
     return rowValue >= filterValue;
   });
 }
-
 function filterLesserThan(rows, id, filterValue) {
   return rows.filter((row) => {
     const rowValue = row.values[id];
@@ -566,20 +623,16 @@ function filterLesserThan(rows, id, filterValue) {
 // will be automatically removed. Normally this is just an undefined
 // check, but here, we want to remove the filter if it's not a number
 filterGreaterThan.autoRemove = (val) => typeof val !== 'number';
-
 const IndeterminateCheckbox = React.forwardRef(
   ({ indeterminate, ...rest }, ref) => {
     const defaultRef = React.useRef();
     const resolvedRef = ref || defaultRef;
-
     React.useEffect(() => {
       resolvedRef.current.indeterminate = indeterminate;
     }, [resolvedRef, indeterminate]);
-
     return <input type='checkbox' ref={resolvedRef} {...rest} />;
   },
 );
-
 const StockManager = ({ data, setData, setSelected, setStockEditPending }) => {
   const columns = React.useMemo(
     () => [
@@ -668,7 +721,6 @@ const StockManager = ({ data, setData, setSelected, setStockEditPending }) => {
   React.useEffect(() => {
     skipResetRef.current = false;
   }, [data]);
-
   return (
     <MyTable
       columns={columns}
@@ -679,5 +731,4 @@ const StockManager = ({ data, setData, setSelected, setStockEditPending }) => {
     />
   );
 };
-
 export default StockManager;

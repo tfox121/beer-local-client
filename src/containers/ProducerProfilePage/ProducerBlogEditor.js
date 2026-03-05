@@ -8,7 +8,7 @@ import {
   BLOG_EDITOR_TOOLBAR,
 } from '../../utils/constants';
 import { usePostBlogMutation } from '../../queries/producerProfile';
-
+import { tr } from '../../utils/i18nRuntime';
 const ProducerBlogEditor = ({ onBlogPosted }) => {
   const { mutateAsync: blogPost, isLoading: blogPosting } =
     usePostBlogMutation();
@@ -19,52 +19,80 @@ const ProducerBlogEditor = ({ onBlogPosted }) => {
     display: true,
   });
   const [modalOpen, setModalOpen] = useState(false);
-
   const handleBlogEditorSave = async () => {
     const contentState = blogEditor.getCurrentContent();
     const rawBlogData = convertToRaw(contentState);
-    await blogPost({ rawBlogData: JSON.stringify(rawBlogData), blogMeta });
+    await blogPost({
+      rawBlogData: JSON.stringify(rawBlogData),
+      blogMeta,
+    });
     setBlogEditor(EditorState.createEmpty());
-    setBlogMeta({ title: '', author: '', display: true });
+    setBlogMeta({
+      title: '',
+      author: '',
+      display: true,
+    });
     setModalOpen(false);
     if (onBlogPosted) {
       onBlogPosted();
     }
   };
-
   return (
     <Modal
       open={modalOpen}
       trigger={
         <Button onClick={() => setModalOpen(true)} primary>
-          Add
+          {tr('containers.producerprofilepage.producerblogeditor.add', 'Add')}
         </Button>
       }
     >
-      <Modal.Header>New post</Modal.Header>
+      <Modal.Header>
+        {tr(
+          'containers.producerprofilepage.producerblogeditor.new.post',
+          'New post',
+        )}
+      </Modal.Header>
       <Modal.Content>
         <Modal.Description>
           <Form>
             <Form.Group>
               <Form.Input
-                label='Title'
+                label={tr(
+                  'containers.producerprofilepage.producerblogeditor.title',
+                  'Title',
+                )}
                 fluid
                 width={7}
                 value={blogMeta.title}
                 onChange={(e) =>
-                  setBlogMeta({ ...blogMeta, title: e.target.value })
+                  setBlogMeta({
+                    ...blogMeta,
+                    title: e.target.value,
+                  })
                 }
-                placeholder='Post title...'
+                placeholder={tr(
+                  'containers.producerprofilepage.producerblogeditor.post.title',
+                  'Post title...',
+                )}
               />
               <Form.Input
-                label='Author'
+                label={tr(
+                  'containers.producerprofilepage.producerblogeditor.author',
+                  'Author',
+                )}
                 fluid
                 width={5}
                 value={blogMeta.author}
                 onChange={(e) =>
-                  setBlogMeta({ ...blogMeta, author: e.target.value })
+                  setBlogMeta({
+                    ...blogMeta,
+                    author: e.target.value,
+                  })
                 }
-                placeholder='Author'
+                placeholder={tr(
+                  'containers.producerprofilepage.producerblogeditor.author',
+                  'Author',
+                )}
               />
             </Form.Group>
           </Form>
@@ -94,28 +122,41 @@ const ProducerBlogEditor = ({ onBlogPosted }) => {
         </Modal.Description>
         <Form.Checkbox
           className='blogpost-display-checkbox'
-          label='Display'
+          label={tr(
+            'containers.producerprofilepage.producerblogeditor.display',
+            'Display',
+          )}
           checked={blogMeta.display}
           onChange={() =>
-            setBlogMeta({ ...blogMeta, display: !blogMeta.display })
+            setBlogMeta({
+              ...blogMeta,
+              display: !blogMeta.display,
+            })
           }
         />
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={() => setModalOpen(false)} content='Cancel' />
+        <Button
+          onClick={() => setModalOpen(false)}
+          content={tr(
+            'containers.producerprofilepage.producerblogeditor.cancel',
+            'Cancel',
+          )}
+        />
         <Button
           primary
           loading={blogPosting}
           onClick={handleBlogEditorSave}
-          content='Save'
+          content={tr(
+            'containers.producerprofilepage.producerblogeditor.save',
+            'Save',
+          )}
         />
       </Modal.Actions>
     </Modal>
   );
 };
-
 ProducerBlogEditor.propTypes = {
   onBlogPosted: PropTypes.func,
 };
-
 export default ProducerBlogEditor;

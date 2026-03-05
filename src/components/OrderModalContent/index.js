@@ -11,7 +11,7 @@ import { Modal, Header, Table, Button, Grid, Message } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import Select from 'react-select';
 import OrderLine from '../OrderLine';
-
+import { tr } from '../../utils/i18nRuntime';
 function OrderModalContent({
   editingOrder,
   businessName,
@@ -29,39 +29,63 @@ function OrderModalContent({
 }) {
   const [newItem, setNewItem] = useState({});
   const [addingItem, setAddingItem] = useState(false);
-
   const handleSelectChange = (selectedOption) => {
     setNewItem(selectedOption);
   };
-
   const handleAddingItem = () => {
     handleAddItem(newItem);
     setAddingItem(false);
   };
-
   if (!orderItems) {
     return null;
   }
   return (
-    <Modal.Content style={{ overflowX: 'scroll' }}>
+    <Modal.Content
+      style={{
+        overflowX: 'scroll',
+      }}
+    >
       {type === 'draftOrder' && (
         <>
           <Header as='h5'>{`Your order from ${businessName}`}</Header>
           <p>
-            This is the contents of your order. Click below to confirm, or
-            cancel to go back.
+            {tr(
+              'components.ordermodalcontent.index.this.is.the.contents.of.your.order.click.below.to.confirm.or.cancel.to.go.back',
+              'This is the contents of your order. Click below to confirm, or cancel to go back.',
+            )}
           </p>
         </>
       )}
-      <Table celled unstackable style={{ minWidth: '600px' }}>
+      <Table
+        celled
+        unstackable
+        style={{
+          minWidth: '600px',
+        }}
+      >
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>ABV</Table.HeaderCell>
-            <Table.HeaderCell>Pack Size</Table.HeaderCell>
-            <Table.HeaderCell>List Price</Table.HeaderCell>
-            <Table.HeaderCell>Order #</Table.HeaderCell>
-            <Table.HeaderCell>Total</Table.HeaderCell>
+            <Table.HeaderCell>
+              {tr('components.ordermodalcontent.index.name', 'Name')}
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              {tr('components.ordermodalcontent.index.abv', 'ABV')}
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              {tr('components.ordermodalcontent.index.pack.size', 'Pack Size')}
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              {tr(
+                'components.ordermodalcontent.index.list.price',
+                'List Price',
+              )}
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              {tr('components.ordermodalcontent.index.order', 'Order #')}
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              {tr('components.ordermodalcontent.index.total', 'Total')}
+            </Table.HeaderCell>
             {editingOrder && <Table.HeaderCell></Table.HeaderCell>}
           </Table.Row>
         </Table.Header>
@@ -88,7 +112,10 @@ function OrderModalContent({
                   attached
                   basic
                   icon='plus'
-                  content='Add item'
+                  content={tr(
+                    'components.ordermodalcontent.index.add.item',
+                    'Add item',
+                  )}
                   onClick={() => setAddingItem(true)}
                 />
               </Table.HeaderCell>
@@ -102,7 +129,10 @@ function OrderModalContent({
                     <Select
                       options={availableStock}
                       onChange={handleSelectChange}
-                      placeholder='Select item'
+                      placeholder={tr(
+                        'components.ordermodalcontent.index.select.item',
+                        'Select item',
+                      )}
                     />
                   </Grid.Column>
                   <Grid.Column width={4}>
@@ -110,7 +140,10 @@ function OrderModalContent({
                       icon='add'
                       primary
                       fluid
-                      content='Add'
+                      content={tr(
+                        'components.ordermodalcontent.index.add',
+                        'Add',
+                      )}
                       onClick={handleAddingItem}
                     />
                   </Grid.Column>
@@ -120,7 +153,10 @@ function OrderModalContent({
           )}
           <Table.Row>
             <Table.HeaderCell colSpan={editingOrder ? 6 : 5} textAlign='right'>
-              Estimated Total:
+              {tr(
+                'components.ordermodalcontent.index.estimated.total',
+                'Estimated Total:',
+              )}
             </Table.HeaderCell>
             <Table.HeaderCell>
               <NumberFormat
@@ -142,10 +178,16 @@ function OrderModalContent({
       {distancePurchase && !distantPurchasingMinimumMet && (
         <Message warning>
           <Message.Header>
-            You are outside this brewery&apos;s distribution area
+            {tr(
+              'components.ordermodalcontent.index.you.are.outside.this.brewery.s.distribution.area',
+              "You are outside this brewery's distribution area",
+            )}
           </Message.Header>
           <p>
-            To process your order, you must spent at least £
+            {tr(
+              'components.ordermodalcontent.index.to.process.your.order.you.must.spent.at.least',
+              'To process your order, you must spent at least £',
+            )}
             {Number(distantPurchasingConditions.minSpend).toFixed(2)}.
           </p>
         </Message>
@@ -153,8 +195,10 @@ function OrderModalContent({
       {deliveryInstruction && (
         <Message info>
           <Message.Header>
-            The following delivery instructions will be passed along with your
-            order:
+            {tr(
+              'components.ordermodalcontent.index.the.following.delivery.instructions.will.be.passed.along.with.your.order',
+              'The following delivery instructions will be passed along with your order:',
+            )}
           </Message.Header>
           <p>{deliveryInstruction}</p>
         </Message>
@@ -162,7 +206,6 @@ function OrderModalContent({
     </Modal.Content>
   );
 }
-
 OrderModalContent.propTypes = {
   editingOrder: PropTypes.bool,
   businessName: PropTypes.string,
@@ -178,5 +221,4 @@ OrderModalContent.propTypes = {
   handleDecreaseQuant: PropTypes.func,
   handleIncreaseQuant: PropTypes.func,
 };
-
 export default OrderModalContent;

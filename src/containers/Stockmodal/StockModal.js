@@ -16,18 +16,15 @@ import {
   Icon,
   Message,
 } from 'semantic-ui-react';
-
 import arrayMove from '../../utils/arrayMove';
 import { useUpdateStockMutation } from '../../queries/producerProfile';
-
 import StockModalStyle from './StockModalStyle';
 import StockModalMenu from './StockModalMenu';
 import StockManager from './StockManager';
-
+import { tr } from '../../utils/i18nRuntime';
 export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
   const { mutateAsync: stockUpdate, isLoading: updatingStock } =
     useUpdateStockMutation();
-
   const stockDataTemplate = {
     id: shortid.generate(),
     name: '',
@@ -40,7 +37,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
     availability: '',
     display: 'Hide',
   };
-
   const [stockData, setStockData] = useState([stockDataTemplate]);
   const [originalStockData, setOriginalStockData] = useState(null);
   const [selected, setSelected] = useState({});
@@ -49,7 +45,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
   const [loadingData, setLoadingData] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [incompleteStockItem, setIncompleteStockItem] = useState(false);
-
   useEffect(() => {
     if (fetchingProfile && !loadingData) {
       setDataLoaded(false);
@@ -64,7 +59,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
       }, 3000);
     }
   }, [fetchingProfile, loadingData]);
-
   useEffect(() => {
     if (stock && stock.length) {
       setStockData(stock);
@@ -81,7 +75,9 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
 
     // Normalize data for comparison (remove _id and other transient fields)
     const normalizeStockItem = (item) => {
-      const normalized = { ...item };
+      const normalized = {
+        ...item,
+      };
       delete normalized._id;
       // Convert numeric fields to numbers for comparison
       if (normalized.abv !== undefined) normalized.abv = Number(normalized.abv);
@@ -89,7 +85,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
         normalized.price = Number(normalized.price);
       return normalized;
     };
-
     const normalizedOriginal = originalStockData.map(normalizeStockItem);
     const normalizedCurrent = stockData.map(normalizeStockItem);
 
@@ -109,7 +104,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
       return Array.from(allKeys).some((key) => original[key] !== current[key]);
     });
   };
-
   const moveStockLineUp = () => {
     const rows = Object.keys(selected);
     if (rows.includes('0')) {
@@ -122,7 +116,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
     // const newSelected = rows.reduce((obj, val) => { obj[Number(val) - 1] = true; return obj; }, {});
     setStockData(tempArr);
   };
-
   const moveStockLineDown = () => {
     const rows = Object.keys(selected);
     if (rows.includes((stock.length - 1).toString())) {
@@ -134,11 +127,9 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
     });
     setStockData(tempArr);
   };
-
   const addNewStockLine = async () => {
     setStockData([stockDataTemplate, ...stockData]);
   };
-
   const deleteStockItems = async () => {
     const rows = Object.keys(selected);
     const deleteIds = [];
@@ -151,7 +142,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
     });
     setStockData(newData);
   };
-
   const copyStockItems = async () => {
     const rows = Object.keys(selected);
     const filteredData = stockData.filter((row, index) =>
@@ -167,10 +157,8 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
     });
     setStockData([...duplicateRows, ...stockData]);
   };
-
   const handleStockSave = async () => {
     let complete = true;
-
     stockData.forEach((stockItem) => {
       const { name, abv, packSize, price } = stockItem;
       if (!name || !abv || !packSize || !price) {
@@ -192,7 +180,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
       setIncompleteStockItem(true);
     }
   };
-
   const handleModalClose = () => {
     // Only show warning if there are actual changes
     if (hasChanges()) {
@@ -201,11 +188,9 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
     setIncompleteStockItem(false);
     return setModalOpen(false);
   };
-
   const handleCloseCancel = () => {
     setConfirmOpen(false);
   };
-
   const handleCloseConfirm = () => {
     setConfirmOpen(false);
     setModalOpen(false);
@@ -220,7 +205,6 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
     }
     setOriginalStockData(null);
   };
-
   return (
     <>
       <Modal
@@ -242,7 +226,7 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
               }
             }}
           >
-            Edit
+            {tr('containers.stockmodal.stockmodal.edit', 'Edit')}
           </Button>
         }
       >
@@ -265,7 +249,10 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
             />
           </Modal.Content>
           <Message
-            style={{ width: '97%', margin: '1.5%' }}
+            style={{
+              width: '97%',
+              margin: '1.5%',
+            }}
             icon
             error
             compact
@@ -274,14 +261,25 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
             <Icon name='warning sign' />
             <Message.Content>
               <Message.Header>
-                A stock item is missing required fields.
+                {tr(
+                  'containers.stockmodal.stockmodal.a.stock.item.is.missing.required.fields',
+                  'A stock item is missing required fields.',
+                )}
               </Message.Header>
-              <p>Please complete them or delete the item.</p>
+              <p>
+                {tr(
+                  'containers.stockmodal.stockmodal.please.complete.them.or.delete.the.item',
+                  'Please complete them or delete the item.',
+                )}
+              </p>
             </Message.Content>
           </Message>
         </StockModalStyle>
         <Modal.Actions>
-          <Button onClick={handleModalClose} content='Close' />
+          <Button
+            onClick={handleModalClose}
+            content={tr('containers.stockmodal.stockmodal.close', 'Close')}
+          />
           <Button
             loading={updatingStock}
             className='stock-save'
@@ -291,7 +289,9 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
           >
             {loadingData && <Loader active inline='centered' size='mini' />}
             {dataLoaded && <Icon name='check' />}
-            {!dataLoaded && !loadingData && 'Save'}
+            {!dataLoaded &&
+              !loadingData &&
+              tr('containers.stockmodal.stockmodal.save', 'Save')}
           </Button>
         </Modal.Actions>
       </Modal>
@@ -300,21 +300,21 @@ export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
         open={confirmOpen}
         onCancel={handleCloseCancel}
         onConfirm={handleCloseConfirm}
-        content='Close stock manager without saving?'
+        content={tr(
+          'containers.stockmodal.stockmodal.close.stock.manager.without.saving',
+          'Close stock manager without saving?',
+        )}
       />
     </>
   );
 }
-
 StockModal.propTypes = {
   stock: PropTypes.array,
   fetchingProfile: PropTypes.bool,
   onStockUpdated: PropTypes.func,
 };
-
 StockModal.defaultProps = {
   stock: [],
   fetchingProfile: false,
 };
-
 export default StockModal;

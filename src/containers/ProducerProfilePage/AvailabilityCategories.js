@@ -18,17 +18,15 @@ import {
 } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
-
 import { useHistory } from 'react-router-dom';
 import Select from 'react-select';
 import { PACK_SIZES } from '../../utils/constants';
-
 import AvailabilityStyle from './AvailabilityStyle';
 import OrderModalContent from '../../components/OrderModalContent';
 import geoJsonContainsCoords from '../../utils/geoJsonContainsCoords';
 import calcOrderTotal from '../../utils/calcOrderTotal';
 import { useSendOrderMutation } from '../../queries/producerProfile';
-
+import { tr } from '../../utils/i18nRuntime';
 const TableRows = ({
   rows,
   prepareRow,
@@ -45,11 +43,9 @@ const TableRows = ({
     setCategory(selectedOption.value);
     handleCategoryChange(index, selectedOption.value);
   };
-
   useEffect(() => {
     setCategory(storedCategory);
   }, [storedCategory]);
-
   return (
     <>
       <Table.Row>
@@ -57,21 +53,39 @@ const TableRows = ({
           <>
             <Table.Cell colSpan={2}>
               <Select
-                options={[...categories, { value: '', label: 'All' }]}
+                options={[
+                  ...categories,
+                  {
+                    value: '',
+                    label: 'All',
+                  },
+                ]}
                 onChange={onSelectChange}
                 value={
                   category
-                    ? { value: category, label: category }
-                    : { value: '', label: 'All' }
+                    ? {
+                        value: category,
+                        label: category,
+                      }
+                    : {
+                        value: '',
+                        label: 'All',
+                      }
                 }
-                placeholder='All'
+                placeholder={tr(
+                  'containers.producerprofilepage.availabilitycategories.all',
+                  'All',
+                )}
                 menuPortalTarget={document.body}
               />
             </Table.Cell>
             <Table.Cell colSpan={3} />
             <Table.Cell colSpan={2} textAlign='right'>
               <Button
-                content='Remove section'
+                content={tr(
+                  'containers.producerprofilepage.availabilitycategories.remove.section',
+                  'Remove section',
+                )}
                 icon='minus'
                 attached
                 basic
@@ -122,7 +136,9 @@ const TableRows = ({
                         {...cell.getCellProps()}
                       >
                         {cell.column.id === 'orderQuant'
-                          ? cell.render('Cell', { editable: true })
+                          ? cell.render('Cell', {
+                              editable: true,
+                            })
                           : cell.render('Cell')}
                       </Table.Cell>
                     );
@@ -149,7 +165,13 @@ const TableRows = ({
                     />
                   </Grid.Column>
                   <Grid.Column width={11}>
-                    <p>{row.original.description || 'No description'}</p>
+                    <p>
+                      {row.original.description ||
+                        tr(
+                          'containers.producerprofilepage.availabilitycategories.no.description',
+                          'No description',
+                        )}
+                    </p>
                   </Grid.Column>
                 </Grid>
               </Popup.Content>
@@ -161,7 +183,6 @@ const TableRows = ({
     </>
   );
 };
-
 TableRows.propTypes = {
   rows: PropTypes.array,
   prepareRow: PropTypes.func,
@@ -173,17 +194,16 @@ TableRows.propTypes = {
   handleCategoryChange: PropTypes.func,
   handleRemoveCategory: PropTypes.func,
 };
-
 const EditableCell = ({
   value: initialValue,
   row: { index },
   column: { id },
-  updateMyData, // This is a custom function that we supplied to our table instance
+  updateMyData,
+  // This is a custom function that we supplied to our table instance
   editable,
 }) => {
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
-
   const onChange = (e) => {
     setValue(e.target.value);
   };
@@ -197,11 +217,9 @@ const EditableCell = ({
   React.useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
-
   if (!editable) {
     return `${initialValue}`;
   }
-
   return (
     <Input
       className='table-input'
@@ -215,7 +233,6 @@ const EditableCell = ({
     />
   );
 };
-
 EditableCell.propTypes = {
   value: PropTypes.node,
   row: PropTypes.object,
@@ -223,7 +240,6 @@ EditableCell.propTypes = {
   updateMyData: PropTypes.func,
   editable: PropTypes.bool,
 };
-
 const AvailibilityTable = ({
   columns,
   data,
@@ -242,7 +258,6 @@ const AvailibilityTable = ({
     }),
     [],
   );
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
       {
@@ -255,7 +270,6 @@ const AvailibilityTable = ({
       },
       useSortBy,
     );
-
   const [modalOpen, setModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [stockCategories, setStockCategories] = useState(
@@ -264,7 +278,6 @@ const AvailibilityTable = ({
   const isInitialMount = useRef(true);
   const lastPatchedCategories = useRef(stockCategories);
   const hasOrderItems = data.some((item) => Number(item.orderQuant) > 0);
-
   const handleAddCategory = () => {
     if (
       stockCategories.length <
@@ -273,19 +286,16 @@ const AvailibilityTable = ({
       setStockCategories([...stockCategories, '']);
     }
   };
-
   const handleRemoveCategory = (index) => {
     const newCats = [...stockCategories];
     newCats.splice(index, 1);
     setStockCategories([...newCats]);
   };
-
   const handleCategoryChange = (index, value) => {
     const newCats = stockCategories;
     newCats[index] = value;
     setStockCategories([...newCats]);
   };
-
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -303,27 +313,26 @@ const AvailibilityTable = ({
       });
     }
   }, [profileOptionsUpdate, stockCategories]);
-
   useEffect(() => {
     setCategories(
       [...new Set(data.map((stockItem) => stockItem.category))]
         .filter((category) => !!category && !stockCategories.includes(category))
-        .map((category) => ({ value: category, label: category })),
+        .map((category) => ({
+          value: category,
+          label: category,
+        })),
     );
   }, [data, stockCategories]);
-
   const handleModalOpen = () => {
     const orderQuantity = data.reduce((acc, cur) => acc + cur.orderQuant, 0);
     if (orderQuantity) {
       setModalOpen(true);
     }
   };
-
   const handleSendOrder = async () => {
     await handleSubmit();
     setModalOpen(false);
   };
-
   return (
     <>
       {orderSending && (
@@ -395,7 +404,10 @@ const AvailibilityTable = ({
                   attached
                   basic
                   icon='plus'
-                  content='Add category section'
+                  content={tr(
+                    'containers.producerprofilepage.availabilitycategories.add.category.section',
+                    'Add category section',
+                  )}
                   onClick={handleAddCategory}
                 />
               </Table.HeaderCell>
@@ -416,7 +428,12 @@ const AvailibilityTable = ({
                         onClose={() => setModalOpen(false)}
                         size='large'
                       >
-                        <Modal.Header>Confirm Order</Modal.Header>
+                        <Modal.Header>
+                          {tr(
+                            'containers.producerprofilepage.availabilitycategories.confirm.order',
+                            'Confirm Order',
+                          )}
+                        </Modal.Header>
                         <OrderModalContent
                           orderItems={data}
                           businessName={producerProfile.businessName}
@@ -440,12 +457,18 @@ const AvailibilityTable = ({
                         />
                         <Modal.Actions>
                           <Button
-                            content='Cancel'
+                            content={tr(
+                              'containers.producerprofilepage.availabilitycategories.cancel',
+                              'Cancel',
+                            )}
                             onClick={() => setModalOpen(false)}
                           />
                           <Button
                             primary
-                            content='Confirm'
+                            content={tr(
+                              'containers.producerprofilepage.availabilitycategories.confirm',
+                              'Confirm',
+                            )}
                             disabled={
                               !hasOrderItems ||
                               (!geoJsonContainsCoords(
@@ -475,7 +498,6 @@ const AvailibilityTable = ({
     </>
   );
 };
-
 AvailibilityTable.propTypes = {
   columns: PropTypes.array,
   data: PropTypes.array,
@@ -488,7 +510,6 @@ AvailibilityTable.propTypes = {
   profileOptionsUpdate: PropTypes.func,
   orderSending: PropTypes.bool,
 };
-
 const AvailabilityCategories = ({
   data,
   producerProfile,
@@ -499,9 +520,11 @@ const AvailabilityCategories = ({
   const { mutateAsync: orderSend, isLoading: orderSending } =
     useSendOrderMutation();
   const [orderItems, setOrderItems] = useState(
-    [...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })),
+    [...data].map((stockItem) => ({
+      ...stockItem,
+      orderQuant: 0,
+    })),
   );
-
   const handleSubmit = async () => {
     const order = orderItems.filter((stockItem) => stockItem.orderQuant);
     const response = await orderSend({
@@ -512,13 +535,14 @@ const AvailabilityCategories = ({
       history.push(`/order/${response.order._id}`);
     }
   };
-
   useEffect(() => {
     setOrderItems(
-      [...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })),
+      [...data].map((stockItem) => ({
+        ...stockItem,
+        orderQuant: 0,
+      })),
     );
   }, [data]);
-
   const columns = React.useMemo(
     () => [
       {
@@ -577,9 +601,7 @@ const AvailabilityCategories = ({
     ],
     [],
   );
-
   const skipResetRef = React.useRef(false);
-
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
     skipResetRef.current = true;
@@ -596,15 +618,12 @@ const AvailabilityCategories = ({
       }),
     );
   };
-
   React.useEffect(() => {
     skipResetRef.current = false;
   }, [orderItems]);
-
   if (!orderItems) {
     return null;
   }
-
   return (
     <AvailabilityStyle>
       <AvailibilityTable
@@ -622,12 +641,10 @@ const AvailabilityCategories = ({
     </AvailabilityStyle>
   );
 };
-
 AvailabilityCategories.propTypes = {
   data: PropTypes.array,
   producerProfile: PropTypes.object,
   profileOptionsUpdate: PropTypes.func,
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
 };
-
 export default AvailabilityCategories;

@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Map, TileLayer } from 'react-leaflet';
-
 import {
   Header,
   Segment,
@@ -13,7 +12,6 @@ import {
 } from 'semantic-ui-react';
 import { Helmet } from 'react-helmet';
 import { Link, useLocation } from 'react-router-dom';
-
 import PageWrapper from '../../components/PageWrapper';
 import OrderModalContent from '../../components/OrderModalContent';
 import { getPrivateRoute } from '../../utils/api';
@@ -32,12 +30,14 @@ import {
   useSendOrderMessageMutation,
 } from '../../queries/orders';
 import { useUserQuery } from '../../queries/user';
-
+import { tr } from '../../utils/i18nRuntime';
 const OrderPage = () => {
   const { isAuthenticated } = useAuth0();
   const location = useLocation();
   const orderId = location.pathname.split('/')[2];
-  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
+  const { data: userProfile } = useUserQuery({
+    enabled: isAuthenticated,
+  });
   const { data: orderInfo } = useOrderQuery(orderId, {
     enabled: isAuthenticated && !!orderId,
   });
@@ -46,7 +46,6 @@ const OrderPage = () => {
   const { mutate: messageSend, isLoading: messageSending } =
     useSendOrderMessageMutation(orderId);
   const notificationClearedRef = useRef(false);
-
   useEffect(
     () => () => {
       notificationClearedRef.current = false;
@@ -54,9 +53,7 @@ const OrderPage = () => {
     },
     [isAuthenticated, location.pathname],
   );
-
   const { role } = userProfile || {};
-
   const [editingOrder, setEditingOrder] = useState(false);
   const [orderData, setOrderData] = useState(orderInfo?.order || {});
   const [orderItems, setOrderItems] = useState([]);
@@ -65,7 +62,6 @@ const OrderPage = () => {
   // const [messageModalOpen, setMessageModalOpen] = useState(false);
   const [messageContent, setMessageContent] = useState('');
   const orderIdRef = useRef(null);
-
   useEffect(() => {
     // orderInfo is the order object itself (from selector), or it might have order/business structure
     const order = orderInfo?.order || orderInfo;
@@ -74,7 +70,9 @@ const OrderPage = () => {
 
     // On first load or when navigating to a different order, hydrate all local state.
     if (currentOrderId !== orderIdRef.current) {
-      setOrderData({ ...order });
+      setOrderData({
+        ...order,
+      });
       setOrderItems([...order.items]);
       orderIdRef.current = currentOrderId;
       notificationClearedRef.current = false; // Reset notification flag for new order
@@ -91,10 +89,11 @@ const OrderPage = () => {
       ) {
         return prevOrderData;
       }
-      return { ...order };
+      return {
+        ...order,
+      };
     });
   }, [orderInfo]);
-
   useEffect(() => {
     if (userProfile && userProfile.stock && orderItems.length) {
       const orderIds = orderItems.map((orderItem) => orderItem.id);
@@ -113,7 +112,6 @@ const OrderPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile?.stock, orderItems.length]);
-
   useEffect(() => {
     // Only clear notification once when order is first loaded
     if (
@@ -148,7 +146,6 @@ const OrderPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderData?._id, role, orderIdRef.current]);
-
   const handleCancelEdit = () => {
     const order = orderInfo?.order || orderInfo;
     if (order?.items) {
@@ -156,7 +153,6 @@ const OrderPage = () => {
     }
     setEditingOrder(false);
   };
-
   const handleConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
     const confirmedOrder = {
@@ -173,12 +169,14 @@ const OrderPage = () => {
     //   console.error(err);
     // }
   };
-
   const handleChangesConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
     const itemsApproved = orderItems
       .filter((orderItem) => orderItem.orderChange !== 'delete')
-      .map((orderItem) => ({ ...orderItem, orderChange: '' }));
+      .map((orderItem) => ({
+        ...orderItem,
+        orderChange: '',
+      }));
     const pendingOrder = {
       _id: orderData._id,
       status: 'Pending',
@@ -195,14 +193,12 @@ const OrderPage = () => {
     //   console.error(err);
     // }
   };
-
   const handleReject = async () => {
     // const privateRoute = await getPrivateRoute();
     const rejectedOrder = {
       _id: orderData._id,
       status: orderData.status === 'Rejected' ? 'Pending' : 'Rejected',
     };
-
     orderEdit(rejectedOrder);
 
     // try {
@@ -214,11 +210,12 @@ const OrderPage = () => {
     //   console.error(err);
     // }
   };
-
   const handleCancel = async () => {
     // const privateRoute = await getPrivateRoute();
-    const cancelledOrder = { _id: orderData._id, status: 'Cancelled' };
-
+    const cancelledOrder = {
+      _id: orderData._id,
+      status: 'Cancelled',
+    };
     orderEdit(cancelledOrder);
 
     // try {
@@ -230,22 +227,26 @@ const OrderPage = () => {
     //   console.error(err);
     // }
   };
-
   const handleDeleteItem = (id) => {
     // setOrderEditPending(true);
     setOrderItems(
       orderItems.map((orderItem) => {
         if (orderItem.id === id && orderItem.orderChange === 'delete') {
-          return { ...orderItem, orderChange: '' };
+          return {
+            ...orderItem,
+            orderChange: '',
+          };
         }
         if (orderItem.id === id) {
-          return { ...orderItem, orderChange: 'delete' };
+          return {
+            ...orderItem,
+            orderChange: 'delete',
+          };
         }
         return orderItem;
       }),
     );
   };
-
   const handleAddItem = (newItem) => {
     // setOrderEditPending(true);
     const item = newItem;
@@ -255,7 +256,6 @@ const OrderPage = () => {
     item.orderQuant = 1;
     setOrderItems([...orderItems, item]);
   };
-
   const handleDecreaseQuant = (id) => {
     // setOrderEditPending(true);
     const orderItemsEdit = orderItems.map((orderItem) => {
@@ -283,7 +283,6 @@ const OrderPage = () => {
     });
     setOrderItems(orderItemsEdit);
   };
-
   const handleIncreaseQuant = (id) => {
     // setOrderEditPending(true);
     const orderItemsEdit = orderItems.map((orderItem) => {
@@ -311,7 +310,6 @@ const OrderPage = () => {
     });
     setOrderItems(orderItemsEdit);
   };
-
   const handleSave = async () => {
     // const privateRoute = await getPrivateRoute();
     const editedOrder = {
@@ -328,10 +326,12 @@ const OrderPage = () => {
     // setOrderEditPending(false);
     // console.log(response.data);
   };
-
   const handleMessageSend = async () => {
     // const privatSeRoute = await getPrivateRoute();
-    messageSend({ _id: orderData._id, content: messageContent });
+    messageSend({
+      _id: orderData._id,
+      content: messageContent,
+    });
 
     // const response = await privateRoute.post(`/orders/${orderData._id}/message`, { content: messageContent });
     // setOrderData(rejectedOrder);
@@ -344,7 +344,6 @@ const OrderPage = () => {
   // orderInfo might be the order object itself, or have order/business structure
   const order = orderInfo?.order || orderInfo;
   const business = orderInfo?.business;
-
   if (
     !userProfile ||
     !business ||
@@ -353,12 +352,19 @@ const OrderPage = () => {
   ) {
     return null;
   }
-
   return (
     <>
       <Helmet>
-        <title>BeerLocal - Order Info</title>
-        <meta name='description' content='Your order' />
+        <title>
+          {tr(
+            'containers.orderpage.index.beerlocal.order.info',
+            'BeerLocal - Order Info',
+          )}
+        </title>
+        <meta
+          name='description'
+          content={tr('containers.orderpage.index.your.order', 'Your order')}
+        />
       </Helmet>
       <PageWrapper>
         <Segment basic className='primary wrapper'>
@@ -368,33 +374,57 @@ const OrderPage = () => {
             <Message negative>
               <Message.Header>{`This order has been ${orderData.status.toLowerCase()}.`}</Message.Header>
               <p>
-                If this is a mistake, please contact us <Link to='/'>here</Link>
-                .
+                {tr(
+                  'containers.orderpage.index.if.this.is.a.mistake.please.contact.us',
+                  'If this is a mistake, please contact us',
+                )}
+                <Link to='/'>here</Link>.
               </p>
             </Message>
           )}
           {orderData.status === 'Confirmed' && role === 'retailer' && (
             <Message info>
-              <Message.Header>Your order has been confirmed!</Message.Header>
+              <Message.Header>
+                {tr(
+                  'containers.orderpage.index.your.order.has.been.confirmed',
+                  'Your order has been confirmed!',
+                )}
+              </Message.Header>
             </Message>
           )}
           {orderData.status === 'Changes pending' && role === 'retailer' && (
             <Message warning>
-              <Message.Header>Your order has changes pending.</Message.Header>
-              <p>Please approve the changes or cancel the order.</p>
+              <Message.Header>
+                {tr(
+                  'containers.orderpage.index.your.order.has.changes.pending',
+                  'Your order has changes pending.',
+                )}
+              </Message.Header>
+              <p>
+                {tr(
+                  'containers.orderpage.index.please.approve.the.changes.or.cancel.the.order',
+                  'Please approve the changes or cancel the order.',
+                )}
+              </p>
             </Message>
           )}
           {orderData.status === 'Changes pending' && role === 'producer' && (
             <Message>
               <Message.Header>
-                Awaiting approval for order changes from the customer.
+                {tr(
+                  'containers.orderpage.index.awaiting.approval.for.order.changes.from.the.customer',
+                  'Awaiting approval for order changes from the customer.',
+                )}
               </Message.Header>
             </Message>
           )}
           {orderData.status === 'Pending' && role === 'retailer' && (
             <Message>
               <Message.Header>
-                Awaiting order confirmation from the brewery.
+                {tr(
+                  'containers.orderpage.index.awaiting.order.confirmation.from.the.brewery',
+                  'Awaiting order confirmation from the brewery.',
+                )}
               </Message.Header>
             </Message>
           )}
@@ -404,7 +434,10 @@ const OrderPage = () => {
             business.deliveryInstruction && (
               <Message warning>
                 <Message.Header>
-                  This customer has specific requirements for delivery.
+                  {tr(
+                    'containers.orderpage.index.this.customer.has.specific.requirements.for.delivery',
+                    'This customer has specific requirements for delivery.',
+                  )}
                 </Message.Header>
                 <p>{business.deliveryInstruction}</p>
               </Message>
@@ -424,8 +457,14 @@ const OrderPage = () => {
                     icon='check'
                     content={
                       orderData.status !== 'Confirmed'
-                        ? 'Confirm order'
-                        : 'Confirmed - click again to undo'
+                        ? tr(
+                            'containers.orderpage.index.confirm.order',
+                            'Confirm order',
+                          )
+                        : tr(
+                            'containers.orderpage.index.confirmed.click.again.to.undo',
+                            'Confirmed - click again to undo',
+                          )
                     }
                   />
                 )
@@ -441,7 +480,10 @@ const OrderPage = () => {
                     loading={orderEditing}
                     color='green'
                     icon='check'
-                    content='Approve changes'
+                    content={tr(
+                      'containers.orderpage.index.approve.changes',
+                      'Approve changes',
+                    )}
                   />
                 )
               }
@@ -461,8 +503,14 @@ const OrderPage = () => {
                     icon='ban'
                     content={
                       orderData.status !== 'Rejected'
-                        ? 'Reject order'
-                        : 'Rejected - click again to undo'
+                        ? tr(
+                            'containers.orderpage.index.reject.order',
+                            'Reject order',
+                          )
+                        : tr(
+                            'containers.orderpage.index.rejected.click.again.to.undo',
+                            'Rejected - click again to undo',
+                          )
                     }
                   />
                 )
@@ -482,8 +530,14 @@ const OrderPage = () => {
                     icon='close'
                     content={
                       orderData.status !== 'Cancelled'
-                        ? 'Cancel order'
-                        : 'Cancelled - click again to undo'
+                        ? tr(
+                            'containers.orderpage.index.cancel.order',
+                            'Cancel order',
+                          )
+                        : tr(
+                            'containers.orderpage.index.cancelled.click.again.to.undo',
+                            'Cancelled - click again to undo',
+                          )
                     }
                   />
                 )
@@ -533,8 +587,15 @@ const OrderPage = () => {
           <br />
           {editingOrder ? (
             <Button.Group>
-              <Button content='Cancel' onClick={handleCancelEdit} />
-              <Button content='Save' primary onClick={handleSave} />
+              <Button
+                content={tr('containers.orderpage.index.cancel', 'Cancel')}
+                onClick={handleCancelEdit}
+              />
+              <Button
+                content={tr('containers.orderpage.index.save', 'Save')}
+                primary
+                onClick={handleSave}
+              />
             </Button.Group>
           ) : (
             <Can
@@ -545,7 +606,7 @@ const OrderPage = () => {
                 orderData.status !== 'Rejected' && (
                   <Button
                     primary
-                    content='Edit'
+                    content={tr('containers.orderpage.index.edit', 'Edit')}
                     size='large'
                     onClick={() => setEditingOrder(true)}
                   />
@@ -569,13 +630,18 @@ const OrderPage = () => {
             <Button
               attached='right'
               primary
-              content='Send'
+              content={tr('containers.orderpage.index.send', 'Send')}
               onClick={handleMessageSend}
               loading={messageSending}
             />
           </MessageBoxStyle>
           {!!messageContent.length && (
-            <p style={{ textAlign: 'right', fontSize: '10px' }}>
+            <p
+              style={{
+                textAlign: 'right',
+                fontSize: '10px',
+              }}
+            >
               {messageContent.length}/{ORDER_MESSAGE_CHARACTER_LIMIT}
             </p>
           )}
@@ -600,11 +666,10 @@ const OrderPage = () => {
               <Button color="red" inverted content="Cancel" onClick={() => setMessageModalOpen(false)} />
               <Button primary inverted content="Submit" onClick={handleMessageSend} />
             </Modal.Actions>
-          </Modal> */}
+           </Modal> */}
         </Segment>
       </PageWrapper>
     </>
   );
 };
-
 export default OrderPage;

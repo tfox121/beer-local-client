@@ -2,23 +2,22 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Header, Segment, Feed, Dimmer, Loader } from 'semantic-ui-react';
-
 import PageWrapper from '../../components/PageWrapper';
 import RetailerDashboardStyle from './RetailerDashboardStyle';
 import FeedItem from './FeedItem';
 import { useRetailerFeedQuery } from '../../queries/retailerFeed';
 import { useUserQuery } from '../../queries/user';
-
+import { tr } from '../../utils/i18nRuntime';
 const RetailerDashboardPage = () => {
   const { isAuthenticated } = useAuth0();
-  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
+  const { data: userProfile } = useUserQuery({
+    enabled: isAuthenticated,
+  });
   const { data: producerFeed = [], isLoading: producerFeedFetching } =
     useRetailerFeedQuery();
-
   if (!producerFeed) {
     return null;
   }
-
   return (
     <PageWrapper>
       {producerFeedFetching && (
@@ -27,7 +26,9 @@ const RetailerDashboardPage = () => {
         </Dimmer>
       )}
       <Segment basic className='primary wrapper'>
-        <Header as='h1'>Updates</Header>
+        <Header as='h1'>
+          {tr('containers.retailerdashboardpage.index.updates', 'Updates')}
+        </Header>
         <RetailerDashboardStyle>
           <Feed size='large'>
             {producerFeed.map((producerItem, index) => {
@@ -51,5 +52,4 @@ const RetailerDashboardPage = () => {
     </PageWrapper>
   );
 };
-
 export default RetailerDashboardPage;

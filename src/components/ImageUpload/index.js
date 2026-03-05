@@ -8,16 +8,13 @@ import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Form, Button } from 'semantic-ui-react';
-
 import { ACCEPTED_IMAGE_FORMATS } from '../../utils/constants';
 import ImageUploadStyle from './ImageUploadStyle';
 import messages from './messages';
-
+import { tr } from '../../utils/i18nRuntime';
 function ImageUpload({ formValues, setFormValues, formErrors }) {
   const { pictureFile } = formValues;
-
   const fileInputRef = createRef();
-
   const fileChange = (e) => {
     setFormValues({
       ...formValues,
@@ -32,7 +29,10 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
       <Form>
         <Form.Field>
           <label htmlFor='fileUpload'>
-            Profile picture
+            {tr(
+              'components.imageupload.index.profile.picture',
+              'Profile picture',
+            )}
             <br />
             <Button
               type='button'
@@ -62,7 +62,10 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
                 role='alert'
                 aria-atomic='true'
               >
-                Invalid file type.
+                {tr(
+                  'components.imageupload.index.invalid.file.type',
+                  'Invalid file type.',
+                )}
               </div>
             )}
           </label>
@@ -71,11 +74,9 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
     </ImageUploadStyle>
   );
 }
-
 ImageUpload.propTypes = {
   formValues: PropTypes.object,
   setFormValues: PropTypes.func,
   formErrors: PropTypes.object,
 };
-
 export default ImageUpload;

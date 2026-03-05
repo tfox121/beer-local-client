@@ -3,38 +3,32 @@ import PropTypes from 'prop-types';
 import { Table, Image, Button } from 'semantic-ui-react';
 import { Link, useHistory } from 'react-router-dom';
 import { Map, TileLayer } from 'react-leaflet';
-
 import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
 import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 import { useFollowProducerMutation } from '../../queries/user';
-
+import { tr } from '../../utils/i18nRuntime';
 const ProducerListItem = ({ producer, user }) => {
   const history = useHistory();
   const { mutate: followProducer, isLoading: producerFollowing } =
     useFollowProducerMutation();
   const [followButtonClicked, setFollowButtonClicked] = useState(false);
-
   useEffect(() => {
     if (!producerFollowing) {
       setFollowButtonClicked(false);
     }
   }, [producerFollowing]);
-
   const handleFollowClick = () => {
     followProducer(producer.sub);
     setFollowButtonClicked(true);
   };
-
   const handleClick = (businessId) => {
     history.push(`/brewery/${businessId}`);
   };
-
   const followedProducerSubs = (user.followedProducers || []).map(
     (followedProducer) => followedProducer.sub,
   );
   const isFollowed = followedProducerSubs.includes(producer.sub);
-
   return (
     <Table.Row key={producer._id}>
       <Table.Cell width={5}>
@@ -49,14 +43,22 @@ const ProducerListItem = ({ producer, user }) => {
         />
       </Table.Cell>
       <Table.Cell width={6}>
-        <div style={{ display: 'flex' }}>
+        <div
+          style={{
+            display: 'flex',
+          }}
+        >
           <Link to={`/brewery/${producer.businessId}`}>
             <h2>{producer.businessName}</h2>
           </Link>
           <Button
             size='mini'
-            style={{ maxWidth: '100px', maxHeight: '30px', marginLeft: '1em' }}
-            title={`${isFollowed ? 'Unfollow ' : 'Follow '}${producer.businessName}`}
+            style={{
+              maxWidth: '100px',
+              maxHeight: '30px',
+              marginLeft: '1em',
+            }}
+            title={`${isFollowed ? tr('containers.producerlistpage.producerlistitem.unfollow', 'Unfollow') : tr('containers.producerlistpage.producerlistitem.follow', 'Follow')}${producer.businessName}`}
             loading={followButtonClicked}
             positive={isFollowed}
             icon={isFollowed ? 'check' : 'plus'}
@@ -78,10 +80,8 @@ const ProducerListItem = ({ producer, user }) => {
     </Table.Row>
   );
 };
-
 ProducerListItem.propTypes = {
   producer: PropTypes.object,
   user: PropTypes.object,
 };
-
 export default ProducerListItem;

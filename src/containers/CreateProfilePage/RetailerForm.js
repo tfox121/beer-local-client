@@ -3,9 +3,7 @@ import PropTypes from 'prop-types';
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
 import AddressAutocomplete from '../../components/AddressAutocomplete';
-
 import ayt from '../../utils/phoneNumberValidation';
-
 import MapMarker from '../../components/MapMarker';
 import MarkerMapStyle from './MarkerMapStyle';
 import SuggestBlockStyle from './SuggestBlockStyle';
@@ -14,7 +12,7 @@ import {
   DELIVERY_INSTRUCTION_CHARACTER_LIMIT,
   MAP_TILE_PROVIDER_URL,
 } from '../../utils/constants';
-
+import { tr } from '../../utils/i18nRuntime';
 const RetailerForm = ({
   formValues,
   setFormValues,
@@ -30,7 +28,6 @@ const RetailerForm = ({
   const [visible, setVisible] = useState(false);
   const [unformattedTel, setUnformattedTel] = useState('');
   const geosuggestEl = useRef(null);
-
   useEffect(() => {
     if (profileStage === 1 && formValues.type === 'retailer') {
       setVisible(true);
@@ -38,17 +35,17 @@ const RetailerForm = ({
     }
     setVisible(false);
   }, [formValues.type, profileStage]);
-
   useEffect(() => {
     if (formValues.location && formValues.location.lat) {
       setMapCentre([formValues.location.lat, formValues.location.lng]);
       setZoomLevel(15);
     }
   }, [setMapCentre, formValues.location]);
-
   useEffect(() => {
     setFormErrors((prevErrors) => {
-      const newErrors = { ...prevErrors };
+      const newErrors = {
+        ...prevErrors,
+      };
       delete newErrors.purchasingContactNumber;
       return newErrors;
     });
@@ -66,31 +63,49 @@ const RetailerForm = ({
       }));
     }
   }, [setFormErrors, setFormValues, unformattedTel]);
-
   const handleChange = (e, { name, value }) => {
-    const newErrors = { ...formErrors };
+    const newErrors = {
+      ...formErrors,
+    };
     delete newErrors[name];
-    setFormErrors({ ...newErrors });
-    setFormValues({ ...formValues, [name]: value });
+    setFormErrors({
+      ...newErrors,
+    });
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
   };
-
   const handleCheckboxChange = () => {
-    const newErrors = { ...formErrors };
+    const newErrors = {
+      ...formErrors,
+    };
     delete newErrors.terms;
-    setFormErrors({ ...newErrors });
-    setFormValues({ ...formValues, terms: !formValues.terms });
+    setFormErrors({
+      ...newErrors,
+    });
+    setFormValues({
+      ...formValues,
+      terms: !formValues.terms,
+    });
   };
-
   const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
       const locationObj = Array.isArray(locationArray)
-        ? { lat: locationArray[0], lng: locationArray[1] }
+        ? {
+            lat: locationArray[0],
+            lng: locationArray[1],
+          }
         : locationArray;
-      const newErrors = { ...formErrors };
+      const newErrors = {
+        ...formErrors,
+      };
       delete newErrors.location;
-      setFormErrors({ ...newErrors });
+      setFormErrors({
+        ...newErrors,
+      });
       setFormValues({
         ...formValues,
         location: locationObj,
@@ -98,7 +113,6 @@ const RetailerForm = ({
       });
     }
   };
-
   return (
     visible && (
       <Grid centered columns={2}>
@@ -106,7 +120,10 @@ const RetailerForm = ({
           <Grid.Column width={10}>
             <Form>
               <Form.Input
-                label='Premises name'
+                label={tr(
+                  'containers.createprofilepage.retailerform.premises.name',
+                  'Premises name',
+                )}
                 name='businessName'
                 value={formValues.businessName || ''}
                 required
@@ -119,7 +136,10 @@ const RetailerForm = ({
                 }
               />
               <Form.Input
-                label='Primary contact name'
+                label={tr(
+                  'containers.createprofilepage.retailerform.primary.contact.name',
+                  'Primary contact name',
+                )}
                 name='primaryContactName'
                 value={formValues.primaryContactName || ''}
                 required
@@ -132,7 +152,10 @@ const RetailerForm = ({
                 }
               />
               <Form.Input
-                label='Purchasing email address'
+                label={tr(
+                  'containers.createprofilepage.retailerform.purchasing.email.address',
+                  'Purchasing email address',
+                )}
                 name='purchasingEmail'
                 type='email'
                 value={formValues.purchasingEmail || ''}
@@ -146,7 +169,10 @@ const RetailerForm = ({
                 }
               />
               <Form.Input
-                label='Purchasing contact number'
+                label={tr(
+                  'containers.createprofilepage.retailerform.purchasing.contact.number',
+                  'Purchasing contact number',
+                )}
                 name='purchasingContactNumber'
                 type='tel'
                 value={formValues.purchasingContactNumber || ''}
@@ -164,7 +190,10 @@ const RetailerForm = ({
                 <SuggestBlockStyle>
                   <AddressAutocomplete
                     ref={geosuggestEl}
-                    label='Location'
+                    label={tr(
+                      'containers.createprofilepage.retailerform.location',
+                      'Location',
+                    )}
                     id='Location'
                     location={mapCentre}
                     radius={1500}
@@ -182,14 +211,23 @@ const RetailerForm = ({
                     role='alert'
                     aria-atomic='true'
                   >
-                    This field is required
+                    {tr(
+                      'containers.createprofilepage.retailerform.this.field.is.required',
+                      'This field is required',
+                    )}
                   </div>
                 )}
               </div>
               <br />
               <Form.TextArea
-                label='Delivery Instruction'
-                placeholder='Any delivery restrictions or instructions...'
+                label={tr(
+                  'containers.createprofilepage.retailerform.delivery.instruction',
+                  'Delivery Instruction',
+                )}
+                placeholder={tr(
+                  'containers.createprofilepage.retailerform.any.delivery.restrictions.or.instructions',
+                  'Any delivery restrictions or instructions...',
+                )}
                 value={formValues.deliveryInstruction || ''}
                 name='deliveryInstruction'
                 onChange={handleChange}
@@ -197,13 +235,21 @@ const RetailerForm = ({
               />
               {formValues.deliveryInstruction &&
                 !!formValues.deliveryInstruction.length && (
-                  <p style={{ textAlign: 'right', fontSize: '10px' }}>
+                  <p
+                    style={{
+                      textAlign: 'right',
+                      fontSize: '10px',
+                    }}
+                  >
                     {formValues.deliveryInstruction.length}/
                     {DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
                   </p>
                 )}
               <Form.Checkbox
-                label='I agree to the Terms and Conditions'
+                label={tr(
+                  'containers.createprofilepage.retailerform.i.agree.to.the.terms.and.conditions',
+                  'I agree to the Terms and Conditions',
+                )}
                 name='terms'
                 // value={formValues.terms}
                 checked={formValues.terms}
@@ -237,7 +283,6 @@ const RetailerForm = ({
     )
   );
 };
-
 RetailerForm.propTypes = {
   formValues: PropTypes.object,
   setFormValues: PropTypes.func,
@@ -249,5 +294,4 @@ RetailerForm.propTypes = {
   avatarSaved: PropTypes.string,
   setAvatarSaved: PropTypes.func,
 };
-
 export default RetailerForm;

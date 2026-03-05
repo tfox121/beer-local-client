@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { divIcon } from 'leaflet';
 import { Icon } from 'semantic-ui-react';
-
+import { tr } from '../../utils/i18nRuntime';
 const blueMarkerIconMarkup = renderToStaticMarkup(
   <Icon size='big' color='blue' name='map marker alternate' />,
 );
@@ -23,31 +23,26 @@ const manIconMarkup = renderToStaticMarkup(
 const dotIconMarkup = renderToStaticMarkup(
   <Icon name='dot circle outline' color='blue' />,
 );
-
 const blueMarkerIcon = divIcon({
   html: blueMarkerIconMarkup,
   className: 'blue-marker-icon',
   iconAnchor: [14, 19],
 });
-
 const redMarkerIcon = divIcon({
   html: redMarkerIconMarkup,
   className: 'red-marker-icon',
   iconAnchor: [14, 19],
 });
-
 const manIcon = divIcon({
   html: manIconMarkup,
   className: 'man-icon',
   iconAnchor: [14, 19],
 });
-
 const dotIcon = divIcon({
   html: dotIconMarkup,
   className: 'dot-icon',
   // iconAnchor: [14, 19],
 });
-
 function MapMarker({ location, type, name }) {
   switch (type) {
     case 'customer':
@@ -70,7 +65,9 @@ function MapMarker({ location, type, name }) {
       return (
         <Marker position={location} icon={manIcon}>
           <Popup>
-            <span>Your location.</span>
+            <span>
+              {tr('components.mapmarker.index.your.location', 'Your location.')}
+            </span>
           </Popup>
         </Marker>
       );
@@ -78,17 +75,20 @@ function MapMarker({ location, type, name }) {
       return (
         <Marker position={location} icon={dotIcon}>
           <Popup>
-            <span>Brewery location.</span>
+            <span>
+              {tr(
+                'components.mapmarker.index.brewery.location',
+                'Brewery location.',
+              )}
+            </span>
           </Popup>
         </Marker>
       );
   }
 }
-
 MapMarker.propTypes = {
   location: PropTypes.object,
   type: PropTypes.string,
   name: PropTypes.string,
 };
-
 export default MapMarker;

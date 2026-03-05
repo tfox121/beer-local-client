@@ -6,7 +6,6 @@ import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
 import { Item, Button, Form, Segment, Grid } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { Editor } from 'react-draft-wysiwyg';
-
 import {
   BLOG_ITEMS_PER_PAGE,
   BLOG_EDITOR_TOOLBAR,
@@ -14,7 +13,7 @@ import {
 } from '../../utils/constants';
 import timeAgo from '../../utils/timeAgo';
 import { useEditBlogMutation } from '../../queries/producerProfile';
-
+import { tr } from '../../utils/i18nRuntime';
 const BlogPost = ({
   user,
   businessId,
@@ -45,11 +44,9 @@ const BlogPost = ({
   ) {
     return null;
   }
-
   if (!blogPost) {
     return null;
   }
-
   const handleEditConfirm = async () => {
     const contentState = blogData.getCurrentContent();
     const rawBlogData = convertToRaw(contentState);
@@ -63,26 +60,49 @@ const BlogPost = ({
       onBlogEdited();
     }
   };
-
   return (
-    <Segment stacked style={{ marginTop: '1em', marginBottom: 0 }}>
+    <Segment
+      stacked
+      style={{
+        marginTop: '1em',
+        marginBottom: 0,
+      }}
+    >
       <Item.Group>
-        <Item style={{ marginTop: 0, marginBottom: 0 }}>
+        <Item
+          style={{
+            marginTop: 0,
+            marginBottom: 0,
+          }}
+        >
           {/* <Item.Image src="https://react.semantic-ui.com/images/wireframe/image.png" /> */}
           <Item.Content>
             {editingBlog ? (
               <Form.Input
-                label='Title'
+                label={tr(
+                  'containers.producerprofilepage.blogpost.title',
+                  'Title',
+                )}
                 fluid
                 width={7}
                 value={blogMeta.title}
                 onChange={(e) =>
-                  setBlogMeta({ ...blogMeta, title: e.target.value })
+                  setBlogMeta({
+                    ...blogMeta,
+                    title: e.target.value,
+                  })
                 }
-                placeholder='Post title...'
+                placeholder={tr(
+                  'containers.producerprofilepage.blogpost.post.title',
+                  'Post title...',
+                )}
               />
             ) : (
-              <Item.Header style={{ fontSize: '1.5em' }}>
+              <Item.Header
+                style={{
+                  fontSize: '1.5em',
+                }}
+              >
                 {blogMeta.title}
               </Item.Header>
             )}
@@ -118,30 +138,48 @@ const BlogPost = ({
               {timeAgo.format(Date.parse(blogPost.createdAt))}
               {editingBlog ? (
                 <Grid
-                  style={{ padding: 0 }}
+                  style={{
+                    padding: 0,
+                  }}
                   textAlign='right'
                   verticalAlign='middle'
                 >
                   <Grid.Column
                     textAlign='left'
                     width={2}
-                    style={{ padding: 0 }}
+                    style={{
+                      padding: 0,
+                    }}
                   >
                     <Form.Checkbox
                       className='blogpost-display-checkbox'
-                      label='Display'
+                      label={tr(
+                        'containers.producerprofilepage.blogpost.display',
+                        'Display',
+                      )}
                       checked={blogMeta.display}
                       onChange={() =>
-                        setBlogMeta({ ...blogMeta, display: !blogMeta.display })
+                        setBlogMeta({
+                          ...blogMeta,
+                          display: !blogMeta.display,
+                        })
                       }
                     />
                   </Grid.Column>
                   <Grid.Column width={10} />
-                  <Grid.Column width={4} style={{ padding: 0 }}>
+                  <Grid.Column
+                    width={4}
+                    style={{
+                      padding: 0,
+                    }}
+                  >
                     <Button
                       compact
                       onClick={() => setEditingBlog(false)}
-                      content='Cancel'
+                      content={tr(
+                        'containers.producerprofilepage.blogpost.cancel',
+                        'Cancel',
+                      )}
                       floated='right'
                     />
                     <Button
@@ -149,7 +187,10 @@ const BlogPost = ({
                       color='green'
                       loading={editingBlogRequest}
                       onClick={handleEditConfirm}
-                      content='Save'
+                      content={tr(
+                        'containers.producerprofilepage.blogpost.save',
+                        'Save',
+                      )}
                       floated='right'
                     />
                   </Grid.Column>
@@ -158,27 +199,41 @@ const BlogPost = ({
                 <>
                   {user && user.businessId === businessId && (
                     <Grid
-                      style={{ padding: 0 }}
+                      style={{
+                        padding: 0,
+                      }}
                       textAlign='right'
                       verticalAlign='middle'
                     >
                       <Grid.Column
                         textAlign='left'
                         width={8}
-                        style={{ padding: 0 }}
+                        style={{
+                          padding: 0,
+                        }}
                         verticalAlign='bottom'
                       >
                         {blogMeta.display ? (
-                          <strong>Displayed</strong>
+                          <strong>
+                            {tr(
+                              'containers.producerprofilepage.blogpost.displayed',
+                              'Displayed',
+                            )}
+                          </strong>
                         ) : (
-                          'Hidden'
+                          tr(
+                            'containers.producerprofilepage.blogpost.hidden',
+                            'Hidden',
+                          )
                         )}
                       </Grid.Column>
                       {/* <Grid.Column width={12} /> */}
                       <Grid.Column
                         width={8}
                         textAlign='right'
-                        style={{ padding: 0 }}
+                        style={{
+                          padding: 0,
+                        }}
                       >
                         <Button
                           compact
@@ -186,7 +241,10 @@ const BlogPost = ({
                           floated='right'
                           primary
                           onClick={() => setEditingBlog(true)}
-                          content='Edit'
+                          content={tr(
+                            'containers.producerprofilepage.blogpost.edit',
+                            'Edit',
+                          )}
                         />
                       </Grid.Column>
                     </Grid>
@@ -200,7 +258,6 @@ const BlogPost = ({
     </Segment>
   );
 };
-
 BlogPost.propTypes = {
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   businessId: PropTypes.string,
@@ -209,5 +266,4 @@ BlogPost.propTypes = {
   index: PropTypes.number,
   onBlogEdited: PropTypes.func,
 };
-
 export default BlogPost;

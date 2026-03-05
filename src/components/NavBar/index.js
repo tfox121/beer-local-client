@@ -5,23 +5,21 @@
  */
 
 import React, { useState, memo } from 'react';
-
 import { Menu, Responsive, Dropdown } from 'semantic-ui-react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useHistory } from 'react-router-dom';
-
 import UserMenuItems from './UserMenuItems';
 import Can from '../Can';
-
 import { useUserQuery } from '../../queries/user';
 import NavBarStyle from './NavBarStyle';
-
+import { tr } from '../../utils/i18nRuntime';
 function NavBar() {
   const [activeItem, setActiveItem] = useState('');
   const { isAuthenticated } = useAuth0();
   const history = useHistory();
-  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
-
+  const { data: userProfile } = useUserQuery({
+    enabled: isAuthenticated,
+  });
   const handleItemClick = (e, { name }) => {
     setActiveItem(name);
     switch (name) {
@@ -42,15 +40,19 @@ function NavBar() {
         break;
     }
   };
-
   return (
     <NavBarStyle>
       <Menu fixed='top'>
         {userProfile ? (
-          <Responsive as={Dropdown} text='BeerLocal' item maxWidth={425}>
+          <Responsive
+            as={Dropdown}
+            text={tr('components.navbar.index.beerlocal', 'BeerLocal')}
+            item
+            maxWidth={425}
+          >
             <Dropdown.Menu>
               <Dropdown.Item
-                content='Home'
+                content={tr('components.navbar.index.home', 'Home')}
                 name='/'
                 active={activeItem === '/'}
                 onClick={handleItemClick}
@@ -61,13 +63,16 @@ function NavBar() {
                 yes={() => (
                   <>
                     <Dropdown.Item
-                      content='Your Store'
+                      content={tr(
+                        'components.navbar.index.your.store',
+                        'Your Store',
+                      )}
                       active={activeItem === '/brewery/profile'}
                       onClick={handleItemClick}
                       name='/brewery/profile'
                     />
                     <Dropdown.Item
-                      content='Orders'
+                      content={tr('components.navbar.index.orders', 'Orders')}
                       active={activeItem === '/sales/orders'}
                       onClick={handleItemClick}
                       name='/sales/orders'
@@ -82,12 +87,15 @@ function NavBar() {
                   <>
                     <Dropdown.Item
                       name='/breweries'
-                      content='Breweries'
+                      content={tr(
+                        'components.navbar.index.breweries',
+                        'Breweries',
+                      )}
                       active={activeItem === '/breweries'}
                       onClick={handleItemClick}
                     />
                     <Dropdown.Item
-                      content='Orders'
+                      content={tr('components.navbar.index.orders', 'Orders')}
                       active={activeItem === '/sales/orders'}
                       onClick={handleItemClick}
                       name='/sales/orders'
@@ -106,7 +114,7 @@ function NavBar() {
             maxWidth={425}
             className='home-button'
           >
-            BeerLocal
+            {tr('components.navbar.index.beerlocal', 'BeerLocal')}
           </Responsive>
         )}
         <Responsive
@@ -117,7 +125,7 @@ function NavBar() {
           minWidth={426}
           className='home-button'
         >
-          BeerLocal
+          {tr('components.navbar.index.beerlocal', 'BeerLocal')}
         </Responsive>
         <Responsive as={React.Fragment} minWidth={426}>
           <Can
@@ -126,13 +134,16 @@ function NavBar() {
             yes={() => (
               <>
                 <Menu.Item
-                  content='Your Store'
+                  content={tr(
+                    'components.navbar.index.your.store',
+                    'Your Store',
+                  )}
                   active={activeItem === '/brewery/profile'}
                   onClick={handleItemClick}
                   name='/brewery/profile'
                 />
                 <Menu.Item
-                  content='Orders'
+                  content={tr('components.navbar.index.orders', 'Orders')}
                   active={activeItem === '/sales/orders'}
                   onClick={handleItemClick}
                   name='/sales/orders'
@@ -147,12 +158,12 @@ function NavBar() {
               <>
                 <Menu.Item
                   name='/breweries'
-                  content='Breweries'
+                  content={tr('components.navbar.index.breweries', 'Breweries')}
                   active={activeItem === '/breweries'}
                   onClick={handleItemClick}
                 />
                 <Menu.Item
-                  content='Orders'
+                  content={tr('components.navbar.index.orders', 'Orders')}
                   active={activeItem === '/sales/orders'}
                   onClick={handleItemClick}
                   name='/sales/orders'

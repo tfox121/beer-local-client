@@ -10,7 +10,6 @@ import { Segment, Header, Dimmer, Loader } from 'semantic-ui-react';
 import PhoneNumber from 'awesome-phonenumber';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useHistory } from 'react-router-dom';
-
 import { Helmet } from 'react-helmet';
 // import messages from './messages';
 
@@ -24,13 +23,12 @@ import PageWrapper from '../../components/PageWrapper';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
 import { useSaveUserMutation } from '../../queries/user';
-
+import { tr } from '../../utils/i18nRuntime';
 export function CreateProfilePage() {
   const { user } = useAuth0();
   const history = useHistory();
   const { mutateAsync: saveUser, isLoading: savingUser } =
     useSaveUserMutation();
-
   const formTemplate = useMemo(
     () => ({
       type: '',
@@ -46,7 +44,6 @@ export function CreateProfilePage() {
     }),
     [],
   );
-
   const producerFormTemplate = useMemo(
     () => ({
       salesEmail: '',
@@ -57,7 +54,6 @@ export function CreateProfilePage() {
     }),
     [],
   );
-
   const retailerFormTemplate = useMemo(
     () => ({
       purchasingEmail: '',
@@ -67,14 +63,12 @@ export function CreateProfilePage() {
     }),
     [],
   );
-
   const [avatarSaved, setAvatarSaved] = useState(undefined);
   const [avatarRoute, setAvatarRoute] = useState({});
   const [formValues, setFormValues] = useState(formTemplate);
   const [formErrors, setFormErrors] = useState({});
   const [profileStage, setProfileStage] = useState(0);
   const [mapCentre, setMapCentre] = useState([54.00366, -2.547855]);
-
   useEffect(() => {
     if (
       profileStage === 0 &&
@@ -84,22 +78,26 @@ export function CreateProfilePage() {
       setFormErrors({});
     }
   }, [profileStage, formTemplate, formValues]);
-
   useEffect(() => {
     if (
       formValues.type === 'producer' &&
       Object.keys(formValues).length === Object.keys(formTemplate).length
     ) {
-      setFormValues({ ...formValues, ...producerFormTemplate });
+      setFormValues({
+        ...formValues,
+        ...producerFormTemplate,
+      });
     }
     if (
       formValues.type === 'retailer' &&
       Object.keys(formValues).length === Object.keys(formTemplate).length
     ) {
-      setFormValues({ ...formValues, ...retailerFormTemplate });
+      setFormValues({
+        ...formValues,
+        ...retailerFormTemplate,
+      });
     }
   }, [formValues, formTemplate, producerFormTemplate, retailerFormTemplate]);
-
   useEffect(() => {
     if (avatarSaved) {
       const setAvatarRouteAsync = async () => {
@@ -111,7 +109,6 @@ export function CreateProfilePage() {
       setAvatarRoute({});
     };
   }, [avatarSaved]);
-
   useEffect(() => {
     if (localStorage.businessName) {
       setFormValues((prevFormValues) => ({
@@ -127,14 +124,11 @@ export function CreateProfilePage() {
       setProfileStage(1);
     }
   }, []);
-
   const backClickHandler = () => {
     setProfileStage(profileStage - 1);
   };
-
   const forwardClickHandler = () => {
     const errors = {};
-
     if (formValues.type === 'retailer') {
       const puchasingNumber = new PhoneNumber(
         formValues.purchasingContactNumber,
@@ -170,17 +164,14 @@ export function CreateProfilePage() {
     if (!formValues.fileValid) {
       errors.pictureFile = 'Invalid file type';
     }
-
     if (!Object.keys(errors).length) {
       setProfileStage(profileStage + 1);
     } else {
       setFormErrors(errors);
     }
   };
-
   const handleSubmit = async () => {
     const errors = {};
-
     if (formValues.type === 'producer') {
       if (
         formValues.distributionAreas &&
@@ -191,7 +182,6 @@ export function CreateProfilePage() {
           "You need to save at least one distribution area. If you have already drawn a shape, make sure you click 'Finish' in order to proceed";
       }
     }
-
     if (!Object.keys(errors).length) {
       let avatarSource;
       if (avatarSaved) {
@@ -200,7 +190,10 @@ export function CreateProfilePage() {
           avatarSource = getImageUrl(user.sub, 'avatar');
         }
       }
-      const response = await saveUser({ ...formValues, avatarSource });
+      const response = await saveUser({
+        ...formValues,
+        avatarSource,
+      });
       if (response && response.user) {
         if (formValues.type === 'producer') {
           history.push(`/brewery/${response.user.businessId}`);
@@ -212,16 +205,31 @@ export function CreateProfilePage() {
       setFormErrors(errors);
     }
   };
-
   return (
     <>
       <Helmet>
-        <title>BeerLocal - Create your profile</title>
-        <meta name='description' content='Profile creation form' />
+        <title>
+          {tr(
+            'containers.createprofilepage.index.beerlocal.create.your.profile',
+            'BeerLocal - Create your profile',
+          )}
+        </title>
+        <meta
+          name='description'
+          content={tr(
+            'containers.createprofilepage.index.profile.creation.form',
+            'Profile creation form',
+          )}
+        />
       </Helmet>
       <PageWrapper>
         <Segment basic textAlign='center' className='primary wrapper'>
-          <Header as='h1'>Complete your profile</Header>
+          <Header as='h1'>
+            {tr(
+              'containers.createprofilepage.index.complete.your.profile',
+              'Complete your profile',
+            )}
+          </Header>
           <BusinessTypeSelection
             profileStage={profileStage}
             setProfileStage={setProfileStage}
@@ -279,5 +287,4 @@ export function CreateProfilePage() {
     </>
   );
 }
-
 export default CreateProfilePage;

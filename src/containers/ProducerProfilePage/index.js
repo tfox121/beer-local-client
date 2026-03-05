@@ -30,7 +30,6 @@ import {
 import { Map, TileLayer } from 'react-leaflet';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useLocation } from 'react-router-dom';
-
 import {
   BLOG_ITEMS_PER_PAGE,
   PACK_SIZES,
@@ -57,16 +56,17 @@ import ProducerBlogEditor from './ProducerBlogEditor';
 import ProfileEditModal from '../ProfileEditModal';
 import BlogPost from './BlogPost';
 import PromotionModal from './PromotionModal';
-
 import MapStyle from './MapStyle';
 import BlogStyle from './BlogStyle';
 import BannerStyle from './BannerStyle';
 import AvailabilityMobile from './AvailabilityMobile';
-
+import { tr } from '../../utils/i18nRuntime';
 export function ProducerProfilePage() {
   const { isAuthenticated } = useAuth0();
   const routerLocation = useLocation();
-  const { data: user } = useUserQuery({ enabled: isAuthenticated });
+  const { data: user } = useUserQuery({
+    enabled: isAuthenticated,
+  });
   const { mutate: producerFollow, isLoading: producerFollowing } =
     useFollowProducerMutation();
   const producerBusinessId =
@@ -83,7 +83,6 @@ export function ProducerProfilePage() {
   const { mutateAsync: profileUpdateMutation } = useUpdateProfileMutation();
   const { mutateAsync: profileOptionsUpdateMutation } =
     useUpdateProfileOptionsMutation();
-
   const [producerFollowed, setProducerFollowed] = useState(false);
   const [blogPage, setBlogPage] = useState(1);
   const [profileEditModalOpen, setProfileEditModalOpen] = useState(false);
@@ -96,13 +95,11 @@ export function ProducerProfilePage() {
     [followedProducers],
   );
   const producerSub = producerProfile && producerProfile.sub;
-
   useEffect(() => {
     if (producerSub) {
       setProducerFollowed(followedProducerSubs.includes(producerSub));
     }
   }, [followedProducerSubs, producerSub]);
-
   const handleDeletePromo = useCallback(
     async (id) => {
       await promotionDeleteMutation(id);
@@ -110,7 +107,6 @@ export function ProducerProfilePage() {
     },
     [promotionDeleteMutation, profileFetch],
   );
-
   const handleProfileUpdate = useCallback(
     async (updateObj) => {
       await profileUpdateMutation(updateObj);
@@ -118,7 +114,6 @@ export function ProducerProfilePage() {
     },
     [profileUpdateMutation, profileFetch],
   );
-
   const handleProfileOptionsUpdate = useCallback(
     async (updateObj) => {
       await profileOptionsUpdateMutation(updateObj);
@@ -126,11 +121,9 @@ export function ProducerProfilePage() {
     },
     [profileOptionsUpdateMutation, profileFetch],
   );
-
   if (fetchingProfile || !producerProfile) {
     return null;
   }
-
   const {
     sub,
     businessId,
@@ -146,13 +139,10 @@ export function ProducerProfilePage() {
     bannerSource,
     avatarSource,
   } = producerProfile;
-
   TimeAgo.addLocale(en);
-
   const handleFollowClick = async () => {
     producerFollow(producerProfile.sub);
   };
-
   const blogRender = (blogArray, page) =>
     blogArray
       .filter(
@@ -179,7 +169,6 @@ export function ProducerProfilePage() {
           </React.Fragment>
         );
       });
-
   return (
     <>
       <Helmet>
@@ -235,11 +224,19 @@ export function ProducerProfilePage() {
                           onClick={() => setProfileEditModalOpen(true)}
                           primary
                         >
-                          Edit Profile
+                          {tr(
+                            'containers.producerprofilepage.index.edit.profile',
+                            'Edit Profile',
+                          )}
                         </Button>
                       }
                     >
-                      <Modal.Header>Edit profile</Modal.Header>
+                      <Modal.Header>
+                        {tr(
+                          'containers.producerprofilepage.index.edit.profile.2',
+                          'Edit profile',
+                        )}
+                      </Modal.Header>
                       <ProfileEditModal
                         user={producerProfile}
                         profileEditModalOpen={profileEditModalOpen}
@@ -257,7 +254,17 @@ export function ProducerProfilePage() {
                       icon={
                         followedProducerSubs.includes(sub) ? 'check' : 'plus'
                       }
-                      content={producerFollowed ? 'Following' : 'Follow'}
+                      content={
+                        producerFollowed
+                          ? tr(
+                              'containers.producerprofilepage.index.following',
+                              'Following',
+                            )
+                          : tr(
+                              'containers.producerprofilepage.index.follow',
+                              'Follow',
+                            )
+                      }
                       onClick={handleFollowClick}
                     />
                   )}
@@ -293,7 +300,10 @@ export function ProducerProfilePage() {
                       href={`mailto:${salesEmail}`}
                       target='_blank'
                       rel='noopener noreferrer'
-                      content='email'
+                      content={tr(
+                        'containers.producerprofilepage.index.email',
+                        'email',
+                      )}
                       icon='mail'
                     />
                     <Label
@@ -333,9 +343,16 @@ export function ProducerProfilePage() {
         {producerProfile.profileOptions.activeModules.includes('blog') && (
           <Segment basic className='wrapper'>
             <BlogStyle>
-              <Grid columns={2} style={{ marginBottom: '0.05em' }}>
+              <Grid
+                columns={2}
+                style={{
+                  marginBottom: '0.05em',
+                }}
+              >
                 <Grid.Column width={7} textAlign='left'>
-                  <Header as='h2'>News</Header>
+                  <Header as='h2'>
+                    {tr('containers.producerprofilepage.index.news', 'News')}
+                  </Header>
                 </Grid.Column>
                 <Grid.Column width={9} textAlign='right'>
                   {user && user.businessId === businessId && (
@@ -347,7 +364,12 @@ export function ProducerProfilePage() {
                 {blog && blog.length ? (
                   blogRender(blog, blogPage)
                 ) : (
-                  <Segment>No posts yet!</Segment>
+                  <Segment>
+                    {tr(
+                      'containers.producerprofilepage.index.no.posts.yet',
+                      'No posts yet!',
+                    )}
+                  </Segment>
                 )}
                 {blog && blog.length > BLOG_ITEMS_PER_PAGE && (
                   <Segment basic textAlign='center'>
@@ -383,9 +405,19 @@ export function ProducerProfilePage() {
           'promotions',
         ) && (
           <Segment basic className='wrapper'>
-            <Grid columns={2} style={{ marginBottom: '0.05em' }}>
+            <Grid
+              columns={2}
+              style={{
+                marginBottom: '0.05em',
+              }}
+            >
               <Grid.Column width={8} textAlign='left'>
-                <Header as='h2'>Promotions</Header>
+                <Header as='h2'>
+                  {tr(
+                    'containers.producerprofilepage.index.promotions',
+                    'Promotions',
+                  )}
+                </Header>
               </Grid.Column>
               <Grid.Column width={8} textAlign='right'>
                 {user && user.businessId === businessId && (
@@ -444,7 +476,12 @@ export function ProducerProfilePage() {
                   })}
                 </Item.Group>
               ) : (
-                <>No promotions currently available.</>
+                <>
+                  {tr(
+                    'containers.producerprofilepage.index.no.promotions.currently.available',
+                    'No promotions currently available.',
+                  )}
+                </>
               )}
             </Segment>
           </Segment>
@@ -454,9 +491,19 @@ export function ProducerProfilePage() {
           'availability',
         ) && (
           <Segment basic className='wrapper'>
-            <Grid columns={2} style={{ marginBottom: '0.05em' }}>
+            <Grid
+              columns={2}
+              style={{
+                marginBottom: '0.05em',
+              }}
+            >
               <Grid.Column width={8} textAlign='left'>
-                <Header as='h2'>Availability</Header>
+                <Header as='h2'>
+                  {tr(
+                    'containers.producerprofilepage.index.availability',
+                    'Availability',
+                  )}
+                </Header>
               </Grid.Column>
               <Grid.Column width={8} textAlign='right'>
                 {user && user.businessId === businessId && (
@@ -497,5 +544,4 @@ export function ProducerProfilePage() {
     </>
   );
 }
-
 export default ProducerProfilePage;

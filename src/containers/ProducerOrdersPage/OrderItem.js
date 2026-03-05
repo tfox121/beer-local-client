@@ -4,23 +4,23 @@ import { Table, Button, Popup, Image } from 'semantic-ui-react';
 import moment from 'moment';
 import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
-
 import calcOrderTotal from '../../utils/calcOrderTotal';
 import OrderModalContent from '../../components/OrderModalContent';
 import Can from '../../components/Can';
 import { useEditProducerOrderMutation } from '../../queries/orders';
-
+import { tr } from '../../utils/i18nRuntime';
 const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
   const { mutate: orderEdit, isLoading: orderEditing } =
     useEditProducerOrderMutation();
-  const [orderData, setOrderData] = useState({ ...order });
-
+  const [orderData, setOrderData] = useState({
+    ...order,
+  });
   const { role } = userProfile;
-
   useEffect(() => {
-    setOrderData({ ...order });
+    setOrderData({
+      ...order,
+    });
   }, [order]);
-
   const handleConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
     const confirmedOrder = {
@@ -37,18 +37,19 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
     //   console.error(err);
     // }
   };
-
   const handleChangesConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
     const itemsApproved = order.items
       .filter((orderItem) => orderItem.orderChange !== 'delete')
-      .map((orderItem) => ({ ...orderItem, orderChange: '' }));
+      .map((orderItem) => ({
+        ...orderItem,
+        orderChange: '',
+      }));
     const pendingOrder = {
       _id: orderData._id,
       status: 'Pending',
       items: itemsApproved,
     };
-
     orderEdit(pendingOrder);
 
     // try {
@@ -60,14 +61,12 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
     //   console.error(err);
     // }
   };
-
   const handleReject = async () => {
     // const privateRoute = await getPrivateRoute();
     const rejectedOrder = {
       _id: orderData._id,
       status: orderData.status === 'Rejected' ? 'Pending' : 'Rejected',
     };
-
     orderEdit(rejectedOrder);
     // try {
     //   const response = await privateRoute.patch(`/orders/${order._id}`, rejectedOrder);
@@ -78,11 +77,12 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
     //   console.error(err);
     // }
   };
-
   const handleCancel = async () => {
     // const privateRoute = await getPrivateRoute();
-    const cancelledOrder = { _id: orderData._id, status: 'Cancelled' };
-
+    const cancelledOrder = {
+      _id: orderData._id,
+      status: 'Cancelled',
+    };
     orderEdit(cancelledOrder);
 
     // try {
@@ -94,7 +94,6 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
     //   console.error(err);
     // }
   };
-
   return (
     <Popup
       mouseEnterDelay={500}
@@ -117,12 +116,14 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
           </Table.Cell>
           <Table.Cell>
             <Image
-              style={{ marginLeft: '0.5em' }}
+              style={{
+                marginLeft: '0.5em',
+              }}
               src={
                 ordersInfo.businesses[index]?.avatarSource ||
                 '/images/avatars/blank-avatar.webp'
               }
-              alt={`${ordersInfo.businesses[index]?.businessName || 'Business'} avatar`}
+              alt={`${ordersInfo.businesses[index]?.businessName || tr('containers.producerorderspage.orderitem.business', 'Business')} avatar`}
               avatar
               onError={(e) => {
                 e.target.src = '/images/avatars/blank-avatar.webp';
@@ -148,19 +149,26 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
             />
           </Table.Cell>
           <Table.Cell
-            style={{ fontWeight: order.status === 'Confirmed' && 'bold' }}
+            style={{
+              fontWeight: order.status === 'Confirmed' && 'bold',
+            }}
           >
             {order.status}
           </Table.Cell>
           <Table.Cell textAlign='center' width={2}>
-            <Link to={`/order/${order._id}`}>View Details</Link>
+            <Link to={`/order/${order._id}`}>
+              {tr(
+                'containers.producerorderspage.orderitem.view.details',
+                'View Details',
+              )}
+            </Link>
           </Table.Cell>
           {/* <Modal
-        trigger={<Table.Cell textAlign="center" width={2}>View Details</Table.Cell>}
-        dimmer="inverted"
-      >
-        <Modal.Content>
-          <Modal.Description>
+           trigger={<Table.Cell textAlign="center" width={2}>View Details</Table.Cell>}
+           dimmer="inverted"
+           >
+           <Modal.Content>
+           <Modal.Description>
             <OrderModalContent
               editingOrder={editingOrder}
               orderItems={order.items}
@@ -172,11 +180,11 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
               businessName={ordersInfo.businesses[index].businessName}
               type="orderInfo"
             />
-          </Modal.Description>
-          <MessageFeed messages={order.messages} user={userProfile} business={ordersInfo.businesses[index]} businessAvatar={ordersInfo.images[index]} />
-        </Modal.Content>
-        <Modal.Actions>
-          {editingOrder
+           </Modal.Description>
+           <MessageFeed messages={order.messages} user={userProfile} business={ordersInfo.businesses[index]} businessAvatar={ordersInfo.images[index]} />
+           </Modal.Content>
+           <Modal.Actions>
+           {editingOrder
             ? (
               <>
                 <Button content="Cancel" onClick={() => setEditingOrder(false)} />
@@ -206,8 +214,8 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
                 />
               </>
             )}
-        </Modal.Actions>
-      </Modal> */}
+           </Modal.Actions>
+           </Modal> */}
           <Table.Cell textAlign='center'>
             <Can
               role={role}
@@ -221,7 +229,10 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
                     basic={orderData.status !== 'Confirmed'}
                     color='green'
                     icon='check'
-                    title='Confirm order'
+                    title={tr(
+                      'containers.producerorderspage.orderitem.confirm.order',
+                      'Confirm order',
+                    )}
                   />
                 )
               }
@@ -236,7 +247,10 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
                     onClick={handleChangesConfirm}
                     color='green'
                     icon='check'
-                    title='Approve changes'
+                    title={tr(
+                      'containers.producerorderspage.orderitem.approve.changes',
+                      'Approve changes',
+                    )}
                   />
                 )
               }
@@ -254,7 +268,10 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
                     basic={orderData.status !== 'Rejected'}
                     color='red'
                     icon='ban'
-                    title='Reject order'
+                    title={tr(
+                      'containers.producerorderspage.orderitem.reject.order',
+                      'Reject order',
+                    )}
                   />
                 )
               }
@@ -271,7 +288,10 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
                     basic={orderData.status !== 'Cancelled'}
                     color='red'
                     icon='close'
-                    title='Cancel order'
+                    title={tr(
+                      'containers.producerorderspage.orderitem.cancel.order',
+                      'Cancel order',
+                    )}
                   />
                 )
               }
@@ -291,7 +311,6 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
     />
   );
 };
-
 OrderItem.propTypes = {
   userProfile: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
   ordersInfo: PropTypes.object,
@@ -299,5 +318,4 @@ OrderItem.propTypes = {
   index: PropTypes.number,
   role: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
-
 export default OrderItem;

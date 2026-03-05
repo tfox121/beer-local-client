@@ -16,7 +16,6 @@ import {
 } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { TileLayer, Map } from 'react-leaflet';
-
 import PageWrapper from '../../components/PageWrapper';
 import ProducerDashboardStyle from './ProducerDashboardStyle';
 import calcOrderTotal from '../../utils/calcOrderTotal';
@@ -30,10 +29,12 @@ import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
 import { useProducerDashboardQuery } from '../../queries/producerDashboard';
 import { useUserQuery } from '../../queries/user';
-
+import { tr } from '../../utils/i18nRuntime';
 const ProducerDashboardPage = () => {
   const { isAuthenticated } = useAuth0();
-  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
+  const { data: userProfile } = useUserQuery({
+    enabled: isAuthenticated,
+  });
   const { data: dashboardData, isLoading: producerDashboardFetching } =
     useProducerDashboardQuery();
   const dashboardOrders = useMemo(
@@ -44,7 +45,6 @@ const ProducerDashboardPage = () => {
     () => dashboardData?.dashboardRetailers || [],
     [dashboardData],
   );
-
   const [salesPeriod, setSalesPeriod] = useState('week');
   const [periodSales, setPeriodSales] = useState({});
   const [periodSalesDiff, setPeriodSalesDiff] = useState(0);
@@ -54,14 +54,11 @@ const ProducerDashboardPage = () => {
   const [periodSalesAverageItemsDiff, setPeriodSalesAverageItemsDiff] =
     useState(0);
   const [topCustomers, setTopCustomers] = useState([]);
-
   const status = 'Pending';
-
   const periodSalesCalc = (ordersArr, period, previous) => {
     let total = 0;
     let orderCount = 0;
     let itemCount = 0;
-
     ordersArr.forEach((order) => {
       if (
         previous &&
@@ -98,7 +95,6 @@ const ProducerDashboardPage = () => {
       averageItems,
     };
   };
-
   const topCustomersArr = (ordersArr, period) => {
     const customerList = ordersArr.reduce((customers, order) => {
       const customersObj = customers;
@@ -125,7 +121,6 @@ const ProducerDashboardPage = () => {
       a.salesTotal > b.salesTotal ? -1 : a.salesTotal < b.salesTotal ? 1 : 0,
     );
   };
-
   const topItemsArr = (ordersArr, period) => {
     if (ordersArr.length) {
       const itemList = ordersArr.reduce((items, order) => {
@@ -154,7 +149,6 @@ const ProducerDashboardPage = () => {
       );
     }
   };
-
   useEffect(() => {
     if (dashboardOrders.length) {
       const currentPeriodData = periodSalesCalc(dashboardOrders, salesPeriod);
@@ -180,12 +174,10 @@ const ProducerDashboardPage = () => {
       setTopCustomers(topCustomersArr(dashboardOrders, salesPeriod));
     }
   }, [dashboardOrders, salesPeriod]);
-
   const topItems = useMemo(
     () => topItemsArr(dashboardOrders, salesPeriod),
     [dashboardOrders, salesPeriod],
   );
-
   if (
     !userProfile ||
     !Object.keys(dashboardOrders).length ||
@@ -213,9 +205,13 @@ const ProducerDashboardPage = () => {
           <Grid stackable columns={2} verticalAlign='middle'>
             <Grid.Column className='header-column' width='10'>
               <Header as='h1'>
-                Hi {userProfile.businessName}
+                {tr('containers.producerdashboardpage.index.hi', 'Hi')}
+                {userProfile.businessName}
                 {', '}
-                here&apos;s how things are going.
+                {tr(
+                  'containers.producerdashboardpage.index.here.s.how.things.are.going',
+                  "here's how things are going.",
+                )}
               </Header>
             </Grid.Column>
             <Grid.Column className='button-column' width='6' textAlign='right'>
@@ -224,19 +220,19 @@ const ProducerDashboardPage = () => {
                   active={salesPeriod === 'week'}
                   onClick={() => setSalesPeriod('week')}
                 >
-                  Week
+                  {tr('containers.producerdashboardpage.index.week', 'Week')}
                 </Button>
                 <Button
                   active={salesPeriod === 'month'}
                   onClick={() => setSalesPeriod('month')}
                 >
-                  Month
+                  {tr('containers.producerdashboardpage.index.month', 'Month')}
                 </Button>
                 <Button
                   active={salesPeriod === 'year'}
                   onClick={() => setSalesPeriod('year')}
                 >
-                  Year
+                  {tr('containers.producerdashboardpage.index.year', 'Year')}
                 </Button>
               </Button.Group>
             </Grid.Column>
@@ -244,13 +240,23 @@ const ProducerDashboardPage = () => {
           <Segment basic>
             <Grid columns={3} stackable>
               <Grid.Column className='sales-summary' width={6}>
-                <Header>This {salesPeriod} you&apos;ve sold</Header>
+                <Header>
+                  {tr('containers.producerdashboardpage.index.this', 'This')}
+                  {salesPeriod}
+                  {tr(
+                    'containers.producerdashboardpage.index.you.ve.sold',
+                    "you've sold",
+                  )}
+                </Header>
                 <Header as='h1' dividing>
                   £{periodSales.total.toFixed(2)}
                 </Header>
-                That&apos;s{' '}
+                {tr('containers.producerdashboardpage.index.that.s', "That's")}{' '}
                 {periodSalesDiff === 0 ? (
-                  'exactly the same as'
+                  tr(
+                    'containers.producerdashboardpage.index.exactly.the.same.as',
+                    'exactly the same as',
+                  )
                 ) : (
                   <>
                     £{Math.abs(periodSalesDiff).toFixed(2)}{' '}
@@ -264,7 +270,10 @@ const ProducerDashboardPage = () => {
                 </Header>
                 That&apos;s{' '}
                 {periodSalesOrderCountDiff === 0 ? (
-                  'exactly the same as'
+                  tr(
+                    'containers.producerdashboardpage.index.exactly.the.same.as.2',
+                    'exactly the same as',
+                  )
                 ) : (
                   <>
                     {Math.abs(periodSalesOrderCountDiff)}{' '}
@@ -300,12 +309,18 @@ const ProducerDashboardPage = () => {
               </Grid.Column>
               <Grid.Column className='sales-averages' width={3}>
                 <Header as='h5' className='top-level'>
-                  Average Sale Value
+                  {tr(
+                    'containers.producerdashboardpage.index.average.sale.value',
+                    'Average Sale Value',
+                  )}
                 </Header>
                 <Header>
                   {!Number.isNaN(periodSales.average)
                     ? `£${periodSales.average.toFixed(2)}`
-                    : 'No sales to go on!'}
+                    : tr(
+                        'containers.producerdashboardpage.index.no.sales.to.go.on',
+                        'No sales to go on!',
+                      )}
                 </Header>
                 {!Number.isNaN(periodSalesAverageDiff) && (
                   <>
@@ -322,7 +337,10 @@ const ProducerDashboardPage = () => {
                   </>
                 )}
                 <Header as='h5' className='top-level'>
-                  Average Items per Sale
+                  {tr(
+                    'containers.producerdashboardpage.index.average.items.per.sale',
+                    'Average Items per Sale',
+                  )}
                 </Header>
                 <Header>
                   {!Number.isNaN(periodSales.averageItems)
@@ -348,14 +366,21 @@ const ProducerDashboardPage = () => {
             </Grid>
           </Segment>
           <Segment>
-            <Header dividing>Top Customers</Header>
+            <Header dividing>
+              {tr(
+                'containers.producerdashboardpage.index.top.customers',
+                'Top Customers',
+              )}
+            </Header>
             <Grid columns={2}>
               {topCustomers.length ? (
                 topCustomers.map((customer) => (
                   <Grid.Row key={customer.businessId}>
                     <Grid.Column width={12}>
                       <Image
-                        style={{ marginRight: '0.5em' }}
+                        style={{
+                          marginRight: '0.5em',
+                        }}
                         avatar
                         bordered
                         centered
@@ -377,21 +402,32 @@ const ProducerDashboardPage = () => {
               ) : (
                 <Grid.Row>
                   <Grid.Column width={16}>
-                    No customers so far this {salesPeriod}.
+                    {tr(
+                      'containers.producerdashboardpage.index.no.customers.so.far.this',
+                      'No customers so far this',
+                    )}
+                    {salesPeriod}.
                   </Grid.Column>
                 </Grid.Row>
               )}
             </Grid>
           </Segment>
           <Segment>
-            <Header dividing>Top Items</Header>
+            <Header dividing>
+              {tr(
+                'containers.producerdashboardpage.index.top.items',
+                'Top Items',
+              )}
+            </Header>
             <Grid columns={2} verticalAlign='middle'>
               {topItems.length ? (
                 topItems.map((item) => (
                   <Grid.Row key={item.id}>
                     <Grid.Column width={8}>
                       <Image
-                        style={{ marginRight: '0.5em' }}
+                        style={{
+                          marginRight: '0.5em',
+                        }}
                         avatar
                         bordered
                         centered
@@ -414,7 +450,11 @@ const ProducerDashboardPage = () => {
               ) : (
                 <Grid.Row>
                   <Grid.Column width={16}>
-                    No items sold so far this {salesPeriod}.
+                    {tr(
+                      'containers.producerdashboardpage.index.no.items.sold.so.far.this',
+                      'No items sold so far this',
+                    )}
+                    {salesPeriod}.
                   </Grid.Column>
                 </Grid.Row>
               )}
@@ -460,17 +500,25 @@ const ProducerDashboardPage = () => {
                 ))}
             </Map>
             <Icon
-              style={{ marginTop: '1em' }}
+              style={{
+                marginTop: '1em',
+              }}
               color='blue'
               name='map marker alternate'
             />
-            - current customers <Icon color='red' name='map marker alternate' />
-            - potential customers
+            {tr(
+              'containers.producerdashboardpage.index.current.customers',
+              '- current customers',
+            )}
+            <Icon color='red' name='map marker alternate' />
+            {tr(
+              'containers.producerdashboardpage.index.potential.customers',
+              '- potential customers',
+            )}
           </Segment>
         </ProducerDashboardStyle>
       </Segment>
     </PageWrapper>
   );
 };
-
 export default ProducerDashboardPage;

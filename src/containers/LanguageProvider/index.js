@@ -2,6 +2,7 @@ import React, { createContext, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { IntlProvider } from 'react-intl';
 import { DEFAULT_LOCALE } from '../../i18n';
+import { setI18nMessages } from '../../utils/i18nRuntime';
 
 const LanguageContext = createContext({
   locale: DEFAULT_LOCALE,
@@ -16,6 +17,7 @@ export function LanguageProvider({
   initialLocale = DEFAULT_LOCALE,
 }) {
   const [locale, setLocale] = useState(initialLocale);
+  setI18nMessages(messages[locale] || {});
   const contextValue = useMemo(() => ({ locale, setLocale }), [locale]);
 
   return (

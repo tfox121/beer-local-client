@@ -15,23 +15,20 @@ import timeAgo from '../../utils/timeAgo';
 import numToWords from '../../utils/numToWords';
 import { PACK_SIZES } from '../../utils/constants';
 import { useFollowProducerMutation } from '../../queries/user';
-
+import { tr } from '../../utils/i18nRuntime';
 const FeedItem = ({ producerItem, userProfile }) => {
   const { mutate: producerFollow, isLoading: producerFollowing } =
     useFollowProducerMutation();
   const [followButtonClicked, setFollowButtonClicked] = useState(false);
-
   useEffect(() => {
     if (!producerFollowing) {
       setFollowButtonClicked(false);
     }
   }, [producerFollowing]);
-
   const handleFollowClick = () => {
     producerFollow(producerItem.sub);
     setFollowButtonClicked(true);
   };
-
   const multiNewItemRender = (itemGroup) => {
     const vowelRegex = '^[aieouAIEOU].*';
     if (itemGroup.producerItems.length === 1) {
@@ -55,7 +52,10 @@ const FeedItem = ({ producerItem, userProfile }) => {
                   {itemGroup.producerItems[0].producer}
                 </Link>
               </Feed.User>{' '}
-              added a new beer
+              {tr(
+                'containers.retailerdashboardpage.feeditem.added.a.new.beer',
+                'added a new beer',
+              )}
               <Feed.Date>
                 {timeAgo.format(
                   Date.parse(itemGroup.producerItems[0].createdAt),
@@ -156,7 +156,6 @@ const FeedItem = ({ producerItem, userProfile }) => {
       </Feed.Event>
     );
   };
-
   const newBlogRender = (item) => (
     <Feed.Event key={item._id}>
       <Feed.Label>
@@ -198,7 +197,6 @@ const FeedItem = ({ producerItem, userProfile }) => {
       </Feed.Content>
     </Feed.Event>
   );
-
   const newProducerRender = (producer) => (
     <Feed.Event key={producer.businessId}>
       <Feed.Label>
@@ -211,14 +209,27 @@ const FeedItem = ({ producerItem, userProfile }) => {
               {producer.businessName}
             </Link>
           </Feed.User>{' '}
-          has joined BeerLocal, and they deliver to your area!
+          {tr(
+            'containers.retailerdashboardpage.feeditem.has.joined.beerlocal.and.they.deliver.to.your.area',
+            'has joined BeerLocal, and they deliver to your area!',
+          )}
           <Feed.Date>
             {timeAgo.format(Date.parse(producer.createdAt))}
           </Feed.Date>
         </Feed.Summary>
         <Segment>
-          <Feed.Extra images style={{ flexDirection: 'column' }}>
-            <div className='follow-container' style={{ display: 'flex' }}>
+          <Feed.Extra
+            images
+            style={{
+              flexDirection: 'column',
+            }}
+          >
+            <div
+              className='follow-container'
+              style={{
+                display: 'flex',
+              }}
+            >
               <Image
                 size='small'
                 centered
@@ -227,7 +238,12 @@ const FeedItem = ({ producerItem, userProfile }) => {
                 }
                 alt='product'
               />
-              <p style={{ marginBottom: '0', paddingTop: '0' }}>
+              <p
+                style={{
+                  marginBottom: '0',
+                  paddingTop: '0',
+                }}
+              >
                 {producer.intro}
               </p>
               <Button
@@ -248,8 +264,14 @@ const FeedItem = ({ producerItem, userProfile }) => {
                   userProfile.followedProducers
                     .map((followedProducer) => followedProducer.sub)
                     .includes(producer.sub)
-                    ? 'Following'
-                    : 'Follow'
+                    ? tr(
+                        'containers.retailerdashboardpage.feeditem.following',
+                        'Following',
+                      )
+                    : tr(
+                        'containers.retailerdashboardpage.feeditem.follow',
+                        'Follow',
+                      )
                 }
                 onClick={handleFollowClick}
               />
@@ -264,7 +286,6 @@ const FeedItem = ({ producerItem, userProfile }) => {
       </Feed.Content>
     </Feed.Event>
   );
-
   if (producerItem.blogData) {
     return newBlogRender(producerItem);
   }
@@ -276,7 +297,6 @@ const FeedItem = ({ producerItem, userProfile }) => {
   }
   return null;
 };
-
 FeedItem.propTypes = {
   producerItem: PropTypes.object,
   userProfile: PropTypes.object,

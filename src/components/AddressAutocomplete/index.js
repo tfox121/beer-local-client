@@ -13,9 +13,8 @@ import React, {
 } from 'react';
 import PropTypes from 'prop-types';
 import { Input } from 'semantic-ui-react';
-
+import { tr } from '../../utils/i18nRuntime';
 const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/search';
-
 const AddressAutocomplete = forwardRef(
   (
     {
@@ -42,7 +41,6 @@ const AddressAutocomplete = forwardRef(
     const inputRef = useRef(null);
     const suggestionsRef = useRef(null);
     const debounceTimerRef = useRef(null);
-
     useImperativeHandle(ref, () => ({
       selectSuggest: () => {
         if (suggestions.length > 0 && selectedIndex >= 0) {
@@ -55,18 +53,15 @@ const AddressAutocomplete = forwardRef(
         inputRef.current?.focus();
       },
     }));
-
     useEffect(() => {
       setQuery(initialValue);
     }, [initialValue]);
-
     const searchNominatim = async (searchQuery) => {
       if (!searchQuery || searchQuery.length < minlength) {
         setSuggestions([]);
         setShowSuggestions(false);
         return;
       }
-
       setIsLoading(true);
       try {
         const params = new URLSearchParams({
@@ -76,13 +71,11 @@ const AddressAutocomplete = forwardRef(
           limit: '5',
           countrycodes: country,
         });
-
         if (location && location.length === 2) {
           params.append('lat', location[0]);
           params.append('lon', location[1]);
           params.append('radius', radius);
         }
-
         const response = await fetch(
           `${NOMINATIM_BASE_URL}?${params.toString()}`,
           {
@@ -91,11 +84,9 @@ const AddressAutocomplete = forwardRef(
             },
           },
         );
-
         if (!response.ok) {
           throw new Error('Nominatim API error');
         }
-
         const data = await response.json();
         const formattedSuggestions = data.map((item, index) => ({
           location: [parseFloat(item.lat), parseFloat(item.lon)],
@@ -107,7 +98,6 @@ const AddressAutocomplete = forwardRef(
           raw: item,
           id: `${item.lat}-${item.lon}-${index}`,
         }));
-
         setSuggestions(formattedSuggestions);
         setShowSuggestions(true);
         setSelectedIndex(autoActivateFirstSuggest ? 0 : -1);
@@ -119,7 +109,6 @@ const AddressAutocomplete = forwardRef(
         setIsLoading(false);
       }
     };
-
     const handleInputChange = (e) => {
       const { value } = e.target;
       setQuery(value);
@@ -129,23 +118,19 @@ const AddressAutocomplete = forwardRef(
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
-
       debounceTimerRef.current = setTimeout(() => {
         searchNominatim(value);
       }, 300);
     };
-
     const handleSelectSuggestion = (suggestion) => {
       setQuery(suggestion.label);
       setShowSuggestions(false);
       setSuggestions([]);
       setSelectedIndex(-1);
-
       if (onSuggestSelect) {
         onSuggestSelect(suggestion);
       }
     };
-
     const handleInputBlur = (e) => {
       // Delay to allow click on suggestion
       setTimeout(() => {
@@ -155,16 +140,13 @@ const AddressAutocomplete = forwardRef(
         }
       }, 200);
     };
-
     const handleInputFocus = () => {
       if (suggestions.length > 0) {
         setShowSuggestions(true);
       }
     };
-
     const handleKeyDown = (e) => {
       if (!showSuggestions || suggestions.length === 0) return;
-
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setSelectedIndex((prev) =>
@@ -184,11 +166,12 @@ const AddressAutocomplete = forwardRef(
         setShowSuggestions(false);
       }
     };
-
     return (
       <div
         className={`geosuggest ${className}`}
-        style={{ position: 'relative' }}
+        style={{
+          position: 'relative',
+        }}
       >
         <Input
           ref={inputRef}
@@ -201,8 +184,13 @@ const AddressAutocomplete = forwardRef(
           onKeyDown={handleKeyDown}
           required={required}
           loading={isLoading}
-          placeholder='Start typing an address...'
-          style={{ width: '100%' }}
+          placeholder={tr(
+            'components.addressautocomplete.index.start.typing.an.address',
+            'Start typing an address...',
+          )}
+          style={{
+            width: '100%',
+          }}
         />
         {showSuggestions && suggestions.length > 0 && (
           <ul
@@ -259,7 +247,6 @@ const AddressAutocomplete = forwardRef(
     );
   },
 );
-
 AddressAutocomplete.propTypes = {
   label: PropTypes.string,
   id: PropTypes.string,
@@ -274,7 +261,5 @@ AddressAutocomplete.propTypes = {
   initialValue: PropTypes.string,
   className: PropTypes.string,
 };
-
 AddressAutocomplete.displayName = 'AddressAutocomplete';
-
 export default AddressAutocomplete;

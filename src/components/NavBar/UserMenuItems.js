@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Dropdown, Menu, Image, Icon } from 'semantic-ui-react';
 import { useAuth0 } from '@auth0/auth0-react';
-
 import styled from 'styled-components';
 import messages from './messages';
 import Notification from './Notification';
 import { getPrivateRoute } from '../../utils/api';
-
+import { tr } from '../../utils/i18nRuntime';
 const NotificationCircle = styled.div`
   position: absolute;
   display: flex;
@@ -23,7 +22,6 @@ const NotificationCircle = styled.div`
   align-items: center;
   border-radius: 50%;
 `;
-
 const StyledDropdownMenu = styled(Dropdown.Menu)`
   &&& {
     @media only screen and (max-width: 425px) {
@@ -38,7 +36,6 @@ const StyledDropdownMenu = styled(Dropdown.Menu)`
     }
   }
 `;
-
 export default function UserMenuItems({
   avatarSource,
   notifications,
@@ -47,13 +44,11 @@ export default function UserMenuItems({
   const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const [notificationsArr, setNotificationsArr] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
-
   useEffect(() => {
     if (notifications) {
       setNotificationsArr([...notifications]);
     }
   }, [notifications]);
-
   useEffect(() => {
     if (notificationsArr) {
       const unreadNotificationCount = notificationsArr.filter(
@@ -62,7 +57,6 @@ export default function UserMenuItems({
       setUnreadNotifications(unreadNotificationCount);
     }
   }, [notificationsArr]);
-
   const handleClose = async () => {
     if (unreadNotifications) {
       const privateRoute = await getPrivateRoute();
@@ -70,7 +64,6 @@ export default function UserMenuItems({
       setNotificationsArr([...response.data.notifications]);
     }
   };
-
   if (isAuthenticated) {
     // eslint-disable-next-line no-unused-expressions
     return (
@@ -101,7 +94,12 @@ export default function UserMenuItems({
                 </React.Fragment>
               ))
             ) : (
-              <Dropdown.Item disabled>No notifications.</Dropdown.Item>
+              <Dropdown.Item disabled>
+                {tr(
+                  'components.navbar.usermenuitems.no.notifications',
+                  'No notifications.',
+                )}
+              </Dropdown.Item>
             )}
           </StyledDropdownMenu>
         </Dropdown>
@@ -123,10 +121,10 @@ export default function UserMenuItems({
             </Dropdown.Header>
             {/* <Dropdown.Item>
               <FormattedMessage {...messages.yourProfile} />
-            </Dropdown.Item>
-            <Dropdown.Item>
+             </Dropdown.Item>
+             <Dropdown.Item>
               <FormattedMessage {...messages.settings} />
-            </Dropdown.Item> */}
+             </Dropdown.Item> */}
             <Dropdown.Item onClick={() => logout()}>
               <FormattedMessage {...messages.logOut} />
             </Dropdown.Item>
@@ -141,7 +139,6 @@ export default function UserMenuItems({
     </Menu.Item>
   );
 }
-
 UserMenuItems.propTypes = {
   avatarSource: PropTypes.string,
   notifications: PropTypes.array,

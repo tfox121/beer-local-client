@@ -13,7 +13,6 @@ import {
 import AvatarEditor from 'react-avatar-editor';
 import { Slider } from 'react-semantic-ui-range';
 import PhoneNumber from 'awesome-phonenumber';
-
 import NumberFormat from 'react-number-format';
 import AddressAutocomplete from '../../components/AddressAutocomplete';
 import L from 'leaflet';
@@ -28,7 +27,7 @@ import SuggestBlockStyle from '../CreateProfilePage/SuggestBlockStyle';
 import DistroMapStyle from '../CreateProfilePage/DistroMapStyle';
 import MapMarker from '../../components/MapMarker';
 import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
-
+import { tr } from '../../utils/i18nRuntime';
 const ProfileEditModal = ({
   producerProfile,
   user,
@@ -38,12 +37,13 @@ const ProfileEditModal = ({
 }) => {
   const { mutateAsync: userUpdate, isLoading: userUpdating } =
     useUpdateUserMutation();
-
   const [userFormValues, setUserFormValues] = useState({});
   const [producerFormValues, setProducerFormValues] = useState({
     profileOptions: {
       activeModules: [],
-      distantPurchasingConditions: { minSped: undefined },
+      distantPurchasingConditions: {
+        minSped: undefined,
+      },
     },
   });
   const [formErrors, setFormErrors] = useState({});
@@ -57,12 +57,10 @@ const ProfileEditModal = ({
   const [imageResizeModalOpen, setImageResizeModalOpen] = useState(false);
   const [unformattedTel, setUnformattedTel] = useState(user.salesContactNumber);
   const [zoom, setZoom] = useState(1);
-
   const bannerRef = createRef();
   const avatarRef = createRef();
   const editorRef = createRef();
   const geosuggestEl = useRef(null);
-
   const sliderSettings = {
     start: 1,
     min: 0.5,
@@ -72,7 +70,6 @@ const ProfileEditModal = ({
       setZoom(value);
     },
   };
-
   const {
     businessName,
     website,
@@ -87,31 +84,44 @@ const ProfileEditModal = ({
     bannerSource,
     avatarSource,
   } = user;
-
   const handleUserInfoChange = (e, { name, value }) => {
     if (formErrors[name]) {
-      const newErrors = { ...formErrors };
+      const newErrors = {
+        ...formErrors,
+      };
       delete newErrors[name];
-      setFormErrors({ ...newErrors });
+      setFormErrors({
+        ...newErrors,
+      });
     }
-    setUserFormValues({ ...userFormValues, [name]: value });
+    setUserFormValues({
+      ...userFormValues,
+      [name]: value,
+    });
   };
-
   const handleProducerInfoChange = (e, { name, value }) => {
     if (formErrors[name]) {
-      const newErrors = { ...formErrors };
+      const newErrors = {
+        ...formErrors,
+      };
       delete newErrors[name];
-      setFormErrors({ ...newErrors });
+      setFormErrors({
+        ...newErrors,
+      });
     }
-    setProducerFormValues({ ...producerFormValues, [name]: value });
+    setProducerFormValues({
+      ...producerFormValues,
+      [name]: value,
+    });
   };
-
   useEffect(() => {
     setFormErrors((prevErrors) => {
       if (!prevErrors.salesContactNumber) {
         return prevErrors;
       }
-      const newErrors = { ...prevErrors };
+      const newErrors = {
+        ...prevErrors,
+      };
       delete newErrors.salesContactNumber;
       return newErrors;
     });
@@ -129,30 +139,33 @@ const ProfileEditModal = ({
       }));
     }
   }, [unformattedTel]);
-
   useEffect(() => {
     if (Object.keys(user).length) {
-      setProducerFormValues((previous) => ({ ...previous, profileOptions }));
+      setProducerFormValues((previous) => ({
+        ...previous,
+        profileOptions,
+      }));
     }
   }, [user, profileOptions]);
-
   useEffect(() => {
     if (distributionAreas) {
-      setSavedPolygons({ ...distributionAreas });
+      setSavedPolygons({
+        ...distributionAreas,
+      });
     }
   }, [distributionAreas]);
-
   useEffect(() => {
     if (!profileEditModalOpen) {
       return;
     }
-
     setUserFormValues({});
     setFormErrors({});
     setProducerFormValues({
       profileOptions: profileOptions || {
         activeModules: [],
-        distantPurchasingConditions: { minSped: undefined },
+        distantPurchasingConditions: {
+          minSped: undefined,
+        },
       },
     });
     setSavedPolygons(distributionAreas || {});
@@ -177,7 +190,6 @@ const ProfileEditModal = ({
       setImageResizeModalOpen(true);
     }
   }, [avatar, banner]);
-
   useEffect(() => {
     if (bannerSaved) {
       const setBannerRouteAsync = async () => {
@@ -196,7 +208,6 @@ const ProfileEditModal = ({
       setAvatarRoute({});
     };
   }, [bannerSaved, avatarSaved]);
-
   const handleApply = () => {
     if (editorRef.current) {
       const canvasScaled = editorRef.current.getImageScaledToCanvas();
@@ -211,13 +222,11 @@ const ProfileEditModal = ({
     }
     setImageResizeModalOpen(false);
   };
-
   const handleModalClose = () => {
     setBanner({});
     setAvatar({});
     setImageResizeModalOpen(false);
   };
-
   const handleModuleToggle = (e, { name, checked }) => {
     let activeModules = [...producerFormValues.profileOptions.activeModules];
     if (checked) {
@@ -227,46 +236,66 @@ const ProfileEditModal = ({
     }
     setProducerFormValues({
       ...producerFormValues,
-      profileOptions: { ...producerFormValues.profileOptions, activeModules },
+      profileOptions: {
+        ...producerFormValues.profileOptions,
+        activeModules,
+      },
     });
   };
-
   const handleProfileOptionsToggle = (e, { name, checked }) => {
-    const newErrors = { ...formErrors };
+    const newErrors = {
+      ...formErrors,
+    };
     delete newErrors[name];
     if (name === 'distantPurchasing') {
       delete newErrors.minSpend;
     }
-    setFormErrors({ ...newErrors });
-    setProducerFormValues({
-      ...producerFormValues,
-      profileOptions: { ...producerFormValues.profileOptions, [name]: checked },
+    setFormErrors({
+      ...newErrors,
     });
-  };
-
-  const handleDistantPurchasingOptionsChange = (e, { name, value }) => {
-    const newErrors = { ...formErrors };
-    delete newErrors[name];
-    setFormErrors({ ...newErrors });
     setProducerFormValues({
       ...producerFormValues,
       profileOptions: {
         ...producerFormValues.profileOptions,
-        distantPurchasingConditions: { [name]: value },
+        [name]: checked,
       },
     });
   };
-
+  const handleDistantPurchasingOptionsChange = (e, { name, value }) => {
+    const newErrors = {
+      ...formErrors,
+    };
+    delete newErrors[name];
+    setFormErrors({
+      ...newErrors,
+    });
+    setProducerFormValues({
+      ...producerFormValues,
+      profileOptions: {
+        ...producerFormValues.profileOptions,
+        distantPurchasingConditions: {
+          [name]: value,
+        },
+      },
+    });
+  };
   const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
       const locationObj = Array.isArray(locationArray)
-        ? { lat: locationArray[0], lng: locationArray[1] }
+        ? {
+            lat: locationArray[0],
+            lng: locationArray[1],
+          }
         : locationArray;
-      const newErrors = { ...formErrors };
+      const newErrors = {
+        ...formErrors,
+      };
       delete newErrors.location;
-      setFormErrors({ ...newErrors });
+      setFormErrors({
+        ...newErrors,
+      });
       setUserFormValues({
         ...userFormValues,
         location: locationObj,
@@ -274,20 +303,15 @@ const ProfileEditModal = ({
       });
     }
   };
-
   let editableFG = null;
-
   const onFeatureGroupReady = (reactFGref) => {
     if (reactFGref) {
       // if (savedPolygons.features && savedPolygons.features.length > 0) {
       const customGeoJSON = new L.GeoJSON(savedPolygons);
-
       const leafletFG = reactFGref.leafletElement;
-
       leafletFG.eachLayer((layer) => {
         leafletFG.removeLayer(layer);
       });
-
       customGeoJSON.eachLayer((layer) => {
         leafletFG.addLayer(layer);
       });
@@ -295,28 +319,25 @@ const ProfileEditModal = ({
       editableFG = reactFGref;
     }
   };
-
   const onChange = () => {
     if (!editableFG || !onChange) {
       return;
     }
     const geojsonData = editableFG.leafletElement.toGeoJSON();
-
-    const newErrors = { ...formErrors };
+    const newErrors = {
+      ...formErrors,
+    };
     delete newErrors.distributionAreas;
-    setFormErrors({ ...newErrors });
+    setFormErrors({
+      ...newErrors,
+    });
     setSavedPolygons(geojsonData);
   };
-
   const onEdited = () => onChange();
-
   const onCreated = () => onChange();
-
   const onDeleted = () => onChange();
-
   const handleSubmit = async () => {
     const errors = {};
-
     if (
       producerFormValues.salesContactNumber &&
       !new PhoneNumber(producerFormValues.salesContactNumber, 'GB').isValid()
@@ -358,7 +379,10 @@ const ProfileEditModal = ({
           imagesObj.avatarSource = getImageUrl(user.sub, 'avatar');
         }
       }
-      userUpdate({ ...userFormValues, ...imagesObj });
+      userUpdate({
+        ...userFormValues,
+        ...imagesObj,
+      });
       profileUpdate({
         ...producerFormValues,
         ...userFormValues,
@@ -375,11 +399,9 @@ const ProfileEditModal = ({
       setFormErrors(errors);
     }
   };
-
   if (!producerProfile) {
     return null;
   }
-
   const autocompleteLocation = (() => {
     const currentLocation = userFormValues.location || location;
     if (Array.isArray(currentLocation) && currentLocation.length === 2) {
@@ -395,7 +417,6 @@ const ProfileEditModal = ({
     }
     return undefined;
   })();
-
   return (
     <>
       <Modal.Content>
@@ -419,7 +440,9 @@ const ProfileEditModal = ({
                     />
                     <Button
                       inverted
-                      style={{ zIndex: 2 }}
+                      style={{
+                        zIndex: 2,
+                      }}
                       circular
                       basic
                       className='image-button'
@@ -496,7 +519,10 @@ const ProfileEditModal = ({
           <Modal.Description>
             <Form>
               <Form.Input
-                label='Brewery name'
+                label={tr(
+                  'containers.profileeditmodal.index.brewery.name',
+                  'Brewery name',
+                )}
                 name='businessName'
                 value={userFormValues.businessName || businessName || ''}
                 required
@@ -509,7 +535,10 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
-                label='Sales contact name'
+                label={tr(
+                  'containers.profileeditmodal.index.sales.contact.name',
+                  'Sales contact name',
+                )}
                 name='primaryContactName'
                 value={
                   userFormValues.primaryContactName || primaryContactName || ''
@@ -524,7 +553,10 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
-                label='Sales email address'
+                label={tr(
+                  'containers.profileeditmodal.index.sales.email.address',
+                  'Sales email address',
+                )}
                 name='salesEmail'
                 value={producerFormValues.salesEmail || salesEmail || ''}
                 required
@@ -538,7 +570,10 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
-                label='Sales contact number'
+                label={tr(
+                  'containers.profileeditmodal.index.sales.contact.number',
+                  'Sales contact number',
+                )}
                 name='salesContactNumber'
                 value={
                   producerFormValues.salesContactNumber ||
@@ -558,26 +593,32 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
-                label='Website'
+                label={tr(
+                  'containers.profileeditmodal.index.website',
+                  'Website',
+                )}
                 name='website'
                 value={userFormValues.website || website || ''}
                 type='url'
                 onChange={handleUserInfoChange}
               />
               <Form.TextArea
-                label='Intro'
+                label={tr('containers.profileeditmodal.index.intro', 'Intro')}
                 name='intro'
                 value={producerFormValues.intro || intro || ''}
                 onChange={handleProducerInfoChange}
               />
 
               <div
-                className={`${formErrors.location && 'error'} required field`}
+                className={`${formErrors.location && tr('containers.profileeditmodal.index.error', 'error')} required field`}
               >
                 <SuggestBlockStyle>
                   <AddressAutocomplete
                     ref={geosuggestEl}
-                    label='Location'
+                    label={tr(
+                      'containers.profileeditmodal.index.location',
+                      'Location',
+                    )}
                     id='breweryLocation'
                     initialValue={userFormValues.address || address}
                     location={autocompleteLocation}
@@ -596,7 +637,10 @@ const ProfileEditModal = ({
                     role='alert'
                     aria-atomic='true'
                   >
-                    This field is required
+                    {tr(
+                      'containers.profileeditmodal.index.this.field.is.required',
+                      'This field is required',
+                    )}
                   </div>
                 )}
               </div>
@@ -642,7 +686,12 @@ const ProfileEditModal = ({
                   </Map>
                 </DistroMapStyle>
               )}
-              <Header as='h4'>Profile Modules</Header>
+              <Header as='h4'>
+                {tr(
+                  'containers.profileeditmodal.index.profile.modules',
+                  'Profile Modules',
+                )}
+              </Header>
               <Form.Group>
                 <Form.Checkbox
                   checked={producerFormValues.profileOptions.activeModules.includes(
@@ -650,7 +699,10 @@ const ProfileEditModal = ({
                   )}
                   onClick={handleModuleToggle}
                   toggle
-                  label='Availability'
+                  label={tr(
+                    'containers.profileeditmodal.index.availability',
+                    'Availability',
+                  )}
                   name='availability'
                 />
                 <Form.Checkbox
@@ -659,7 +711,10 @@ const ProfileEditModal = ({
                   )}
                   onClick={handleModuleToggle}
                   toggle
-                  label='Promotions'
+                  label={tr(
+                    'containers.profileeditmodal.index.promotions',
+                    'Promotions',
+                  )}
                   name='promotions'
                 />
                 <Form.Checkbox
@@ -668,33 +723,50 @@ const ProfileEditModal = ({
                   )}
                   onClick={handleModuleToggle}
                   toggle
-                  label='News'
+                  label={tr('containers.profileeditmodal.index.news', 'News')}
                   name='blog'
                 />
               </Form.Group>
               <Header as='h4'>
-                Allow orders from beyond distribution area
+                {tr(
+                  'containers.profileeditmodal.index.allow.orders.from.beyond.distribution.area',
+                  'Allow orders from beyond distribution area',
+                )}
               </Header>
               <div
                 className={`${formErrors.minSpend && 'error'} required field`}
               >
-                <Form.Group style={{ alignItems: 'center', height: '2em' }}>
+                <Form.Group
+                  style={{
+                    alignItems: 'center',
+                    height: '2em',
+                  }}
+                >
                   <Form.Checkbox
                     checked={
                       producerFormValues.profileOptions.distantPurchasing
                     }
                     onClick={handleProfileOptionsToggle}
                     toggle
-                    label='Allow'
+                    label={tr(
+                      'containers.profileeditmodal.index.allow',
+                      'Allow',
+                    )}
                     name='distantPurchasing'
                   />
                   {producerFormValues.profileOptions.distantPurchasing && (
                     <NumberFormat
-                      style={{ width: '50%', marginLeft: '1em' }}
+                      style={{
+                        width: '50%',
+                        marginLeft: '1em',
+                      }}
                       thousandSeparator
                       decimalScale={2}
                       fixedDecimalScale
-                      placeholder='For orders more than...'
+                      placeholder={tr(
+                        'containers.profileeditmodal.index.for.orders.more.than',
+                        'For orders more than...',
+                      )}
                       prefix='£'
                       onValueChange={(values) =>
                         handleDistantPurchasingOptionsChange(null, {
@@ -743,11 +815,14 @@ const ProfileEditModal = ({
                 icon='left arrow'
                 onClick={() => setImageResizeModalOpen(false)}
               />
-              Edit picture{' '}
+              {tr(
+                'containers.profileeditmodal.index.edit.picture',
+                'Edit picture',
+              )}{' '}
               <Button
                 primary
                 floated='right'
-                content='Apply'
+                content={tr('containers.profileeditmodal.index.apply', 'Apply')}
                 onClick={handleApply}
               />
             </Modal.Header>
@@ -775,7 +850,7 @@ const ProfileEditModal = ({
       <Modal.Actions>
         <Button
           primary
-          content='Save'
+          content={tr('containers.profileeditmodal.index.save', 'Save')}
           onClick={handleSubmit}
           loading={userUpdating}
         />
@@ -783,12 +858,10 @@ const ProfileEditModal = ({
     </>
   );
 };
-
 ProfileEditModal.propTypes = {
   producerProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   profileUpdate: PropTypes.func,
   setProfileEditModalOpen: PropTypes.func,
 };
-
 export default ProfileEditModal;

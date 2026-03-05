@@ -4,11 +4,10 @@ import { Transition, Message } from 'semantic-ui-react';
 import { Map, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import PropTypes from 'prop-types';
-
 import MapMarker from '../../components/MapMarker';
 import DistroMapStyle from './DistroMapStyle';
 import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
-
+import { tr } from '../../utils/i18nRuntime';
 const SelectDistroAreasForm = ({
   formValues,
   setFormValues,
@@ -18,7 +17,6 @@ const SelectDistroAreasForm = ({
   mapCentre,
 }) => {
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     if (profileStage === 2 && formValues.type === 'producer') {
       setVisible(true);
@@ -26,51 +24,63 @@ const SelectDistroAreasForm = ({
     }
     setVisible(false);
   }, [formValues.type, profileStage]);
-
   let editableFG = null;
-
   const onFeatureGroupReady = (reactFGref) => {
     if (reactFGref) {
       editableFG = reactFGref;
     }
   };
-
   const onChange = () => {
     if (!editableFG || !onChange) {
       return;
     }
     const geojsonData = editableFG.leafletElement.toGeoJSON();
-
-    const newErrors = { ...formErrors };
+    const newErrors = {
+      ...formErrors,
+    };
     delete newErrors.distributionAreas;
-    setFormErrors({ ...newErrors });
-    setFormValues({ ...formValues, distributionAreas: geojsonData });
+    setFormErrors({
+      ...newErrors,
+    });
+    setFormValues({
+      ...formValues,
+      distributionAreas: geojsonData,
+    });
   };
-
   const onEdited = () => {
     onChange();
   };
-
   const onCreated = (e) => {
     onChange();
   };
-
   const onDeleted = () => {
     onChange();
   };
-
   return (
-    <Transition.Group animation='fade' duration={{ hide: 500, show: 2000 }}>
+    <Transition.Group
+      animation='fade'
+      duration={{
+        hide: 500,
+        show: 2000,
+      }}
+    >
       {visible && (
         <>
           <p>
-            Use the tools at the top right to draw shapes corresponding to the
-            areas that you distribute to.
+            {tr(
+              'containers.createprofilepage.selectdistroareasform.use.the.tools.at.the.top.right.to.draw.shapes.corresponding.to.the.areas.that.you.distribute.to',
+              'Use the tools at the top right to draw shapes corresponding to the areas that you distribute to.',
+            )}
             <br />
-            Make sure to complete your shape by clicking the first point again
-            or the &quot;Finish&quot; button at the top right.
+            {tr(
+              'containers.createprofilepage.selectdistroareasform.make.sure.to.complete.your.shape.by.clicking.the.first.point.again.or.the.finish.button.at.the.top.right',
+              'Make sure to complete your shape by clicking the first point again or the "Finish" button at the top right.',
+            )}
             <br />
-            Hit &quot;Complete&quot; below when you&apos;re done
+            {tr(
+              'containers.createprofilepage.selectdistroareasform.hit.complete.below.when.you.re.done',
+              'Hit "Complete" below when you\'re done',
+            )}
           </p>
           <DistroMapStyle>
             <Map center={mapCentre} zoom={10} zoomControl={false}>
@@ -110,7 +120,12 @@ const SelectDistroAreasForm = ({
           </DistroMapStyle>
           {formErrors.distributionAreas && (
             <Message warning>
-              <Message.Header>Error</Message.Header>
+              <Message.Header>
+                {tr(
+                  'containers.createprofilepage.selectdistroareasform.error',
+                  'Error',
+                )}
+              </Message.Header>
               <p>{formErrors.distributionAreas}</p>
             </Message>
           )}
@@ -119,7 +134,6 @@ const SelectDistroAreasForm = ({
     </Transition.Group>
   );
 };
-
 SelectDistroAreasForm.propTypes = {
   profileStage: PropTypes.number,
   formValues: PropTypes.object,
@@ -127,5 +141,4 @@ SelectDistroAreasForm.propTypes = {
   mapCentre: PropTypes.array,
   formErrors: PropTypes.object,
 };
-
 export default SelectDistroAreasForm;

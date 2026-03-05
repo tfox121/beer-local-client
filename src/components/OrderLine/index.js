@@ -10,7 +10,7 @@ import { Table, Button } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import { PACK_SIZES } from '../../utils/constants';
 import QuantityButtonStyle from './QuantityButtonStyle';
-
+import { tr } from '../../utils/i18nRuntime';
 function OrderLine({
   orderLine,
   editingOrder,
@@ -21,7 +21,6 @@ function OrderLine({
   if (!orderLine) {
     return null;
   }
-
   return (
     <Table.Row positive={orderLine.orderChange === 'add'} key={orderLine.id}>
       <Table.Cell disabled={orderLine.orderChange === 'delete'}>
@@ -63,14 +62,20 @@ function OrderLine({
                 basic
                 icon='minus'
                 onClick={() => handleDecreaseQuant(orderLine.id)}
-                title='Decrease quantity'
+                title={tr(
+                  'components.orderline.index.decrease.quantity',
+                  'Decrease quantity',
+                )}
               />
               <Button
                 primary
                 basic
                 icon='plus'
                 onClick={() => handleIncreaseQuant(orderLine.id)}
-                title='Increase quantity'
+                title={tr(
+                  'components.orderline.index.increase.quantity',
+                  'Increase quantity',
+                )}
               />
             </Button.Group>
           )}
@@ -92,7 +97,7 @@ function OrderLine({
             color='red'
             size='mini'
             icon='close'
-            title='Cancel item'
+            title={tr('components.orderline.index.cancel.item', 'Cancel item')}
             onClick={() => handleDeleteItem(orderLine.id)}
           />
         </Table.Cell>
@@ -100,5 +105,4 @@ function OrderLine({
     </Table.Row>
   );
 }
-
 export default OrderLine;

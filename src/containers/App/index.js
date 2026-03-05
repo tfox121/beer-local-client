@@ -13,7 +13,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { Dimmer, Loader, Button, Segment, Header } from 'semantic-ui-react';
-
 import checkUserStatus from '../../utils/checkUserStatus';
 import HomePage from '../HomePage/Loadable';
 import CreateProfilePage from '../CreateProfilePage/Loadable';
@@ -25,9 +24,8 @@ import ProtectedRoute from '../../components/ProtectedRoute';
 import ProducerListPage from '../ProducerListPage';
 import OrderPage from '../OrderPage/Loadable';
 import { useUserQuery, userQueryKey } from '../../queries/user';
-
 import GlobalStyle from '../../global-styles';
-
+import { tr } from '../../utils/i18nRuntime';
 const AppWrapper = styled.div`
   background-color: #fdfdf0;
   min-width: 100%;
@@ -38,7 +36,6 @@ const AppWrapper = styled.div`
   // padding: 0 16px;
   flex-direction: column;
 `;
-
 const App = () => {
   const { isAuthenticated, isLoading, error } = useAuth0();
   const location = useLocation();
@@ -49,9 +46,10 @@ const App = () => {
     isLoading: fetchingUser,
     isFetching: userRefetching,
     refetch: userRefetch,
-  } = useUserQuery({ enabled: isAuthenticated });
+  } = useUserQuery({
+    enabled: isAuthenticated,
+  });
   const lastPathnameRef = useRef(location.pathname);
-
   const userStatus = checkUserStatus(
     isLoading,
     error,
@@ -60,19 +58,18 @@ const App = () => {
     userFetchError,
     userProfile,
   );
-
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
-      queryClient.removeQueries({ queryKey: userQueryKey });
+      queryClient.removeQueries({
+        queryKey: userQueryKey,
+      });
     }
   }, [isAuthenticated, isLoading, queryClient]);
-
   useEffect(() => {
     const pathnameChanged = lastPathnameRef.current !== location.pathname;
     if (pathnameChanged) {
       lastPathnameRef.current = location.pathname;
     }
-
     const checkStatus = checkUserStatus(
       isLoading,
       error,
@@ -100,7 +97,6 @@ const App = () => {
     userRefetching,
     userRefetch,
   ]);
-
   if (userStatus.error) {
     const isConnectionError = userStatus.connectionError;
     return (
@@ -108,13 +104,25 @@ const App = () => {
         <Segment padded='very'>
           <Header as='h2'>
             {isConnectionError
-              ? 'Unable to connect to server'
-              : 'There has been an error.'}
+              ? tr(
+                  'containers.app.index.unable.to.connect.to.server',
+                  'Unable to connect to server',
+                )
+              : tr(
+                  'containers.app.index.there.has.been.an.error',
+                  'There has been an error.',
+                )}
           </Header>
           <p>
             {isConnectionError
-              ? 'The backend server appears to be unavailable. Please check your connection or try again later.'
-              : 'An error occurred while loading your data.'}
+              ? tr(
+                  'containers.app.index.the.backend.server.appears.to.be.unavailable.please.check.your.connection.or.try.again.later',
+                  'The backend server appears to be unavailable. Please check your connection or try again later.',
+                )
+              : tr(
+                  'containers.app.index.an.error.occurred.while.loading.your.data',
+                  'An error occurred while loading your data.',
+                )}
           </p>
           <Button
             onClick={() => {
@@ -126,13 +134,14 @@ const App = () => {
               }
             }}
           >
-            {isConnectionError ? 'Return to login' : 'Return to home'}
+            {isConnectionError
+              ? tr('containers.app.index.return.to.login', 'Return to login')
+              : tr('containers.app.index.return.to.home', 'Return to home')}
           </Button>
         </Segment>
       </Dimmer>
     );
   }
-
   if (userStatus.loading) {
     return (
       <Dimmer active inverted page>
@@ -140,7 +149,6 @@ const App = () => {
       </Dimmer>
     );
   }
-
   return (
     <AppWrapper>
       <NavBar />
@@ -177,5 +185,4 @@ const App = () => {
     </AppWrapper>
   );
 };
-
 export default App;

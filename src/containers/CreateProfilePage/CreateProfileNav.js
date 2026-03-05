@@ -1,11 +1,9 @@
 import React from 'react';
 import { Grid, Icon } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-
 import CreateProfileNavStyle from './CreateProfileNavStyle';
-
 import { PROFILE_CREATION_STAGES } from '../../utils/constants';
-
+import { tr } from '../../utils/i18nRuntime';
 const CreateProfileNav = ({
   profileStage,
   backClickHandler,
@@ -15,24 +13,21 @@ const CreateProfileNav = ({
   const backButton = () => (
     <Grid.Column width='2' as='button' onClick={backClickHandler}>
       <Icon name='angle left' size='big' />
-      Back
+      {tr('containers.createprofilepage.createprofilenav.back', 'Back')}
     </Grid.Column>
   );
-
   const forwardButton = () => (
     <Grid.Column width='2' as='button' onClick={forwardClickHandler}>
       <Icon name='angle right' size='big' />
-      Continue
+      {tr('containers.createprofilepage.createprofilenav.continue', 'Continue')}
     </Grid.Column>
   );
-
   const tickButton = () => (
     <Grid.Column width='2' as='button' onClick={handleSubmit}>
       <Icon name='check' size='large' />
-      Complete
+      {tr('containers.createprofilepage.createprofilenav.complete', 'Complete')}
     </Grid.Column>
   );
-
   switch (profileStage) {
     case 0:
       return null;
@@ -62,12 +57,10 @@ const CreateProfileNav = ({
       );
   }
 };
-
 CreateProfileNav.propTypes = {
   profileStage: PropTypes.number,
   handleSubmit: PropTypes.func,
   backClickHandler: PropTypes.func,
   forwardClickHandler: PropTypes.func,
 };
-
 export default CreateProfileNav;

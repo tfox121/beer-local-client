@@ -9,20 +9,17 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 // import { FormattedMessage } from 'react-intl';
 import { Modal, Button, Dropdown, Input, Divider } from 'semantic-ui-react';
-
 import NumberFormat from 'react-number-format';
 import promotionCopySelection from '../../utils/promotionCopy';
-
 import { useUserQuery } from '../../queries/user';
 import { useAddPromotionMutation } from '../../queries/producerProfile';
 import { PACK_SIZES } from '../../utils/constants';
 import PromotionModalStyle from './PromotionModalStyle';
-
+import { tr } from '../../utils/i18nRuntime';
 const PromotionModal = ({ onPromotionAdded }) => {
   const { data: userProfile } = useUserQuery();
   const { mutateAsync: promotionAdd, isLoading: addingPromotion } =
     useAddPromotionMutation();
-
   const [modalOpen, setModalOpen] = useState(false);
   const [promotionSelectedValues, setPromotionSelectedValues] = useState({});
   const [availableStock, setAvailableStock] = useState([]);
@@ -30,7 +27,6 @@ const PromotionModal = ({ onPromotionAdded }) => {
   const [conditionsComplete, setConditionsComplete] = useState(false);
   const [discountsComplete, setDiscountsComplete] = useState(false);
   const [promotionSaved, setPromotionSaved] = useState(false);
-
   useEffect(() => {
     if (userProfile && userProfile.stock) {
       setAvailableStock(
@@ -53,7 +49,6 @@ const PromotionModal = ({ onPromotionAdded }) => {
       );
     }
   }, [userProfile]);
-
   const promotionOptions = [
     {
       key: 'multibuy',
@@ -66,7 +61,6 @@ const PromotionModal = ({ onPromotionAdded }) => {
       value: 'minSpend',
     },
   ];
-
   const typeOptions = [
     {
       key: 'product',
@@ -79,7 +73,6 @@ const PromotionModal = ({ onPromotionAdded }) => {
       value: 'packageType',
     },
   ];
-
   const discountTypeOptions = [
     {
       key: 'moneyOff',
@@ -97,17 +90,17 @@ const PromotionModal = ({ onPromotionAdded }) => {
       value: 'freeItems',
     },
   ];
-
   const handleModalClose = () => {
     setPromotionSelectedValues({});
     setModalOpen(false);
     setPromotionSaved(false);
   };
-
   const handleChange = (e, { name, value }) => {
-    setPromotionSelectedValues({ ...promotionSelectedValues, [name]: value });
+    setPromotionSelectedValues({
+      ...promotionSelectedValues,
+      [name]: value,
+    });
   };
-
   const handleSave = async () => {
     // const privateRoute = await getPrivateRoute();
     // const response = await privateRoute.post('/producer/promotion', promotionSelectedValues);
@@ -118,26 +111,36 @@ const PromotionModal = ({ onPromotionAdded }) => {
     }
     // console.log(response.data);
   };
-
   return (
     <Modal
-      style={{ left: 0, minWidth: '800px' }}
+      style={{
+        left: 0,
+        minWidth: '800px',
+      }}
       size='large'
       open={modalOpen}
       onClose={handleModalClose}
       closeIcon
       trigger={
         <Button primary onClick={() => setModalOpen(true)}>
-          Add
+          {tr('containers.producerprofilepage.promotionmodal.add', 'Add')}
         </Button>
       }
     >
-      <Modal.Header>Add New Promotion</Modal.Header>
+      <Modal.Header>
+        {tr(
+          'containers.producerprofilepage.promotionmodal.add.new.promotion',
+          'Add New Promotion',
+        )}
+      </Modal.Header>
       <Modal.Content>
         {!promotionSaved ? (
           <PromotionModalStyle>
             <Dropdown
-              placeholder='Condition'
+              placeholder={tr(
+                'containers.producerprofilepage.promotionmodal.condition',
+                'Condition',
+              )}
               name='condition'
               selection
               options={promotionOptions}
@@ -149,7 +152,10 @@ const PromotionModal = ({ onPromotionAdded }) => {
             <div>
               {promotionSelectedValues.condition === 'minSpend' && (
                 <>
-                  If you spend{' '}
+                  {tr(
+                    'containers.producerprofilepage.promotionmodal.if.you.spend',
+                    'If you spend',
+                  )}{' '}
                   <NumberFormat
                     thousandSeparator
                     decimalScale={2}
@@ -171,16 +177,25 @@ const PromotionModal = ({ onPromotionAdded }) => {
               )}
               {promotionSelectedValues.condition === 'multibuy' && (
                 <>
-                  If you buy{' '}
+                  {tr(
+                    'containers.producerprofilepage.promotionmodal.if.you.buy',
+                    'If you buy',
+                  )}{' '}
                   <Input
                     name='multibuyQuantity'
                     className='multibuy-quantity'
-                    placeholder='Quantity'
+                    placeholder={tr(
+                      'containers.producerprofilepage.promotionmodal.quantity',
+                      'Quantity',
+                    )}
                     onChange={handleChange}
                     value={promotionSelectedValues.multibuyQuantity || ''}
                   />{' '}
                   <Dropdown
-                    placeholder='Type'
+                    placeholder={tr(
+                      'containers.producerprofilepage.promotionmodal.type',
+                      'Type',
+                    )}
                     name='multibuyType'
                     selection
                     inline
@@ -190,12 +205,18 @@ const PromotionModal = ({ onPromotionAdded }) => {
                   />
                   {promotionSelectedValues.multibuyType === 'product' && (
                     <Dropdown
-                      placeholder='Product'
+                      placeholder={tr(
+                        'containers.producerprofilepage.promotionmodal.product',
+                        'Product',
+                      )}
                       name='multibuyProduct'
                       selection
                       options={availableStock}
                       onChange={(e, { name, value }) => {
-                        handleChange(e, { name, value });
+                        handleChange(e, {
+                          name,
+                          value,
+                        });
                         setConditionsComplete(true);
                       }}
                       value={
@@ -205,12 +226,18 @@ const PromotionModal = ({ onPromotionAdded }) => {
                   )}
                   {promotionSelectedValues.multibuyType === 'packageType' && (
                     <Dropdown
-                      placeholder='Package type'
+                      placeholder={tr(
+                        'containers.producerprofilepage.promotionmodal.package.type',
+                        'Package type',
+                      )}
                       name='multibuyPackageType'
                       selection
                       options={availablePackageTypes}
                       onChange={(e, { name, value }) => {
-                        handleChange(e, { name, value });
+                        handleChange(e, {
+                          name,
+                          value,
+                        });
                         setConditionsComplete(true);
                       }}
                       value={
@@ -223,7 +250,10 @@ const PromotionModal = ({ onPromotionAdded }) => {
             </div>
             <Divider />
             <Dropdown
-              placeholder='Discount type'
+              placeholder={tr(
+                'containers.producerprofilepage.promotionmodal.discount.type',
+                'Discount type',
+              )}
               name='discountType'
               selection
               options={discountTypeOptions}
@@ -236,7 +266,10 @@ const PromotionModal = ({ onPromotionAdded }) => {
 
             {promotionSelectedValues.discountType === 'moneyOff' && (
               <>
-                You will get{' '}
+                {tr(
+                  'containers.producerprofilepage.promotionmodal.you.will.get',
+                  'You will get',
+                )}{' '}
                 <NumberFormat
                   thousandSeparator
                   decimalScale={2}
@@ -254,12 +287,18 @@ const PromotionModal = ({ onPromotionAdded }) => {
                   value={promotionSelectedValues.moneyOff || undefined}
                   className='discount-value-input'
                 />{' '}
-                off the total order.
+                {tr(
+                  'containers.producerprofilepage.promotionmodal.off.the.total.order',
+                  'off the total order.',
+                )}
               </>
             )}
             {promotionSelectedValues.discountType === 'percentageOff' && (
               <>
-                You will get{' '}
+                {tr(
+                  'containers.producerprofilepage.promotionmodal.you.will.get',
+                  'You will get',
+                )}{' '}
                 <NumberFormat
                   decimalScale={1}
                   fixedDecimalScale
@@ -276,28 +315,46 @@ const PromotionModal = ({ onPromotionAdded }) => {
                   value={promotionSelectedValues.percentageOff || undefined}
                   className='discount-percentage-input'
                 />{' '}
-                off the total order.
+                {tr(
+                  'containers.producerprofilepage.promotionmodal.off.the.total.order',
+                  'off the total order.',
+                )}
               </>
             )}
             {promotionSelectedValues.discountType === 'freeItems' && (
               <>
-                You will get{' '}
+                {tr(
+                  'containers.producerprofilepage.promotionmodal.you.will.get',
+                  'You will get',
+                )}{' '}
                 <Input
                   className='free-item-quantity'
                   name='freeItemQuantity'
-                  placeholder='Quantity'
+                  placeholder={tr(
+                    'containers.producerprofilepage.promotionmodal.quantity',
+                    'Quantity',
+                  )}
                   onChange={handleChange}
                   value={promotionSelectedValues.freeItemQuantity || ''}
                 />{' '}
-                free{' '}
+                {tr(
+                  'containers.producerprofilepage.promotionmodal.free',
+                  'free',
+                )}{' '}
                 {promotionSelectedValues.freeItemQuantity && (
                   <Dropdown
-                    placeholder='Product'
+                    placeholder={tr(
+                      'containers.producerprofilepage.promotionmodal.product',
+                      'Product',
+                    )}
                     name='freeItemProduct'
                     selection
                     options={availableStock}
                     onChange={(e, { name, value }) => {
-                      handleChange(e, { name, value });
+                      handleChange(e, {
+                        name,
+                        value,
+                      });
                       setDiscountsComplete(true);
                     }}
                     value={promotionSelectedValues.freeItemProduct || undefined}
@@ -333,20 +390,25 @@ const PromotionModal = ({ onPromotionAdded }) => {
         )}
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={handleModalClose} content='Close' />
+        <Button
+          onClick={handleModalClose}
+          content={tr(
+            'containers.producerprofilepage.promotionmodal.close',
+            'Close',
+          )}
+        />
         <Button
           primary
           className='stock-save'
           loading={addingPromotion}
           onClick={handleSave}
         >
-          Save
+          {tr('containers.producerprofilepage.promotionmodal.save', 'Save')}
         </Button>
       </Modal.Actions>
     </Modal>
   );
 };
-
 PromotionModal.propTypes = {
   onPromotionAdded: PropTypes.func,
 };

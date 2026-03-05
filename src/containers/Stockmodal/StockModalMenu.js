@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu, Icon } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-
+import { tr } from '../../utils/i18nRuntime';
 const StockModalMenu = ({
   moveStockLineUp,
   moveStockLineDown,
@@ -10,32 +10,39 @@ const StockModalMenu = ({
   copyStockItems,
 }) => (
   <Menu secondary>
-    <Menu.Item as='h2'>Edit Stock</Menu.Item>
+    <Menu.Item as='h2'>
+      {tr('containers.stockmodal.stockmodalmenu.edit.stock', 'Edit Stock')}
+    </Menu.Item>
     <Menu.Menu position='right'>
       <Menu.Item name='Up' onClick={moveStockLineUp}>
         <Icon name='angle up' />
-        Up
+        {tr('containers.stockmodal.stockmodalmenu.up', 'Up')}
       </Menu.Item>
       <Menu.Item name='Down' onClick={moveStockLineDown}>
         <Icon name='angle down' />
-        Down
+        {tr('containers.stockmodal.stockmodalmenu.down', 'Down')}
       </Menu.Item>
       <Menu.Item name='Add Item' onClick={addNewStockLine}>
         <Icon name='plus' />
-        Add Item
+        {tr('containers.stockmodal.stockmodalmenu.add.item', 'Add Item')}
       </Menu.Item>
       <Menu.Item name='Delete Selected' onClick={deleteStockItems}>
         <Icon name='trash' />
-        Delete Selected
+        {tr(
+          'containers.stockmodal.stockmodalmenu.delete.selected',
+          'Delete Selected',
+        )}
       </Menu.Item>
       <Menu.Item name='Copy Selected' onClick={copyStockItems}>
         <Icon name='copy' />
-        Copy Selected
+        {tr(
+          'containers.stockmodal.stockmodalmenu.copy.selected',
+          'Copy Selected',
+        )}
       </Menu.Item>
     </Menu.Menu>
   </Menu>
 );
-
 StockModalMenu.propTypes = {
   addNewStockLine: PropTypes.func,
   deleteStockItems: PropTypes.func,
@@ -43,5 +50,4 @@ StockModalMenu.propTypes = {
   moveStockLineUp: PropTypes.func,
   moveStockLineDown: PropTypes.func,
 };
-
 export default StockModalMenu;

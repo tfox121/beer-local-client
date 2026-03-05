@@ -13,7 +13,6 @@ import ReactDOM from 'react-dom';
 import NumberFormat from 'react-number-format';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Select from 'react-select';
-
 import {
   useTable,
   usePagination,
@@ -29,19 +28,15 @@ import { Button, Icon } from 'semantic-ui-react';
 
 // import { FormattedMessage } from 'react-intl';
 import StockTableStyle from './StockTableStyle';
-
+import { tr } from '../../utils/i18nRuntime';
 const portal = document.createElement('div');
 portal.classList.add('my-super-cool-portal');
-
 if (!document.body) {
   throw new Error('body not ready for portal creation!');
 }
-
 document.body.appendChild(portal);
-
 const PortalAwareItem = ({ provided, snapshot, children }) => {
   const usePortal = snapshot.isDragging;
-
   const child = (
     <div
       ref={provided.innerRef}
@@ -52,7 +47,6 @@ const PortalAwareItem = ({ provided, snapshot, children }) => {
       {children}
     </div>
   );
-
   if (!usePortal) {
     return child;
   }
@@ -66,26 +60,29 @@ const EditableCell = ({
   value: initialValue,
   row: { index },
   column: { id },
-  updateMyData, // This is a custom function that we supplied to our table instance
+  updateMyData,
+  // This is a custom function that we supplied to our table instance
   editable,
 }) => {
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
-
   const onChange = (e) => {
     setValue(e.target.value);
   };
-
   const onCheckboxChange = () => {
     value === 'Show' ? setValue('Hide') : setValue('Show');
     setValue('Show');
-    updateMyData(index, id, value === 'Show' ? 'Hide' : 'Show' || 0);
+    updateMyData(
+      index,
+      id,
+      value === 'Show'
+        ? tr('containers.stockmodal.stockmanagerdraggable.hide', 'Hide')
+        : 'Show' || 0,
+    );
   };
-
   const onValueChange = (values) => {
     setValue(values.floatValue || 0);
   };
-
   const onSelectChange = (selectedOption) => {
     setValue(selectedOption);
     updateMyData(index, id, selectedOption.value || 0);
@@ -100,11 +97,9 @@ const EditableCell = ({
   React.useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
-
   if (!editable) {
     return `${initialValue}`;
   }
-
   let element = (
     <input
       className='table-input'
@@ -113,7 +108,6 @@ const EditableCell = ({
       onBlur={onBlur}
     />
   );
-
   if (id === 'price') {
     element = (
       <NumberFormat
@@ -128,7 +122,6 @@ const EditableCell = ({
       />
     );
   }
-
   if (id === 'abv') {
     element = (
       <NumberFormat
@@ -142,39 +135,77 @@ const EditableCell = ({
       />
     );
   }
-
   if (id === 'packSize') {
     const customStyles = {
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-      dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
-      indicatorSeparator: () => ({ display: 'none' }),
-      container: (base) => ({ ...base, border: 'none' }),
-      control: (base) => ({ ...base, minHeight: 'unset', border: 'none' }),
-      valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-      singleValue: (base) => ({ ...base, padding: '3px' }),
+      menuPortal: (base) => ({
+        ...base,
+        zIndex: 9999,
+      }),
+      dropdownIndicator: (base) => ({
+        ...base,
+        padding: '4px',
+      }),
+      indicatorSeparator: () => ({
+        display: 'none',
+      }),
+      container: (base) => ({
+        ...base,
+        border: 'none',
+      }),
+      control: (base) => ({
+        ...base,
+        minHeight: 'unset',
+        border: 'none',
+      }),
+      valueContainer: (base) => ({
+        ...base,
+        justifyContent: 'center',
+      }),
+      singleValue: (base) => ({
+        ...base,
+        padding: '3px',
+      }),
     };
-
     const options = [
-      { value: '30l', label: '30L' },
-      { value: '50l', label: '50L' },
-      { value: '9g', label: '9g' },
-      { value: '12x330', label: '12x330ml' },
-      { value: '24x330', label: '24x330ml' },
-      { value: '24x440', label: '24x440ml' },
+      {
+        value: '30l',
+        label: '30L',
+      },
+      {
+        value: '50l',
+        label: '50L',
+      },
+      {
+        value: '9g',
+        label: '9g',
+      },
+      {
+        value: '12x330',
+        label: '12x330ml',
+      },
+      {
+        value: '24x330',
+        label: '24x330ml',
+      },
+      {
+        value: '24x440',
+        label: '24x440ml',
+      },
     ];
-
     element = (
       <Select
         options={options}
         onChange={onSelectChange}
         value={options.filter((option) => option.value === value)[0]}
-        placeholder='Select size'
+        placeholder={tr(
+          'containers.stockmodal.stockmanagerdraggable.select.size',
+          'Select size',
+        )}
         menuPortalTarget={document.body}
         styles={customStyles}
       />
     );
   }
-
   if (id === 'display') {
     element = (
       <input
@@ -188,7 +219,6 @@ const EditableCell = ({
       />
     );
   }
-
   return element;
 };
 
@@ -197,11 +227,12 @@ function DefaultColumnFilter({
   column: { filterValue, preFilteredRows, setFilter },
 }) {
   const count = preFilteredRows.length;
-
   return (
     <input
       className='filter-input'
-      style={{ maxWidth: '160px' }}
+      style={{
+        maxWidth: '160px',
+      }}
       value={filterValue || ''}
       onChange={(e) => {
         setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
@@ -227,23 +258,38 @@ function SelectColumnFilter({
       value,
       label: value,
     }));
-    filteredArr.unshift({ label: 'All', value: '' });
-
+    filteredArr.unshift({
+      label: 'All',
+      value: '',
+    });
     return filteredArr;
   }, [id, preFilteredRows]);
-
   const customStyles = {
-    dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
-    indicatorSeparator: () => ({ display: 'none' }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      padding: '4px',
+    }),
+    indicatorSeparator: () => ({
+      display: 'none',
+    }),
     container: (base) => ({
       ...base,
       border: 'none',
       width: '100%',
       minWidth: '100px',
     }),
-    control: (base) => ({ ...base, minHeight: 'unset' }),
-    valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-    singleValue: (base) => ({ ...base, padding: '3px' }),
+    control: (base) => ({
+      ...base,
+      minHeight: 'unset',
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      justifyContent: 'center',
+    }),
+    singleValue: (base) => ({
+      ...base,
+      padding: '3px',
+    }),
   };
   // Render a multi-select box
   return (
@@ -278,7 +324,6 @@ function SliderColumnFilter({
     });
     return [filterMin, filterMax];
   }, [id, preFilteredRows]);
-
   return (
     <>
       <input
@@ -292,14 +337,15 @@ function SliderColumnFilter({
       />
       {/* <Button size="mini" type="button" onClick={() => setFilter(undefined)}>
         Off
-      </Button> */}
+       </Button> */}
       <Icon name='cancel' onClick={() => setFilter(undefined)} />
     </>
   );
 }
-
 function fuzzyTextFilterFn(rows, id, filterValue) {
-  return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
+  return matchSorter(rows, filterValue, {
+    keys: [(row) => row.values[id]],
+  });
 }
 
 // Let the table remove the filter if the string is empty
@@ -332,7 +378,6 @@ const MyTable = ({
     }),
     [],
   );
-
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
@@ -342,27 +387,22 @@ const MyTable = ({
     }),
     [],
   );
-
   const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
-
     return result;
   };
-
   const onDragEnd = (result) => {
     // dropped outside the list
     if (!result.destination) {
       return;
     }
-
     const newData = reorder(
       data,
       result.source.index,
       result.destination.index,
     );
-
     setData(newData);
   };
 
@@ -372,7 +412,8 @@ const MyTable = ({
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    page, // Instead of using 'rows', we'll use page,
+    page,
+    // Instead of using 'rows', we'll use page,
     // which has only the rows for the active page
 
     // The rest of these things are super handy, too ;)
@@ -436,18 +477,31 @@ const MyTable = ({
       ]);
     },
   );
-
   const customStyles = {
-    dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
-    indicatorSeparator: () => ({ display: 'none' }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      padding: '4px',
+    }),
+    indicatorSeparator: () => ({
+      display: 'none',
+    }),
     container: (base) => ({
       ...base,
       border: 'none',
       width: '100px',
     }),
-    control: (base) => ({ ...base, minHeight: 'unset' }),
-    valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
-    singleValue: (base) => ({ ...base, padding: '3px' }),
+    control: (base) => ({
+      ...base,
+      minHeight: 'unset',
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      justifyContent: 'center',
+    }),
+    singleValue: (base) => ({
+      ...base,
+      padding: '3px',
+    }),
   };
 
   // track selected rows
@@ -466,7 +520,12 @@ const MyTable = ({
               className='rt-table stock-table'
               role='grid'
             >
-              <div className='rt-thead -header' style={{ minWidth: '500px' }}>
+              <div
+                className='rt-thead -header'
+                style={{
+                  minWidth: '500px',
+                }}
+              >
                 {headerGroups.map((headerGroup, index) => (
                   <div
                     className='rt-tr'
@@ -479,7 +538,10 @@ const MyTable = ({
                         key={i}
                         className='rt-th rt-resizable-header header-cell'
                         role='columnheader'
-                        style={{ flex: '100 0 auto', width: '100px' }}
+                        style={{
+                          flex: '100 0 auto',
+                          width: '100px',
+                        }}
                         width={column.width}
                         tabIndex='-1'
                         {...column.getHeaderProps()}
@@ -556,9 +618,12 @@ const MyTable = ({
                                         // If the cell is aggregated, use the Aggregated
                                         // renderer for cell
                                         cell.render('Aggregated')
-                                      ) : cell.isPlaceholder ? null : ( // For cells with repeated values, render null
+                                      ) : cell.isPlaceholder ? null : (
+                                        // For cells with repeated values, render null
                                         // Otherwise, just render the regular cell
-                                        cell.render('Cell', { editable: true })
+                                        cell.render('Cell', {
+                                          editable: true,
+                                        })
                                       )}
                                     </div>
                                   ))}
@@ -577,9 +642,9 @@ const MyTable = ({
           </div>
         </DragDropContext>
         {/*
-        Pagination can be built however you'd like.
-        This is just a very basic UI implementation:
-      */}
+         Pagination can be built however you'd like.
+         This is just a very basic UI implementation:
+         */}
       </StockTableStyle>
 
       <div className='pagination'>
@@ -616,13 +681,16 @@ const MyTable = ({
           <Icon name='angle double right' />
         </Button>{' '}
         <span>
-          Page{' '}
+          {tr('containers.stockmodal.stockmanagerdraggable.page', 'Page')}{' '}
           <strong>
             {pageIndex + 1} of {pageOptions.length}
           </strong>{' '}
         </span>
         <span>
-          &nbsp;| Go to page:{' '}
+          {tr(
+            'containers.stockmodal.stockmanagerdraggable.go.to.page',
+            '| Go to page:',
+          )}{' '}
           <input
             className='pagination-input'
             type='number'
@@ -635,8 +703,14 @@ const MyTable = ({
         </span>
         &nbsp;
         <Select
-          defaultValue={{ value: 10, label: 'Show 10' }}
-          value={{ value: pageSize, label: `Show ${pageSize}` }}
+          defaultValue={{
+            value: 10,
+            label: 'Show 10',
+          }}
+          value={{
+            value: pageSize,
+            label: `Show ${pageSize}`,
+          }}
           styles={customStyles}
           onChange={(e) => {
             setPageSize(Number(e.value));
@@ -653,7 +727,7 @@ const MyTable = ({
               {pageSizeVal}
             </option>
           ))}
-        </Select> */}
+         </Select> */}
       </div>
     </>
   );
@@ -666,7 +740,6 @@ function filterGreaterThan(rows, id, filterValue) {
     return rowValue >= filterValue;
   });
 }
-
 function filterLesserThan(rows, id, filterValue) {
   return rows.filter((row) => {
     const rowValue = row.values[id];
@@ -679,20 +752,16 @@ function filterLesserThan(rows, id, filterValue) {
 // will be automatically removed. Normally this is just an undefined
 // check, but here, we want to remove the filter if it's not a number
 filterGreaterThan.autoRemove = (val) => typeof val !== 'number';
-
 const IndeterminateCheckbox = React.forwardRef(
   ({ indeterminate, ...rest }, ref) => {
     const defaultRef = React.useRef();
     const resolvedRef = ref || defaultRef;
-
     React.useEffect(() => {
       resolvedRef.current.indeterminate = indeterminate;
     }, [resolvedRef, indeterminate]);
-
     return <input type='checkbox' ref={resolvedRef} {...rest} />;
   },
 );
-
 const StockManagerDraggable = ({
   data,
   setData,
@@ -837,5 +906,4 @@ const StockManagerDraggable = ({
     />
   );
 };
-
 export default StockManagerDraggable;
