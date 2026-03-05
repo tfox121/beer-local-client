@@ -11,9 +11,8 @@ import 'regenerator-runtime/runtime';
 // Import all the third party stuff
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { ConnectedRouter } from 'connected-react-router';
+import { Router } from 'react-router-dom';
 import history from './utils/history';
 import 'sanitize.css/sanitize.css';
 
@@ -29,15 +28,11 @@ import LanguageProvider from './containers/LanguageProvider';
 // import '!file-loader?name=[name].[ext]!./images/favicon.ico';
 /* eslint-enable import/no-unresolved, import/extensions */
 
-import configureStore from './configureStore';
 import queryClient from './queryClient';
 
 // Import i18n messages
 import { translationMessages } from './i18n';
 
-// Create redux store with history
-const initialState = {};
-const store = configureStore(initialState, history);
 const MOUNT_NODE = document.getElementById('app');
 
 const render = messages => {
@@ -51,13 +46,11 @@ const render = messages => {
       // scope="read:current_user update:current_user_metadata"
     >
       <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <LanguageProvider messages={messages}>
-            <ConnectedRouter history={history}>
-              <App />
-            </ConnectedRouter>
-          </LanguageProvider>
-        </Provider>
+        <LanguageProvider messages={messages}>
+          <Router history={history}>
+            <App />
+          </Router>
+        </LanguageProvider>
       </QueryClientProvider>
     </Auth0Provider>,
     MOUNT_NODE,
