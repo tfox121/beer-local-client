@@ -4,7 +4,7 @@
  *
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 // import { FormattedMessage } from 'react-intl';
 import { Segment, Header, Dimmer, Loader } from 'semantic-ui-react';
 import PhoneNumber from 'awesome-phonenumber';
@@ -31,33 +31,42 @@ export function CreateProfilePage() {
   const { mutateAsync: saveUser, isLoading: savingUser } =
     useSaveUserMutation();
 
-  const formTemplate = {
-    type: '',
-    businessName: '',
-    primaryContactName: '',
-    location: {},
-    address: '',
-    avatar: false,
-    terms: true,
-    pictureFile: undefined,
-    pictureFileExt: undefined,
-    fileValid: true,
-  };
+  const formTemplate = useMemo(
+    () => ({
+      type: '',
+      businessName: '',
+      primaryContactName: '',
+      location: {},
+      address: '',
+      avatar: false,
+      terms: true,
+      pictureFile: undefined,
+      pictureFileExt: undefined,
+      fileValid: true,
+    }),
+    [],
+  );
 
-  const producerFormTemplate = {
-    salesEmail: '',
-    salesContactNumber: '',
-    website: '',
-    intro: '',
-    distributionAreas: {},
-  };
+  const producerFormTemplate = useMemo(
+    () => ({
+      salesEmail: '',
+      salesContactNumber: '',
+      website: '',
+      intro: '',
+      distributionAreas: {},
+    }),
+    [],
+  );
 
-  const retailerFormTemplate = {
-    purchasingEmail: '',
-    purchasingContactNumber: '',
-    deliveryInstruction: '',
-    contactOptions: {},
-  };
+  const retailerFormTemplate = useMemo(
+    () => ({
+      purchasingEmail: '',
+      purchasingContactNumber: '',
+      deliveryInstruction: '',
+      contactOptions: {},
+    }),
+    [],
+  );
 
   const [avatarSaved, setAvatarSaved] = useState(undefined);
   const [avatarRoute, setAvatarRoute] = useState({});
@@ -117,18 +126,7 @@ export function CreateProfilePage() {
       }));
       setProfileStage(1);
     }
-  }, [localStorage]);
-
-  // useEffect(() => {
-  //   console.log('CHECKING');
-  //   if (formValues.pictureFile && !formValues.fileValid) {
-  //     setFormValues({
-  //       ...formValues,
-  //       fileValid: !!ACCEPTED_IMAGE_FORMATS[formValues.pictureFile.type],
-  //       pictureFileExt: ACCEPTED_IMAGE_FORMATS[formValues.pictureFile.type],
-  //     });
-  //   }
-  // }, [formValues.pictureFile, formValues]);
+  }, []);
 
   const backClickHandler = () => {
     setProfileStage(profileStage - 1);

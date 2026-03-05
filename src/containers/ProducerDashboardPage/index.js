@@ -36,14 +36,14 @@ const ProducerDashboardPage = () => {
   const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
   const { data: dashboardData, isLoading: producerDashboardFetching } =
     useProducerDashboardQuery();
-  const dashboardOrders =
-    dashboardData && dashboardData.dashboardOrders
-      ? dashboardData.dashboardOrders
-      : [];
-  const dashBoardRetailers =
-    dashboardData && dashboardData.dashboardRetailers
-      ? dashboardData.dashboardRetailers
-      : [];
+  const dashboardOrders = useMemo(
+    () => dashboardData?.dashboardOrders || [],
+    [dashboardData],
+  );
+  const dashBoardRetailers = useMemo(
+    () => dashboardData?.dashboardRetailers || [],
+    [dashboardData],
+  );
 
   const [salesPeriod, setSalesPeriod] = useState('week');
   const [periodSales, setPeriodSales] = useState({});

@@ -6,7 +6,7 @@
  *
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 // import { FormattedMessage } from 'react-intl';
 import TimeAgo from 'javascript-time-ago';
@@ -87,17 +87,21 @@ export function ProducerProfilePage() {
   const [producerFollowed, setProducerFollowed] = useState(false);
   const [blogPage, setBlogPage] = useState(1);
   const [profileEditModalOpen, setProfileEditModalOpen] = useState(false);
-  const followedProducers = (user && user.followedProducers) || [];
+  const followedProducers = useMemo(
+    () => (user && user.followedProducers) || [],
+    [user],
+  );
+  const followedProducerSubs = useMemo(
+    () => followedProducers.map((producer) => producer.sub),
+    [followedProducers],
+  );
   const producerSub = producerProfile && producerProfile.sub;
 
   useEffect(() => {
-    if (followedProducers && producerSub) {
-      const followedProducerList = followedProducers.map(
-        (producer) => producer.sub,
-      );
-      setProducerFollowed(followedProducerList.includes(producerSub));
+    if (producerSub) {
+      setProducerFollowed(followedProducerSubs.includes(producerSub));
     }
-  }, [followedProducers, producerSub]);
+  }, [followedProducerSubs, producerSub]);
 
   const handleDeletePromo = useCallback(
     async (id) => {
@@ -249,15 +253,9 @@ export function ProducerProfilePage() {
                   {user && user.role === 'retailer' && (
                     <Button
                       loading={producerFollowing}
-                      positive={followedProducers
-                        .map((producer) => producer.sub)
-                        .includes(sub)}
+                      positive={followedProducerSubs.includes(sub)}
                       icon={
-                        followedProducers
-                          .map((producer) => producer.sub)
-                          .includes(sub)
-                          ? 'check'
-                          : 'plus'
+                        followedProducerSubs.includes(sub) ? 'check' : 'plus'
                       }
                       content={producerFollowed ? 'Following' : 'Follow'}
                       onClick={handleFollowClick}
