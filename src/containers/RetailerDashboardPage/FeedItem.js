@@ -48,7 +48,7 @@ const FeedItem = ({ producerItem, userProfile }) => {
           <Feed.Content>
             <Feed.Summary>
               <Feed.User as='p'>
-                <Link to={`/brewery/${itemGroup.producerItems[0].producerId}`}>
+                <Link to={`/producer/${itemGroup.producerItems[0].producerId}`}>
                   {itemGroup.producerItems[0].producer}
                 </Link>
               </Feed.User>{' '}
@@ -111,7 +111,7 @@ const FeedItem = ({ producerItem, userProfile }) => {
         <Feed.Content>
           <Feed.Summary>
             <Feed.User as='p'>
-              <Link to={`/brewery/${itemGroup.producerItems[0].producerId}`}>
+              <Link to={`/producer/${itemGroup.producerItems[0].producerId}`}>
                 {itemGroup.producerItems[0].producer}
               </Link>
             </Feed.User>{' '}
@@ -167,7 +167,7 @@ const FeedItem = ({ producerItem, userProfile }) => {
       <Feed.Content>
         <Feed.Summary>
           <Feed.User as='p'>
-            <Link to={`/brewery/${item.producerId}`}>{item.producer}</Link>
+            <Link to={`/producer/${item.producerId}`}>{item.producer}</Link>
           </Feed.User>{' '}
           posted some news
           <Feed.Date>{timeAgo.format(Date.parse(item.createdAt))}</Feed.Date>
@@ -205,7 +205,7 @@ const FeedItem = ({ producerItem, userProfile }) => {
       <Feed.Content>
         <Feed.Summary>
           <Feed.User as='div'>
-            <Link to={`/brewery/${producer.businessId}`}>
+            <Link to={`/producer/${producer.businessId}`}>
               {producer.businessName}
             </Link>
           </Feed.User>{' '}

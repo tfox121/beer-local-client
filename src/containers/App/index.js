@@ -160,7 +160,7 @@ const App = () => {
           isEnabled={userStatus.authenticated && !userStatus.registered}
           component={CreateProfilePage}
         />
-        <Route exact path='/brewery/:id' component={ProducerProfilePage} />
+        <Route exact path='/producer/:id' component={ProducerProfilePage} />
         <ProtectedRoute
           exact
           path='/sales/orders'

@@ -23,7 +23,7 @@ const ProducerListItem = ({ producer, user }) => {
     setFollowButtonClicked(true);
   };
   const handleClick = (businessId) => {
-    history.push(`/brewery/${businessId}`);
+    history.push(`/producer/${businessId}`);
   };
   const followedProducerSubs = (user.followedProducers || []).map(
     (followedProducer) => followedProducer.sub,
@@ -48,7 +48,7 @@ const ProducerListItem = ({ producer, user }) => {
             display: 'flex',
           }}
         >
-          <Link to={`/brewery/${producer.businessId}`}>
+          <Link to={`/producer/${producer.businessId}`}>
             <h2>{producer.businessName}</h2>
           </Link>
           <Button

@@ -27,8 +27,8 @@ function NavBar() {
         setActiveItem('');
         history.push('/');
         break;
-      case '/brewery/profile':
-        history.push(`/brewery/${userProfile.businessId}`);
+      case '/producer/profile':
+        history.push(`/producer/${userProfile.businessId}`);
         break;
       case '/sales/orders':
         history.push('/sales/orders');
@@ -67,9 +67,9 @@ function NavBar() {
                         'components.navbar.index.your.store',
                         'Your Store',
                       )}
-                      active={activeItem === '/brewery/profile'}
+                      active={activeItem === '/producer/profile'}
                       onClick={handleItemClick}
-                      name='/brewery/profile'
+                      name='/producer/profile'
                     />
                     <Dropdown.Item
                       content={tr('components.navbar.index.orders', 'Orders')}
@@ -138,9 +138,9 @@ function NavBar() {
                     'components.navbar.index.your.store',
                     'Your Store',
                   )}
-                  active={activeItem === '/brewery/profile'}
+                  active={activeItem === '/producer/profile'}
                   onClick={handleItemClick}
-                  name='/brewery/profile'
+                  name='/producer/profile'
                 />
                 <Menu.Item
                   content={tr('components.navbar.index.orders', 'Orders')}

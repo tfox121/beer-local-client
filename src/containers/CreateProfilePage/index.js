@@ -196,7 +196,7 @@ export function CreateProfilePage() {
       });
       if (response && response.user) {
         if (formValues.type === 'producer') {
-          history.push(`/brewery/${response.user.businessId}`);
+          history.push(`/producer/${response.user.businessId}`);
         } else {
           history.push('/');
         }

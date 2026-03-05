@@ -390,7 +390,7 @@ const ProducerDashboardPage = () => {
                         }
                         alt='user avatar'
                       />
-                      <Link to={`/brewery/${customer.businessId}`}>
+                      <Link to={`/producer/${customer.businessId}`}>
                         {customer.businessName}
                       </Link>
                     </Grid.Column>

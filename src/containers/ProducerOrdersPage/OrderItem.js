@@ -130,7 +130,7 @@ const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
               }}
             />
             {userProfile.role === 'retailer' ? (
-              <Link to={`/brewery/${ordersInfo.businesses[index].businessId}`}>
+              <Link to={`/producer/${ordersInfo.businesses[index].businessId}`}>
                 {ordersInfo.businesses[index].businessName}
               </Link>
             ) : (
