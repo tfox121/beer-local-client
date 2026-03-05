@@ -103,7 +103,7 @@ const ProfileEditModal = ({
 
   useEffect(() => {
     if (Object.keys(user).length) {
-      setProducerFormValues({ profileOptions });
+      setProducerFormValues(previous => ({ ...previous, profileOptions }));
     }
   }, [user, profileOptions]);
 
@@ -112,6 +112,20 @@ const ProfileEditModal = ({
       setSavedPolygons({ ...distributionAreas });
     }
   }, [distributionAreas]);
+
+  useEffect(() => {
+    if (!profileEditModalOpen) {
+      return;
+    }
+
+    setUserFormValues({});
+    setFormErrors({});
+    setProducerFormValues({
+      profileOptions: profileOptions || { activeModules: [], distantPurchasingConditions: { minSped: undefined } },
+    });
+    setSavedPolygons(distributionAreas || {});
+    setUnformattedTel(salesContactNumber || '');
+  }, [profileEditModalOpen, profileOptions, distributionAreas, salesContactNumber]);
 
   // useEffect(() => {
   //   if (profileOptions.distantPurchasing) {

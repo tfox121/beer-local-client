@@ -187,7 +187,7 @@ export function ProducerProfilePage({
                   {(user && user.businessId === businessId) && (
                     <Modal open={profileEditModalOpen} onClose={() => setProfileEditModalOpen(false)} closeIcon size="small" trigger={<Button onClick={() => setProfileEditModalOpen(true)} primary>Edit Profile</Button>}>
                       <Modal.Header>Edit profile</Modal.Header>
-                      <ProfileEditModal user={user} profileEditModalOpen={profileEditModalOpen} setProfileEditModalOpen={setProfileEditModalOpen} location={routerLocation} producerProfile={producerProfile} profileUpdate={handleProfileUpdate} />
+                      <ProfileEditModal user={producerProfile} profileEditModalOpen={profileEditModalOpen} setProfileEditModalOpen={setProfileEditModalOpen} location={routerLocation} producerProfile={producerProfile} profileUpdate={handleProfileUpdate} />
                     </Modal>
                   )}
                   {(user && user.role === 'retailer') && (
