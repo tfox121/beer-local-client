@@ -8,6 +8,8 @@ import messages from './messages';
 import Notification from './Notification';
 import { getPrivateRoute } from '../../utils/api';
 import { tr } from '../../utils/i18nRuntime';
+import { useLanguage } from '../../containers/LanguageProvider';
+import { appLocales } from '../../i18n';
 const NotificationCircle = styled.div`
   position: absolute;
   display: flex;
@@ -42,8 +44,12 @@ export default function UserMenuItems({
   businessName,
 }) {
   const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const { locale, setLocale } = useLanguage();
   const [notificationsArr, setNotificationsArr] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const localeLabels = {
+    en: 'English',
+  };
   useEffect(() => {
     if (notifications) {
       setNotificationsArr([...notifications]);
@@ -119,6 +125,20 @@ export default function UserMenuItems({
               <FormattedMessage {...messages.signedInAs} />{' '}
               {businessName || user.name}
             </Dropdown.Header>
+            <Dropdown.Divider />
+            <Dropdown.Header>
+              {tr('components.navbar.usermenuitems.language', 'Language')}
+            </Dropdown.Header>
+            {appLocales.map((supportedLocale) => (
+              <Dropdown.Item
+                key={supportedLocale}
+                active={supportedLocale === locale}
+                onClick={() => setLocale(supportedLocale)}
+              >
+                {localeLabels[supportedLocale] || supportedLocale.toUpperCase()}
+              </Dropdown.Item>
+            ))}
+            <Dropdown.Divider />
             {/* <Dropdown.Item>
               <FormattedMessage {...messages.yourProfile} />
              </Dropdown.Item>

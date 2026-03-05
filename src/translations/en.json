@@ -17,6 +17,7 @@
   "components.navbar.notification.you.have.a.new.notification": "You have a new notification.",
   "components.navbar.notification.you.have.a.new.order.from": "You have a new order from",
   "components.navbar.notification.your.order.with": "Your order with",
+  "components.navbar.usermenuitems.language": "Language",
   "components.navbar.usermenuitems.no.notifications": "No notifications.",
   "components.orderline.index.cancel.item": "Cancel item",
   "components.orderline.index.decrease.quantity": "Decrease quantity",
