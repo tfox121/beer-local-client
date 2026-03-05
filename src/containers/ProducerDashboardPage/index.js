@@ -54,7 +54,7 @@ const ProducerDashboardPage = () => {
   const [periodSalesAverageItemsDiff, setPeriodSalesAverageItemsDiff] =
     useState(0);
   const [topCustomers, setTopCustomers] = useState([]);
-  const status = 'Pending';
+  const status = 'Confirmed';
   const periodSalesCalc = (ordersArr, period, previous) => {
     let total = 0;
     let orderCount = 0;
