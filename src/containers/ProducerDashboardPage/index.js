@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { compose } from 'redux';
 import moment from 'moment';
 import { values } from 'lodash';
 import { createStructuredSelector } from 'reselect';
@@ -12,10 +11,6 @@ import {
 } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { TileLayer, Map } from 'react-leaflet';
-import { useInjectReducer } from '../../utils/injectReducer';
-import { useInjectSaga } from '../../utils/injectSaga';
-import reducer from './reducer';
-import saga from './saga';
 
 import PageWrapper from '../../components/PageWrapper';
 import { makeSelectUser } from '../App/selectors';
@@ -25,20 +20,17 @@ import LineChart from './LineChart';
 import { PACK_SIZES, PRODUCER_CHART_TIME_PERIODS, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
-import { fetchProducerDashboard } from './actions';
-import {
-  makeSelectProducerDashboardFetching, makeSelectProducerDashboardRetailers, makeSelectProducerDashboardOrders,
-} from './selectors';
+import { useProducerDashboardQuery } from '../../queries/producerDashboard';
 
 const ProducerDashboardPage = ({
   userProfile,
-  producerDashboardFetch,
-  dashboardOrders,
-  dashBoardRetailers,
-  producerDashboardFetching,
 }) => {
-  useInjectReducer({ key: 'ProducerDashboardPage', reducer });
-  useInjectSaga({ key: 'ProducerDashboardPage', saga });
+  const {
+    data: dashboardData,
+    isLoading: producerDashboardFetching,
+  } = useProducerDashboardQuery();
+  const dashboardOrders = dashboardData && dashboardData.dashboardOrders ? dashboardData.dashboardOrders : [];
+  const dashBoardRetailers = dashboardData && dashboardData.dashboardRetailers ? dashboardData.dashboardRetailers : [];
 
   const [salesPeriod, setSalesPeriod] = useState('week');
   const [periodSales, setPeriodSales] = useState({});
@@ -50,10 +42,6 @@ const ProducerDashboardPage = ({
   const [topCustomers, setTopCustomers] = useState([]);
 
   const status = 'Pending';
-
-  useEffect(() => {
-    producerDashboardFetch();
-  }, [producerDashboardFetch]);
 
   const periodSalesCalc = (ordersArr, period, previous) => {
     let total = 0;
@@ -415,30 +403,13 @@ const ProducerDashboardPage = ({
 
 ProducerDashboardPage.propTypes = {
   userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  dashboardOrders: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
-  dashBoardRetailers: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
-  producerDashboardFetching: PropTypes.bool,
-  producerDashboardFetch: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
   userProfile: makeSelectUser(),
-  dashboardOrders: makeSelectProducerDashboardOrders(),
-  dashBoardRetailers: makeSelectProducerDashboardRetailers(),
-  producerDashboardFetching: makeSelectProducerDashboardFetching(),
 });
 
-function mapDispatchToProps(dispatch) {
-  return {
-    producerDashboardFetch: () => dispatch(fetchProducerDashboard()),
-  };
-}
-
-const withConnect = connect(
+export default connect(
   mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(
-  withConnect,
+  null,
 )(ProducerDashboardPage);
