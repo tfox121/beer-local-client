@@ -46,17 +46,25 @@ const ProducerForm = ({
   }, [setMapCentre, formValues.location]);
 
   useEffect(() => {
-    const newErrors = { ...formErrors };
-    delete newErrors.salesContactNumber;
-    setFormErrors({ ...newErrors });
+    setFormErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      delete newErrors.salesContactNumber;
+      return newErrors;
+    });
     if (unformattedTel === '') {
       ayt.reset(null);
-      handleChange(null, { name: 'salesContactNumber', value: '' });
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        salesContactNumber: '',
+      }));
     } else {
       ayt.reset(unformattedTel);
-      handleChange(null, { name: 'salesContactNumber', value: ayt.number() });
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        salesContactNumber: ayt.number(),
+      }));
     }
-  }, [unformattedTel]);
+  }, [setFormErrors, setFormValues, unformattedTel]);
 
   const handleChange = (e, { name, value }) => {
     const newErrors = { ...formErrors };

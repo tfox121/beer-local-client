@@ -23,6 +23,7 @@ const MetadataModal = ({ cell, updateMyData }) => {
 
   const productImageRef = createRef();
   const editorRef = createRef();
+  const productId = cell?.row?.original?.id;
 
   const sliderSettings = {
     start: 1,
@@ -52,18 +53,16 @@ const MetadataModal = ({ cell, updateMyData }) => {
   }, [productImage]);
 
   useEffect(() => {
-    if (productImageSaved) {
+    if (productImageSaved && productId) {
       const setBannerRouteAsync = async () => {
-        setProuctImageRoute(
-          await getPresignedRoute('product', cell.row.original.id),
-        );
+        setProuctImageRoute(await getPresignedRoute('product', productId));
       };
       setBannerRouteAsync();
     }
     return () => {
       setProuctImageRoute({});
     };
-  }, [productImageSaved]);
+  }, [productId, productImageSaved]);
 
   const handleChange = (e, { name, value }) => {
     setItemMetadata({ ...itemMetadata, [name]: value });

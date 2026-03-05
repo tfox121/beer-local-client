@@ -302,7 +302,7 @@ const AvailibilityTable = ({
         payload: stockCategories,
       });
     }
-  }, [stockCategories]);
+  }, [profileOptionsUpdate, stockCategories]);
 
   useEffect(() => {
     setCategories(

@@ -47,20 +47,25 @@ const RetailerForm = ({
   }, [setMapCentre, formValues.location]);
 
   useEffect(() => {
-    const newErrors = { ...formErrors };
-    delete newErrors.purchasingContactNumber;
-    setFormErrors({ ...newErrors });
+    setFormErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      delete newErrors.purchasingContactNumber;
+      return newErrors;
+    });
     if (unformattedTel === '') {
       ayt.reset(null);
-      handleChange(null, { name: 'purchasingContactNumber', value: '' });
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        purchasingContactNumber: '',
+      }));
     } else {
       ayt.reset(unformattedTel);
-      handleChange(null, {
-        name: 'purchasingContactNumber',
-        value: ayt.number(),
-      });
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        purchasingContactNumber: ayt.number(),
+      }));
     }
-  }, [unformattedTel]);
+  }, [setFormErrors, setFormValues, unformattedTel]);
 
   const handleChange = (e, { name, value }) => {
     const newErrors = { ...formErrors };

@@ -107,22 +107,28 @@ const ProfileEditModal = ({
   };
 
   useEffect(() => {
-    if (formErrors.salesContactNumber) {
-      const newErrors = { ...formErrors };
+    setFormErrors((prevErrors) => {
+      if (!prevErrors.salesContactNumber) {
+        return prevErrors;
+      }
+      const newErrors = { ...prevErrors };
       delete newErrors.salesContactNumber;
-      setFormErrors({ ...newErrors });
-    }
+      return newErrors;
+    });
     if (unformattedTel === '') {
       ayt.reset(null);
-      setProducerFormValues({ ...producerFormValues, salesContactNumber: '' });
+      setProducerFormValues((previous) => ({
+        ...previous,
+        salesContactNumber: '',
+      }));
     } else {
       ayt.reset(unformattedTel);
-      setProducerFormValues({
-        ...producerFormValues,
+      setProducerFormValues((previous) => ({
+        ...previous,
         salesContactNumber: ayt.number(),
-      });
+      }));
     }
-  }, [unformattedTel, formErrors, setProducerFormValues]);
+  }, [unformattedTel]);
 
   useEffect(() => {
     if (Object.keys(user).length) {

@@ -5,7 +5,7 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
   Header,
@@ -32,17 +32,12 @@ const HomePage = () => {
   const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
   const [buttonVisible, setButtonVisible] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
-  const [businessName, setBusinessName] = useState('');
-  const [businessType, setBusinessType] = useState(null);
-
-  useEffect(() => {
-    if (localStorage.businessName && businessName === '') {
-      setBusinessName(localStorage.businessName);
-    }
-    if (localStorage.businessType && businessType === '') {
-      setBusinessType(localStorage.businessType);
-    }
-  }, []);
+  const [businessName, setBusinessName] = useState(
+    () => localStorage.businessName || '',
+  );
+  const [businessType, setBusinessType] = useState(
+    () => localStorage.businessType || null,
+  );
 
   let formAnimation = 'fly right';
 
