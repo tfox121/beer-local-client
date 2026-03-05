@@ -205,7 +205,7 @@ const ProducerDashboardPage = () => {
           <Grid stackable columns={2} verticalAlign='middle'>
             <Grid.Column className='header-column' width='10'>
               <Header as='h1'>
-                {tr('containers.producerdashboardpage.index.hi', 'Hi')}
+                {tr('containers.producerdashboardpage.index.hi', 'Hi')}{' '}
                 {userProfile.businessName}
                 {', '}
                 {tr(
@@ -241,8 +241,8 @@ const ProducerDashboardPage = () => {
             <Grid columns={3} stackable>
               <Grid.Column className='sales-summary' width={6}>
                 <Header>
-                  {tr('containers.producerdashboardpage.index.this', 'This')}
-                  {salesPeriod}
+                  {tr('containers.producerdashboardpage.index.this', 'This')}{' '}
+                  {salesPeriod}{' '}
                   {tr(
                     'containers.producerdashboardpage.index.you.ve.sold',
                     "you've sold",
@@ -405,7 +405,7 @@ const ProducerDashboardPage = () => {
                     {tr(
                       'containers.producerdashboardpage.index.no.customers.so.far.this',
                       'No customers so far this',
-                    )}
+                    )}{' '}
                     {salesPeriod}.
                   </Grid.Column>
                 </Grid.Row>
@@ -453,7 +453,7 @@ const ProducerDashboardPage = () => {
                     {tr(
                       'containers.producerdashboardpage.index.no.items.sold.so.far.this',
                       'No items sold so far this',
-                    )}
+                    )}{' '}
                     {salesPeriod}.
                   </Grid.Column>
                 </Grid.Row>

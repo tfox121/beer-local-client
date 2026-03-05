@@ -49,6 +49,7 @@ export default function UserMenuItems({
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const localeLabels = {
     en: 'English',
+    fr: 'Francais',
   };
   useEffect(() => {
     if (notifications) {

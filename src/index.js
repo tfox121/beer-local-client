@@ -72,7 +72,12 @@ if (!window.Intl) {
   new Promise((resolve) => {
     resolve(import('intl'));
   })
-    .then(() => Promise.all([import('intl/locale-data/jsonp/en')]))
+    .then(() =>
+      Promise.all([
+        import('intl/locale-data/jsonp/en'),
+        import('intl/locale-data/jsonp/fr'),
+      ]),
+    )
     .then(() => render(translationMessages))
     .catch((err) => {
       throw err;
