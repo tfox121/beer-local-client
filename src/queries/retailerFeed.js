@@ -10,7 +10,8 @@ export const fetchRetailerFeed = async () => {
   return normalizeProducerFeed(response.data);
 };
 
-export const useRetailerFeedQuery = () => useQuery({
-  queryKey: retailerFeedQueryKey,
-  queryFn: fetchRetailerFeed,
-});
+export const useRetailerFeedQuery = () =>
+  useQuery({
+    queryKey: retailerFeedQueryKey,
+    queryFn: fetchRetailerFeed,
+  });

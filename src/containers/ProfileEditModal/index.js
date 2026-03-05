@@ -1,10 +1,14 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  useState, createRef, useEffect, useRef,
-} from 'react';
+import React, { useState, createRef, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Grid, Image, Button, Modal, Form, Header, Message,
+  Grid,
+  Image,
+  Button,
+  Modal,
+  Form,
+  Header,
+  Message,
 } from 'semantic-ui-react';
 import AvatarEditor from 'react-avatar-editor';
 import { Slider } from 'react-semantic-ui-range';
@@ -26,13 +30,21 @@ import MapMarker from '../../components/MapMarker';
 import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 
 const ProfileEditModal = ({
-  producerProfile, user, profileUpdate, profileEditModalOpen, setProfileEditModalOpen,
+  producerProfile,
+  user,
+  profileUpdate,
+  profileEditModalOpen,
+  setProfileEditModalOpen,
 }) => {
-  const { mutateAsync: userUpdate, isLoading: userUpdating } = useUpdateUserMutation();
+  const { mutateAsync: userUpdate, isLoading: userUpdating } =
+    useUpdateUserMutation();
 
   const [userFormValues, setUserFormValues] = useState({});
   const [producerFormValues, setProducerFormValues] = useState({
-    profileOptions: { activeModules: [], distantPurchasingConditions: { minSped: undefined } },
+    profileOptions: {
+      activeModules: [],
+      distantPurchasingConditions: { minSped: undefined },
+    },
   });
   const [formErrors, setFormErrors] = useState({});
   const [banner, setBanner] = useState({});
@@ -56,13 +68,24 @@ const ProfileEditModal = ({
     min: 0.5,
     max: 3,
     step: 0.05,
-    onChange: value => {
+    onChange: (value) => {
       setZoom(value);
     },
   };
 
   const {
-    businessName, website, primaryContactName, salesEmail, salesContactNumber, address, location, distributionAreas, intro, profileOptions, bannerSource, avatarSource,
+    businessName,
+    website,
+    primaryContactName,
+    salesEmail,
+    salesContactNumber,
+    address,
+    location,
+    distributionAreas,
+    intro,
+    profileOptions,
+    bannerSource,
+    avatarSource,
   } = user;
 
   const handleUserInfoChange = (e, { name, value }) => {
@@ -94,13 +117,16 @@ const ProfileEditModal = ({
       setProducerFormValues({ ...producerFormValues, salesContactNumber: '' });
     } else {
       ayt.reset(unformattedTel);
-      setProducerFormValues({ ...producerFormValues, salesContactNumber: ayt.number() });
+      setProducerFormValues({
+        ...producerFormValues,
+        salesContactNumber: ayt.number(),
+      });
     }
   }, [unformattedTel, formErrors, setProducerFormValues]);
 
   useEffect(() => {
     if (Object.keys(user).length) {
-      setProducerFormValues(previous => ({ ...previous, profileOptions }));
+      setProducerFormValues((previous) => ({ ...previous, profileOptions }));
     }
   }, [user, profileOptions]);
 
@@ -118,11 +144,19 @@ const ProfileEditModal = ({
     setUserFormValues({});
     setFormErrors({});
     setProducerFormValues({
-      profileOptions: profileOptions || { activeModules: [], distantPurchasingConditions: { minSped: undefined } },
+      profileOptions: profileOptions || {
+        activeModules: [],
+        distantPurchasingConditions: { minSped: undefined },
+      },
     });
     setSavedPolygons(distributionAreas || {});
     setUnformattedTel(salesContactNumber || '');
-  }, [profileEditModalOpen, profileOptions, distributionAreas, salesContactNumber]);
+  }, [
+    profileEditModalOpen,
+    profileOptions,
+    distributionAreas,
+    salesContactNumber,
+  ]);
 
   // useEffect(() => {
   //   if (profileOptions.distantPurchasing) {
@@ -183,9 +217,12 @@ const ProfileEditModal = ({
     if (checked) {
       activeModules.push(name);
     } else {
-      activeModules = activeModules.filter(moduleName => moduleName !== name);
+      activeModules = activeModules.filter((moduleName) => moduleName !== name);
     }
-    setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, activeModules } });
+    setProducerFormValues({
+      ...producerFormValues,
+      profileOptions: { ...producerFormValues.profileOptions, activeModules },
+    });
   };
 
   const handleProfileOptionsToggle = (e, { name, checked }) => {
@@ -195,17 +232,26 @@ const ProfileEditModal = ({
       delete newErrors.minSpend;
     }
     setFormErrors({ ...newErrors });
-    setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, [name]: checked } });
+    setProducerFormValues({
+      ...producerFormValues,
+      profileOptions: { ...producerFormValues.profileOptions, [name]: checked },
+    });
   };
 
   const handleDistantPurchasingOptionsChange = (e, { name, value }) => {
     const newErrors = { ...formErrors };
     delete newErrors[name];
     setFormErrors({ ...newErrors });
-    setProducerFormValues({ ...producerFormValues, profileOptions: { ...producerFormValues.profileOptions, distantPurchasingConditions: { [name]: value } } });
+    setProducerFormValues({
+      ...producerFormValues,
+      profileOptions: {
+        ...producerFormValues.profileOptions,
+        distantPurchasingConditions: { [name]: value },
+      },
+    });
   };
 
-  const handleSuggestSelect = suggestion => {
+  const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
@@ -215,24 +261,28 @@ const ProfileEditModal = ({
       const newErrors = { ...formErrors };
       delete newErrors.location;
       setFormErrors({ ...newErrors });
-      setUserFormValues({ ...userFormValues, location: locationObj, address: gmaps.formatted_address });
+      setUserFormValues({
+        ...userFormValues,
+        location: locationObj,
+        address: gmaps.formatted_address,
+      });
     }
   };
 
   let editableFG = null;
 
-  const onFeatureGroupReady = reactFGref => {
+  const onFeatureGroupReady = (reactFGref) => {
     if (reactFGref) {
       // if (savedPolygons.features && savedPolygons.features.length > 0) {
       const customGeoJSON = new L.GeoJSON(savedPolygons);
 
       const leafletFG = reactFGref.leafletElement;
 
-      leafletFG.eachLayer(layer => {
+      leafletFG.eachLayer((layer) => {
         leafletFG.removeLayer(layer);
       });
 
-      customGeoJSON.eachLayer(layer => {
+      customGeoJSON.eachLayer((layer) => {
         leafletFG.addLayer(layer);
       });
       // }
@@ -261,7 +311,10 @@ const ProfileEditModal = ({
   const handleSubmit = async () => {
     const errors = {};
 
-    if (producerFormValues.salesContactNumber && !new PhoneNumber(producerFormValues.salesContactNumber, 'GB').isValid()) {
+    if (
+      producerFormValues.salesContactNumber &&
+      !new PhoneNumber(producerFormValues.salesContactNumber, 'GB').isValid()
+    ) {
       errors.salesContactNumber = 'This is not a valid phone number';
     }
     if (!producerFormValues.salesEmail === '') {
@@ -270,11 +323,20 @@ const ProfileEditModal = ({
     if (userFormValues.businessName === '') {
       errors.businessName = 'This field is required';
     }
-    if (producerFormValues.profileOptions.distantPurchasing && (!producerFormValues.profileOptions.distantPurchasingConditions || !producerFormValues.profileOptions.distantPurchasingConditions.minSpend)) {
-      errors.minSpend = 'If you wish to enable ordering from outside your distribution area, you must enter a minimum order value.';
+    if (
+      producerFormValues.profileOptions.distantPurchasing &&
+      (!producerFormValues.profileOptions.distantPurchasingConditions ||
+        !producerFormValues.profileOptions.distantPurchasingConditions.minSpend)
+    ) {
+      errors.minSpend =
+        'If you wish to enable ordering from outside your distribution area, you must enter a minimum order value.';
     }
-    if (savedPolygons && (!savedPolygons.features || !savedPolygons.features.length)) {
-      errors.distributionAreas = 'You need to save at least one distribution area. If you have already drawn a shape, make sure you click \'Finish\' in order to proceed';
+    if (
+      savedPolygons &&
+      (!savedPolygons.features || !savedPolygons.features.length)
+    ) {
+      errors.distributionAreas =
+        "You need to save at least one distribution area. If you have already drawn a shape, make sure you click 'Finish' in order to proceed";
     }
     if (!Object.keys(errors).length) {
       const imagesObj = {};
@@ -291,7 +353,11 @@ const ProfileEditModal = ({
         }
       }
       userUpdate({ ...userFormValues, ...imagesObj });
-      profileUpdate({ ...producerFormValues, ...userFormValues, distributionAreas: savedPolygons });
+      profileUpdate({
+        ...producerFormValues,
+        ...userFormValues,
+        distributionAreas: savedPolygons,
+      });
       setTimeout(() => {
         if (bannerSaved || avatarSaved) {
           window.location.reload();
@@ -314,10 +380,10 @@ const ProfileEditModal = ({
       return currentLocation;
     }
     if (
-      currentLocation
-      && typeof currentLocation === 'object'
-      && typeof currentLocation.lat === 'number'
-      && typeof currentLocation.lng === 'number'
+      currentLocation &&
+      typeof currentLocation === 'object' &&
+      typeof currentLocation.lat === 'number' &&
+      typeof currentLocation.lng === 'number'
     ) {
       return [currentLocation.lat, currentLocation.lng];
     }
@@ -328,27 +394,39 @@ const ProfileEditModal = ({
     <>
       <Modal.Content>
         <EditProfileStyle>
-          <div className="image-stack">
-            <div className="image-stack__item image-stack__item--bottom">
+          <div className='image-stack'>
+            <div className='image-stack__item image-stack__item--bottom'>
               <Grid.Row>
                 <Grid.Column width={16}>
-                  <div className="button-image-container">
+                  <div className='button-image-container'>
                     <Image
-                      className="banner-image"
-                      src={bannerSaved || bannerSource || '/images/banners/blank-banner.png'}
+                      className='banner-image'
+                      src={
+                        bannerSaved ||
+                        bannerSource ||
+                        '/images/banners/blank-banner.png'
+                      }
                       centered
-                      onError={e => {
+                      onError={(e) => {
                         e.target.src = '/images/banners/blank-banner.png';
                       }}
                     />
-                    <Button inverted style={{ zIndex: 2 }} circular basic className="image-button" icon="camera" onClick={() => bannerRef.current.click()} />
+                    <Button
+                      inverted
+                      style={{ zIndex: 2 }}
+                      circular
+                      basic
+                      className='image-button'
+                      icon='camera'
+                      onClick={() => bannerRef.current.click()}
+                    />
                     <input
-                      id="bannerUpload"
+                      id='bannerUpload'
                       ref={bannerRef}
-                      type="file"
-                      accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
+                      type='file'
+                      accept='.png,.jpg,.jpeg,.svg,.webp,.gif'
                       hidden
-                      onChange={e => {
+                      onChange={(e) => {
                         const file = e.target.files?.[0];
                         setBanner(file || {});
                       }}
@@ -357,30 +435,41 @@ const ProfileEditModal = ({
                 </Grid.Column>
               </Grid.Row>
             </div>
-            <div className="image-stack__item image-stack__item--top">
+            <div className='image-stack__item image-stack__item--top'>
               <Grid>
                 <Grid.Row>
                   <Grid.Column width={4}>
-                    <div className="button-image-container">
+                    <div className='button-image-container'>
                       <Image
-                        className="profile-image"
-                        src={avatarSaved || avatarSource || '/images/avatars/blank-avatar.webp'}
-                        size="small"
+                        className='profile-image'
+                        src={
+                          avatarSaved ||
+                          avatarSource ||
+                          '/images/avatars/blank-avatar.webp'
+                        }
+                        size='small'
                         bordered
                         centered
                         circular
-                        onError={e => {
+                        onError={(e) => {
                           e.target.src = '/images/avatars/blank-avatar.webp';
                         }}
                       />
-                      <Button inverted circular basic className="image-button" icon="camera" onClick={() => avatarRef.current.click()} />
+                      <Button
+                        inverted
+                        circular
+                        basic
+                        className='image-button'
+                        icon='camera'
+                        onClick={() => avatarRef.current.click()}
+                      />
                       <input
-                        id="avatarUpload"
+                        id='avatarUpload'
                         ref={avatarRef}
-                        type="file"
-                        accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
+                        type='file'
+                        accept='.png,.jpg,.jpeg,.svg,.webp,.gif'
                         hidden
-                        onChange={e => {
+                        onChange={(e) => {
                           const file = e.target.files?.[0];
                           setAvatar(file || {});
                         }}
@@ -388,8 +477,12 @@ const ProfileEditModal = ({
                     </div>
                   </Grid.Column>
                   <Grid.Column width={7} />
-                  <Grid.Column className="profile-buttons" width={5} textAlign="right" verticalAlign="middle">
-                  </Grid.Column>
+                  <Grid.Column
+                    className='profile-buttons'
+                    width={5}
+                    textAlign='right'
+                    verticalAlign='middle'
+                  ></Grid.Column>
                 </Grid.Row>
               </Grid>
             </div>
@@ -397,8 +490,8 @@ const ProfileEditModal = ({
           <Modal.Description>
             <Form>
               <Form.Input
-                label="Brewery name"
-                name="businessName"
+                label='Brewery name'
+                name='businessName'
                 value={userFormValues.businessName || businessName || ''}
                 required
                 onChange={handleUserInfoChange}
@@ -410,9 +503,11 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
-                label="Sales contact name"
-                name="primaryContactName"
-                value={userFormValues.primaryContactName || primaryContactName || ''}
+                label='Sales contact name'
+                name='primaryContactName'
+                value={
+                  userFormValues.primaryContactName || primaryContactName || ''
+                }
                 required
                 onChange={handleUserInfoChange}
                 error={
@@ -423,11 +518,11 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
-                label="Sales email address"
-                name="salesEmail"
+                label='Sales email address'
+                name='salesEmail'
                 value={producerFormValues.salesEmail || salesEmail || ''}
                 required
-                type="email"
+                type='email'
                 onChange={handleProducerInfoChange}
                 error={
                   formErrors.salesEmail && {
@@ -437,11 +532,18 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
-                label="Sales contact number"
-                name="salesContactNumber"
-                value={producerFormValues.salesContactNumber || (salesContactNumber ? new PhoneNumber(salesContactNumber, 'GB').getNumber('national') : '')}
-                type="tel"
-                onChange={e => setUnformattedTel(e.target.value)}
+                label='Sales contact number'
+                name='salesContactNumber'
+                value={
+                  producerFormValues.salesContactNumber ||
+                  (salesContactNumber
+                    ? new PhoneNumber(salesContactNumber, 'GB').getNumber(
+                        'national',
+                      )
+                    : '')
+                }
+                type='tel'
+                onChange={(e) => setUnformattedTel(e.target.value)}
                 error={
                   formErrors.salesContactNumber && {
                     content: formErrors.salesContactNumber,
@@ -450,15 +552,15 @@ const ProfileEditModal = ({
                 }
               />
               <Form.Input
-                label="Website"
-                name="website"
+                label='Website'
+                name='website'
                 value={userFormValues.website || website || ''}
-                type="url"
+                type='url'
                 onChange={handleUserInfoChange}
               />
               <Form.TextArea
-                label="Intro"
-                name="intro"
+                label='Intro'
+                name='intro'
                 value={producerFormValues.intro || intro || ''}
                 onChange={handleProducerInfoChange}
               />
@@ -469,13 +571,13 @@ const ProfileEditModal = ({
                 <SuggestBlockStyle>
                   <AddressAutocomplete
                     ref={geosuggestEl}
-                    label="Location"
-                    id="breweryLocation"
+                    label='Location'
+                    id='breweryLocation'
                     initialValue={userFormValues.address || address}
                     location={autocompleteLocation}
                     radius={1500}
                     minlength={3}
-                    country="gb"
+                    country='gb'
                     onSuggestSelect={handleSuggestSelect}
                     onBlur={() => geosuggestEl.current?.selectSuggest()}
                     required
@@ -484,9 +586,9 @@ const ProfileEditModal = ({
                 </SuggestBlockStyle>
                 {formErrors.location && (
                   <div
-                    className="ui pointing above prompt label"
-                    role="alert"
-                    aria-atomic="true"
+                    className='ui pointing above prompt label'
+                    role='alert'
+                    aria-atomic='true'
                   >
                     This field is required
                   </div>
@@ -494,18 +596,20 @@ const ProfileEditModal = ({
               </div>
               {savedPolygons && (
                 <DistroMapStyle>
-                  <Map center={userFormValues.location || location} zoom={10} zoomControl={false}>
-                    <TileLayer
-                      url={MAP_TILE_PROVIDER_URL}
-                    />
+                  <Map
+                    center={userFormValues.location || location}
+                    zoom={10}
+                    zoomControl={false}
+                  >
+                    <TileLayer url={MAP_TILE_PROVIDER_URL} />
                     <MapMarker location={userFormValues.location || location} />
                     <FeatureGroup
-                      ref={reactFGref => {
+                      ref={(reactFGref) => {
                         onFeatureGroupReady(reactFGref);
                       }}
                     >
                       <EditControl
-                        position="topright"
+                        position='topright'
                         onEdited={onEdited}
                         onCreated={onCreated}
                         onDeleted={onDeleted}
@@ -520,7 +624,7 @@ const ProfileEditModal = ({
                             drawError: {
                               color: '#e1e100',
                               message:
-                              "<strong>Oh snap!<strong> you can't draw that!",
+                                "<strong>Oh snap!<strong> you can't draw that!",
                             },
                             shapeOptions: {
                               color: '#009dd6',
@@ -532,41 +636,82 @@ const ProfileEditModal = ({
                   </Map>
                 </DistroMapStyle>
               )}
-              <Header as="h4">
-                Profile Modules
-              </Header>
+              <Header as='h4'>Profile Modules</Header>
               <Form.Group>
-                <Form.Checkbox checked={producerFormValues.profileOptions.activeModules.includes('availability')} onClick={handleModuleToggle} toggle label="Availability" name="availability" />
-                <Form.Checkbox checked={producerFormValues.profileOptions.activeModules.includes('promotions')} onClick={handleModuleToggle} toggle label="Promotions" name="promotions" />
-                <Form.Checkbox checked={producerFormValues.profileOptions.activeModules.includes('blog')} onClick={handleModuleToggle} toggle label="News" name="blog" />
+                <Form.Checkbox
+                  checked={producerFormValues.profileOptions.activeModules.includes(
+                    'availability',
+                  )}
+                  onClick={handleModuleToggle}
+                  toggle
+                  label='Availability'
+                  name='availability'
+                />
+                <Form.Checkbox
+                  checked={producerFormValues.profileOptions.activeModules.includes(
+                    'promotions',
+                  )}
+                  onClick={handleModuleToggle}
+                  toggle
+                  label='Promotions'
+                  name='promotions'
+                />
+                <Form.Checkbox
+                  checked={producerFormValues.profileOptions.activeModules.includes(
+                    'blog',
+                  )}
+                  onClick={handleModuleToggle}
+                  toggle
+                  label='News'
+                  name='blog'
+                />
               </Form.Group>
-              <Header as="h4">
+              <Header as='h4'>
                 Allow orders from beyond distribution area
               </Header>
               <div
                 className={`${formErrors.minSpend && 'error'} required field`}
               >
                 <Form.Group style={{ alignItems: 'center', height: '2em' }}>
-                  <Form.Checkbox checked={producerFormValues.profileOptions.distantPurchasing} onClick={handleProfileOptionsToggle} toggle label="Allow" name="distantPurchasing" />
+                  <Form.Checkbox
+                    checked={
+                      producerFormValues.profileOptions.distantPurchasing
+                    }
+                    onClick={handleProfileOptionsToggle}
+                    toggle
+                    label='Allow'
+                    name='distantPurchasing'
+                  />
                   {producerFormValues.profileOptions.distantPurchasing && (
                     <NumberFormat
                       style={{ width: '50%', marginLeft: '1em' }}
                       thousandSeparator
                       decimalScale={2}
                       fixedDecimalScale
-                      placeholder="For orders more than..."
-                      prefix="£"
-                      onValueChange={values => handleDistantPurchasingOptionsChange(null, { name: 'minSpend', value: values.floatValue })}
+                      placeholder='For orders more than...'
+                      prefix='£'
+                      onValueChange={(values) =>
+                        handleDistantPurchasingOptionsChange(null, {
+                          name: 'minSpend',
+                          value: values.floatValue,
+                        })
+                      }
                       allowNegative={false}
-                      value={(producerFormValues.profileOptions.distantPurchasingConditions && producerFormValues.profileOptions.distantPurchasingConditions.minSpend) || undefined}
+                      value={
+                        (producerFormValues.profileOptions
+                          .distantPurchasingConditions &&
+                          producerFormValues.profileOptions
+                            .distantPurchasingConditions.minSpend) ||
+                        undefined
+                      }
                     />
                   )}
                 </Form.Group>
                 {formErrors.minSpend && (
                   <div
-                    className="ui above pointing prompt label"
-                    role="alert"
-                    aria-atomic="true"
+                    className='ui above pointing prompt label'
+                    role='alert'
+                    aria-atomic='true'
                   >
                     {formErrors.minSpend}
                   </div>
@@ -580,24 +725,43 @@ const ProfileEditModal = ({
               </Message>
             )}
           </Modal.Description>
-          <Modal className="image-resizer" open={imageResizeModalOpen} onClose={handleModalClose}>
+          <Modal
+            className='image-resizer'
+            open={imageResizeModalOpen}
+            onClose={handleModalClose}
+          >
             <Modal.Header>
-              <Button floated="left" basic icon="left arrow" onClick={() => setImageResizeModalOpen(false)} />
-              Edit picture
-              {' '}
-              <Button primary floated="right" content="Apply" onClick={handleApply} />
+              <Button
+                floated='left'
+                basic
+                icon='left arrow'
+                onClick={() => setImageResizeModalOpen(false)}
+              />
+              Edit picture{' '}
+              <Button
+                primary
+                floated='right'
+                content='Apply'
+                onClick={handleApply}
+              />
             </Modal.Header>
             <AvatarEditor
               ref={editorRef}
-              image={(avatar && avatar.name) ? avatar : (banner && banner.name) ? banner : undefined}
-              width={(avatar && avatar.name) ? 300 : 750}
-              height={(avatar && avatar.name) ? 300 : 250}
+              image={
+                avatar && avatar.name
+                  ? avatar
+                  : banner && banner.name
+                    ? banner
+                    : undefined
+              }
+              width={avatar && avatar.name ? 300 : 750}
+              height={avatar && avatar.name ? 300 : 250}
               border={25}
               scale={zoom}
               color={[255, 255, 255, 0.6]}
             />
             <Modal.Content>
-              <Slider value={zoom} color="blue" settings={sliderSettings} />
+              <Slider value={zoom} color='blue' settings={sliderSettings} />
             </Modal.Content>
           </Modal>
         </EditProfileStyle>
@@ -605,7 +769,7 @@ const ProfileEditModal = ({
       <Modal.Actions>
         <Button
           primary
-          content="Save"
+          content='Save'
           onClick={handleSubmit}
           loading={userUpdating}
         />

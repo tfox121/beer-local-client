@@ -15,10 +15,10 @@ const PageWrapperStyle = styled(Container)`
     min-height: calc(100vh - 49px);
     /* min-width: 800px; */
 
-  @media only screen and (max-width: 767px) {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
+    @media only screen and (max-width: 767px) {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
 
     div.ui.text.loader {
       min-height: 100%;
@@ -52,9 +52,7 @@ const PageWrapperStyle = styled(Container)`
 `;
 
 const PageWrapper = ({ children }) => (
-  <PageWrapperStyle>
-    {children}
-  </PageWrapperStyle>
+  <PageWrapperStyle>{children}</PageWrapperStyle>
 );
 
 PageWrapper.propTypes = {

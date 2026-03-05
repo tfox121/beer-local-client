@@ -8,9 +8,7 @@ import React, { useState, memo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 // import { FormattedMessage } from 'react-intl';
-import {
-  Dropdown, Image, Grid,
-} from 'semantic-ui-react';
+import { Dropdown, Image, Grid } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
@@ -44,7 +42,7 @@ const NotificationDropdownStyled = styled(Dropdown.Item)`
         .notification-text-content {
           white-space: normal;
           min-width: 300px;
-          padding-right: 15px
+          padding-right: 15px;
         }
       }
     }
@@ -64,7 +62,7 @@ function Notification({ notification }) {
     // This prevents flickering when notification is being updated
     if (notification && notification.type && notification._id) {
       // Only update if it's actually different to prevent unnecessary re-renders
-      setNotificationObj(prev => {
+      setNotificationObj((prev) => {
         if (prev._id !== notification._id || prev.type !== notification.type) {
           return { ...notification };
         }
@@ -89,36 +87,13 @@ function Notification({ notification }) {
     let message;
     switch (notificationType) {
       case NOTIFICATION_TYPES.newOrder:
-        message = (
-          <>
-            You have a new order from
-            {' '}
-            {author}
-            !
-          </>
-        );
+        message = <>You have a new order from {author}!</>;
         break;
       case NOTIFICATION_TYPES.orderStatusChange:
-        message = (
-          <>
-            The status of your order from
-            {' '}
-            {author}
-            {' '}
-            has changed.
-          </>
-        );
+        message = <>The status of your order from {author} has changed.</>;
         break;
       case NOTIFICATION_TYPES.newOrderMessage:
-        message = (
-          <>
-            Your order with
-            {' '}
-            {author}
-            {' '}
-            has a new message.
-          </>
-        );
+        message = <>Your order with {author} has a new message.</>;
         break;
       default:
         // Only show loading message if we have a notification but unknown type
@@ -139,16 +114,26 @@ function Notification({ notification }) {
   }
 
   return (
-    <NotificationLinkStyled onClick={handleClick} to={`/order/${notificationObj.resourceId}`} $isRead={notificationObj.read}>
+    <NotificationLinkStyled
+      onClick={handleClick}
+      to={`/order/${notificationObj.resourceId}`}
+      $isRead={notificationObj.read}
+    >
       <NotificationDropdownStyled $isRead={notificationObj.read}>
         <Grid width={16}>
           <Grid.Column width={2}>
-            <Image src={notificationObj.image || '/images/avatars/blank-avatar.webp'} alt="user avatar" avatar />
+            <Image
+              src={notificationObj.image || '/images/avatars/blank-avatar.webp'}
+              alt='user avatar'
+              avatar
+            />
           </Grid.Column>
           <Grid.Column width={14}>
-            <div className="notification-text-content">{message}</div>
+            <div className='notification-text-content'>{message}</div>
             {notification?.updatedAt && (
-              <NotificationTimeStyled className="notification-time">{timeAgo.format(Date.parse(notification.updatedAt))}</NotificationTimeStyled>
+              <NotificationTimeStyled className='notification-time'>
+                {timeAgo.format(Date.parse(notification.updatedAt))}
+              </NotificationTimeStyled>
             )}
           </Grid.Column>
         </Grid>
@@ -167,7 +152,6 @@ function Notification({ notification }) {
     //     </Feed.Meta>
     //   </Feed.Content>
     // </Feed.Event>
-
   );
 }
 

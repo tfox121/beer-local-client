@@ -1,33 +1,48 @@
 /* eslint-disable react/no-danger */
 
 import React, { useState } from 'react';
-import {
-  convertFromRaw, EditorState, convertToRaw,
-} from 'draft-js';
+import { convertFromRaw, EditorState, convertToRaw } from 'draft-js';
 // import { stateToHTML } from 'draft-js-export-html';
-import {
-  Item, Button, Form, Segment, Grid,
-} from 'semantic-ui-react';
+import { Item, Button, Form, Segment, Grid } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { Editor } from 'react-draft-wysiwyg';
 
-import { BLOG_ITEMS_PER_PAGE, BLOG_EDITOR_TOOLBAR, BLOG_CHARACTER_LIMIT } from '../../utils/constants';
+import {
+  BLOG_ITEMS_PER_PAGE,
+  BLOG_EDITOR_TOOLBAR,
+  BLOG_CHARACTER_LIMIT,
+} from '../../utils/constants';
 import timeAgo from '../../utils/timeAgo';
 import { useEditBlogMutation } from '../../queries/producerProfile';
 
 const BlogPost = ({
-  user, businessId, blogPost, blogPage, index, onBlogEdited,
+  user,
+  businessId,
+  blogPost,
+  blogPage,
+  index,
+  onBlogEdited,
 }) => {
-  const { mutateAsync: blogEdit, isLoading: editingBlogRequest } = useEditBlogMutation();
+  const { mutateAsync: blogEdit, isLoading: editingBlogRequest } =
+    useEditBlogMutation();
   const parsedBlog = JSON.parse(blogPost.blogData);
   const initialContentState = convertFromRaw(parsedBlog);
-  const [blogData, setBlogData] = useState(EditorState.createWithContent(initialContentState));
-  const [blogMeta, setBlogMeta] = useState({ title: blogPost.title, author: blogPost.author, display: blogPost.display });
+  const [blogData, setBlogData] = useState(
+    EditorState.createWithContent(initialContentState),
+  );
+  const [blogMeta, setBlogMeta] = useState({
+    title: blogPost.title,
+    author: blogPost.author,
+    display: blogPost.display,
+  });
   const [editingBlog, setEditingBlog] = useState(false);
 
   // const htmlString = stateToHTML(blogData.getCurrentContent());
 
-  if (index < (blogPage * BLOG_ITEMS_PER_PAGE) - BLOG_ITEMS_PER_PAGE || index >= blogPage * BLOG_ITEMS_PER_PAGE) {
+  if (
+    index < blogPage * BLOG_ITEMS_PER_PAGE - BLOG_ITEMS_PER_PAGE ||
+    index >= blogPage * BLOG_ITEMS_PER_PAGE
+  ) {
     return null;
   }
 
@@ -38,7 +53,11 @@ const BlogPost = ({
   const handleEditConfirm = async () => {
     const contentState = blogData.getCurrentContent();
     const rawBlogData = convertToRaw(contentState);
-    await blogEdit({ id: blogPost._id, rawBlogData: JSON.stringify(rawBlogData), blogMeta });
+    await blogEdit({
+      id: blogPost._id,
+      rawBlogData: JSON.stringify(rawBlogData),
+      blogMeta,
+    });
     setEditingBlog(false);
     if (onBlogEdited) {
       onBlogEdited();
@@ -51,79 +70,129 @@ const BlogPost = ({
         <Item style={{ marginTop: 0, marginBottom: 0 }}>
           {/* <Item.Image src="https://react.semantic-ui.com/images/wireframe/image.png" /> */}
           <Item.Content>
-            {editingBlog
-              ? <Form.Input label="Title" fluid width={7} value={blogMeta.title} onChange={e => setBlogMeta({ ...blogMeta, title: e.target.value })} placeholder="Post title..." />
-              : <Item.Header style={{ fontSize: '1.5em' }}>{blogMeta.title}</Item.Header>}
-            <Item.Meta>
-              by
-              {' '}
-              {blogMeta.author}
-            </Item.Meta>
+            {editingBlog ? (
+              <Form.Input
+                label='Title'
+                fluid
+                width={7}
+                value={blogMeta.title}
+                onChange={(e) =>
+                  setBlogMeta({ ...blogMeta, title: e.target.value })
+                }
+                placeholder='Post title...'
+              />
+            ) : (
+              <Item.Header style={{ fontSize: '1.5em' }}>
+                {blogMeta.title}
+              </Item.Header>
+            )}
+            <Item.Meta>by {blogMeta.author}</Item.Meta>
             <Item.Description>
               <Editor
                 editorState={blogData}
                 toolbarClassName={editingBlog ? 'blog-editor-toolbar' : ''}
                 wrapperClassName={editingBlog ? 'blog-editor-wrapper' : ''}
                 editorClassName={editingBlog ? 'blog-editor' : ''}
-                onEditorStateChange={editorState => setBlogData(editorState)}
+                onEditorStateChange={(editorState) => setBlogData(editorState)}
                 readOnly={!editingBlog}
                 toolbarHidden={!editingBlog}
                 toolbar={BLOG_EDITOR_TOOLBAR}
-                handleBeforeInput={val => {
-                  const textLength = blogData.getCurrentContent().getPlainText().length;
+                handleBeforeInput={(val) => {
+                  const textLength = blogData
+                    .getCurrentContent()
+                    .getPlainText().length;
                   if (val && textLength >= BLOG_CHARACTER_LIMIT) {
                     return 'handled';
                   }
                   return 'not-handled';
                 }}
-                handlePastedText={val => {
-                  const textLength = blogData.getCurrentContent().getPlainText().length;
-                  return ((val.length + textLength) >= BLOG_CHARACTER_LIMIT);
+                handlePastedText={(val) => {
+                  const textLength = blogData
+                    .getCurrentContent()
+                    .getPlainText().length;
+                  return val.length + textLength >= BLOG_CHARACTER_LIMIT;
                 }}
               />
             </Item.Description>
             <Item.Extra>
               {timeAgo.format(Date.parse(blogPost.createdAt))}
-              {editingBlog
-                ? (
-                  <Grid style={{ padding: 0 }} textAlign="right" verticalAlign="middle">
-                    <Grid.Column textAlign="left" width={2} style={{ padding: 0 }}>
-                      <Form.Checkbox className="blogpost-display-checkbox" label="Display" checked={blogMeta.display} onChange={() => setBlogMeta({ ...blogMeta, display: !blogMeta.display })} />
-                    </Grid.Column>
-                    <Grid.Column width={10} />
-                    <Grid.Column width={4} style={{ padding: 0 }}>
-                      <Button
-                        compact
-                        onClick={() => setEditingBlog(false)}
-                        content="Cancel"
-                        floated="right"
-                      />
-                      <Button
-                        compact
-                        color="green"
-                        loading={editingBlogRequest}
-                        onClick={handleEditConfirm}
-                        content="Save"
-                        floated="right"
-                      />
-                    </Grid.Column>
-                  </Grid>
-                )
-                : (
-                  <>
-                    {(user && user.businessId === businessId) && (
-                      <Grid style={{ padding: 0 }} textAlign="right" verticalAlign="middle">
-                        <Grid.Column textAlign="left" width={8} style={{ padding: 0 }} verticalAlign="bottom">
-                          {blogMeta.display ? <strong>Displayed</strong> : 'Hidden'}
-                        </Grid.Column>
-                        {/* <Grid.Column width={12} /> */}
-                        <Grid.Column width={8} textAlign="right" style={{ padding: 0 }}>
-                          <Button compact basic floated="right" primary onClick={() => setEditingBlog(true)} content="Edit" />
-                        </Grid.Column>
-                      </Grid>
-                    )}
-                  </>
-                )}
+              {editingBlog ? (
+                <Grid
+                  style={{ padding: 0 }}
+                  textAlign='right'
+                  verticalAlign='middle'
+                >
+                  <Grid.Column
+                    textAlign='left'
+                    width={2}
+                    style={{ padding: 0 }}
+                  >
+                    <Form.Checkbox
+                      className='blogpost-display-checkbox'
+                      label='Display'
+                      checked={blogMeta.display}
+                      onChange={() =>
+                        setBlogMeta({ ...blogMeta, display: !blogMeta.display })
+                      }
+                    />
+                  </Grid.Column>
+                  <Grid.Column width={10} />
+                  <Grid.Column width={4} style={{ padding: 0 }}>
+                    <Button
+                      compact
+                      onClick={() => setEditingBlog(false)}
+                      content='Cancel'
+                      floated='right'
+                    />
+                    <Button
+                      compact
+                      color='green'
+                      loading={editingBlogRequest}
+                      onClick={handleEditConfirm}
+                      content='Save'
+                      floated='right'
+                    />
+                  </Grid.Column>
+                </Grid>
+              ) : (
+                <>
+                  {user && user.businessId === businessId && (
+                    <Grid
+                      style={{ padding: 0 }}
+                      textAlign='right'
+                      verticalAlign='middle'
+                    >
+                      <Grid.Column
+                        textAlign='left'
+                        width={8}
+                        style={{ padding: 0 }}
+                        verticalAlign='bottom'
+                      >
+                        {blogMeta.display ? (
+                          <strong>Displayed</strong>
+                        ) : (
+                          'Hidden'
+                        )}
+                      </Grid.Column>
+                      {/* <Grid.Column width={12} /> */}
+                      <Grid.Column
+                        width={8}
+                        textAlign='right'
+                        style={{ padding: 0 }}
+                      >
+                        <Button
+                          compact
+                          basic
+                          floated='right'
+                          primary
+                          onClick={() => setEditingBlog(true)}
+                          content='Edit'
+                        />
+                      </Grid.Column>
+                    </Grid>
+                  )}
+                </>
+              )}
             </Item.Extra>
           </Item.Content>
         </Item>

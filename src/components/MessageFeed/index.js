@@ -11,34 +11,50 @@ import { Feed, Segment } from 'semantic-ui-react';
 import timeAgo from '../../utils/timeAgo';
 import MessageFeedStyle from './MessageFeedStyle';
 
-function MessageFeed({
-  messages, user, business, businessAvatar,
-}) {
+function MessageFeed({ messages, user, business, businessAvatar }) {
   if (!messages || !messages.length) {
     return null;
   }
   return (
-    <Segment className="message-feed">
+    <Segment className='message-feed'>
       <MessageFeedStyle>
-        <Feed size="small">
-          {messages.map(message => (
+        <Feed size='small'>
+          {messages.map((message) => (
             <Feed.Event key={message._id}>
               <Feed.Label>
                 <img
-                  alt={message.author === user.sub ? `${user.businessName || 'User'} avatar` : `${business?.businessName || 'Business'} avatar`}
-                  src={message.author === user.sub ? (user.avatarSource || '/images/avatars/blank-avatar.webp') : (businessAvatar || business?.avatarSource || '/images/avatars/blank-avatar.webp')}
-                  onError={e => {
+                  alt={
+                    message.author === user.sub
+                      ? `${user.businessName || 'User'} avatar`
+                      : `${business?.businessName || 'Business'} avatar`
+                  }
+                  src={
+                    message.author === user.sub
+                      ? user.avatarSource || '/images/avatars/blank-avatar.webp'
+                      : businessAvatar ||
+                        business?.avatarSource ||
+                        '/images/avatars/blank-avatar.webp'
+                  }
+                  onError={(e) => {
                     e.target.src = '/images/avatars/blank-avatar.webp';
                   }}
                 />
               </Feed.Label>
               <Feed.Content>
                 <Feed.Summary>
-                  {message.author === user.sub ? user.primaryContactName : business.primaryContactName}
+                  {message.author === user.sub
+                    ? user.primaryContactName
+                    : business.primaryContactName}
                   {' ('}
-                  <Feed.User>{message.author === user.sub ? user.businessName : business.businessName}</Feed.User>
+                  <Feed.User>
+                    {message.author === user.sub
+                      ? user.businessName
+                      : business.businessName}
+                  </Feed.User>
                   )
-                  <Feed.Date>{timeAgo.format(Date.parse(message.createdAt))}</Feed.Date>
+                  <Feed.Date>
+                    {timeAgo.format(Date.parse(message.createdAt))}
+                  </Feed.Date>
                 </Feed.Summary>
                 <Feed.Extra text>{message.content}</Feed.Extra>
               </Feed.Content>

@@ -23,15 +23,15 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
   // };
 
   return (
-    <Transition.Group animation="fade" duration={{ hide: 500, show: 2000 }}>
+    <Transition.Group animation='fade' duration={{ hide: 500, show: 2000 }}>
       {visible && (
-        <Segment textAlign="left" basic>
-          <Header as="h2">Notification preferences</Header>
+        <Segment textAlign='left' basic>
+          <Header as='h2'>Notification preferences</Header>
           <p>Choose how you receive notifications</p>
           <Form>
             <Segment.Group>
               <Segment>
-                <Header as="h3">Orders</Header>
+                <Header as='h3'>Orders</Header>
                 <p>
                   Notifications for any orders you place, including
                   confirmations, reminders, etc.
@@ -39,8 +39,8 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                 <Grid>
                   <Grid.Column width={2}>
                     <Form.Checkbox
-                      label="Email"
-                      name="ordersEmail"
+                      label='Email'
+                      name='ordersEmail'
                       checked={contactOptions.ordersEmail || false}
                       onChange={() =>
                         setFormValues({
@@ -55,8 +55,8 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                   </Grid.Column>
                   <Grid.Column width={14}>
                     <Form.Checkbox
-                      label="Web & Mobile"
-                      name="ordersWebMobile"
+                      label='Web & Mobile'
+                      name='ordersWebMobile'
                       checked={contactOptions.ordersWebMobile || false}
                       onChange={() =>
                         setFormValues({
@@ -72,14 +72,14 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                 </Grid>
               </Segment>
               <Segment>
-                <Header as="h3">Following</Header>
+                <Header as='h3'>Following</Header>
                 <p>Contact from breweries that you follow.</p>
                 <Grid>
                   {formValues.purchasingContactNumber && (
                     <Grid.Column width={2}>
                       <Form.Checkbox
-                        label="Phone"
-                        name="followingPhone"
+                        label='Phone'
+                        name='followingPhone'
                         checked={contactOptions.followingPhone || false}
                         onChange={() =>
                           setFormValues({
@@ -95,8 +95,8 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                   )}
                   <Grid.Column width={2}>
                     <Form.Checkbox
-                      label="Email"
-                      name="followingEmail"
+                      label='Email'
+                      name='followingEmail'
                       checked={contactOptions.followingEmail || false}
                       onChange={() =>
                         setFormValues({
@@ -111,15 +111,16 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                   </Grid.Column>
                   <Grid.Column width={12} stretched>
                     <Form.Checkbox
-                      label="Web & Mobile"
-                      name="followingWebMobile"
+                      label='Web & Mobile'
+                      name='followingWebMobile'
                       checked={contactOptions.followingWebMobile || false}
                       onChange={() =>
                         setFormValues({
                           ...formValues,
                           contactOptions: {
                             ...contactOptions,
-                            followingWebMobile: !contactOptions.followingWebMobile,
+                            followingWebMobile:
+                              !contactOptions.followingWebMobile,
                           },
                         })
                       }
@@ -128,16 +129,15 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                 </Grid>
               </Segment>
               <Segment>
-                <Header as="h3">Upcoming</Header>
+                <Header as='h3'>Upcoming</Header>
                 <p>
-                  Contact from us about new and upcoming breweries in your
-                  area.
+                  Contact from us about new and upcoming breweries in your area.
                 </p>
                 <Grid>
                   <Grid.Column width={2}>
                     <Form.Checkbox
-                      label="Email"
-                      name="upcomingEmail"
+                      label='Email'
+                      name='upcomingEmail'
                       checked={contactOptions.upcomingEmail || false}
                       onChange={() =>
                         setFormValues({
@@ -152,15 +152,16 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                   </Grid.Column>
                   <Grid.Column width={14}>
                     <Form.Checkbox
-                      label="Web & Mobile"
-                      name="upcomingWebMobile"
+                      label='Web & Mobile'
+                      name='upcomingWebMobile'
                       checked={contactOptions.upcomingWebMobile || false}
                       onChange={() =>
                         setFormValues({
                           ...formValues,
                           contactOptions: {
                             ...contactOptions,
-                            upcomingWebMobile: !contactOptions.upcomingWebMobile,
+                            upcomingWebMobile:
+                              !contactOptions.upcomingWebMobile,
                           },
                         })
                       }
@@ -169,7 +170,7 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                 </Grid>
               </Segment>
               <Segment>
-                <Header as="h3">Us!</Header>
+                <Header as='h3'>Us!</Header>
                 <p>
                   Occasional curated content from us with news and events in
                   your area.
@@ -177,8 +178,8 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                 <Grid>
                   <Grid.Column width={2}>
                     <Form.Checkbox
-                      label="Email"
-                      name="usEmail"
+                      label='Email'
+                      name='usEmail'
                       checked={contactOptions.usEmail || false}
                       onChange={() =>
                         setFormValues({
@@ -193,8 +194,8 @@ const CommsOptionsForm = ({ formValues, setFormValues, profileStage }) => {
                   </Grid.Column>
                   <Grid.Column width={14}>
                     <Form.Checkbox
-                      label="Web & Mobile"
-                      name="usWebMobile"
+                      label='Web & Mobile'
+                      name='usWebMobile'
                       checked={contactOptions.usWebMobile || false}
                       onChange={() =>
                         setFormValues({

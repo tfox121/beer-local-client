@@ -1,7 +1,7 @@
 import { publicRoute, getPrivateRoute } from './api';
 import createBlobUrl from './createBlobUrl';
 
-export const getBanner = async businessId => {
+export const getBanner = async (businessId) => {
   const response = await publicRoute.get(`/producer/banner/${businessId}`, {
     responseType: 'blob',
     timeout: 30000,
@@ -24,7 +24,7 @@ export const getOwnBanner = async () => {
   return undefined;
 };
 
-export const getAvatar = async businessId => {
+export const getAvatar = async (businessId) => {
   const response = await publicRoute.get(`/producer/avatar/${businessId}`, {
     responseType: 'blob',
     timeout: 30000,

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const PromotionModalStyle = styled.div`
-  div.ui.input>input {
+  div.ui.input > input {
     height: 38px;
     font-size: 1rem !important;
     margin: 0 !important;
@@ -15,21 +15,24 @@ const PromotionModalStyle = styled.div`
     width: 2em;
   }
 
-  div.ui.input>input::placeholder {
-    color: rgba(191,191,191,.87);
+  div.ui.input > input::placeholder {
+    color: rgba(191, 191, 191, 0.87);
     opacity: 1;
   }
 
-  div.ui.input>input:hover {
+  div.ui.input > input:hover {
     border-color: rgba(34, 36, 38, 0.35);
   }
 
-  .condition-dropdown, .discount-dropdown {
+  .condition-dropdown,
+  .discount-dropdown {
     text-align: center;
     margin-bottom: 1em;
   }
 
-  .spend-input, .discount-value-input, .discount-percentage-input {
+  .spend-input,
+  .discount-value-input,
+  .discount-percentage-input {
     height: 38px;
     font-size: 1rem !important;
     margin: 0 !important;
@@ -51,7 +54,8 @@ const PromotionModalStyle = styled.div`
     border-color: rgba(34, 36, 38, 0.35);
   }
 
-  .multibuy-quantity, .free-item-quantity {
+  .multibuy-quantity,
+  .free-item-quantity {
     width: 5.5em;
     /* margin-right: 1em; */
   }
@@ -59,7 +63,7 @@ const PromotionModalStyle = styled.div`
   .ui.inline.dropdown {
     margin-right: 1em;
     .dropdown {
-      margin: -.78571429em;
+      margin: -0.78571429em;
     }
     .default.text {
       font-weight: unset;

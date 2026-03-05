@@ -10,26 +10,26 @@ const StockModalMenu = ({
   copyStockItems,
 }) => (
   <Menu secondary>
-    <Menu.Item as="h2">Edit Stock</Menu.Item>
-    <Menu.Menu position="right">
-      <Menu.Item name="Up" onClick={moveStockLineUp}>
-        <Icon name="angle up" />
+    <Menu.Item as='h2'>Edit Stock</Menu.Item>
+    <Menu.Menu position='right'>
+      <Menu.Item name='Up' onClick={moveStockLineUp}>
+        <Icon name='angle up' />
         Up
       </Menu.Item>
-      <Menu.Item name="Down" onClick={moveStockLineDown}>
-        <Icon name="angle down" />
+      <Menu.Item name='Down' onClick={moveStockLineDown}>
+        <Icon name='angle down' />
         Down
       </Menu.Item>
-      <Menu.Item name="Add Item" onClick={addNewStockLine}>
-        <Icon name="plus" />
+      <Menu.Item name='Add Item' onClick={addNewStockLine}>
+        <Icon name='plus' />
         Add Item
       </Menu.Item>
-      <Menu.Item name="Delete Selected" onClick={deleteStockItems}>
-        <Icon name="trash" />
+      <Menu.Item name='Delete Selected' onClick={deleteStockItems}>
+        <Icon name='trash' />
         Delete Selected
       </Menu.Item>
-      <Menu.Item name="Copy Selected" onClick={copyStockItems}>
-        <Icon name="copy" />
+      <Menu.Item name='Copy Selected' onClick={copyStockItems}>
+        <Icon name='copy' />
         Copy Selected
       </Menu.Item>
     </Menu.Menu>

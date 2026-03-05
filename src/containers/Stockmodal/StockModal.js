@@ -9,7 +9,12 @@ import PropTypes from 'prop-types';
 // import { FormattedMessage } from 'react-intl';
 import shortid from 'shortid';
 import {
-  Modal, Button, Confirm, Loader, Icon, Message,
+  Modal,
+  Button,
+  Confirm,
+  Loader,
+  Icon,
+  Message,
 } from 'semantic-ui-react';
 
 import arrayMove from '../../utils/arrayMove';
@@ -19,10 +24,9 @@ import StockModalStyle from './StockModalStyle';
 import StockModalMenu from './StockModalMenu';
 import StockManager from './StockManager';
 
-export function StockModal({
-  stock, fetchingProfile, onStockUpdated,
-}) {
-  const { mutateAsync: stockUpdate, isLoading: updatingStock } = useUpdateStockMutation();
+export function StockModal({ stock, fetchingProfile, onStockUpdated }) {
+  const { mutateAsync: stockUpdate, isLoading: updatingStock } =
+    useUpdateStockMutation();
 
   const stockDataTemplate = {
     id: shortid.generate(),
@@ -76,12 +80,13 @@ export function StockModal({
     if (!originalStockData) return false;
 
     // Normalize data for comparison (remove _id and other transient fields)
-    const normalizeStockItem = item => {
+    const normalizeStockItem = (item) => {
       const normalized = { ...item };
       delete normalized._id;
       // Convert numeric fields to numbers for comparison
       if (normalized.abv !== undefined) normalized.abv = Number(normalized.abv);
-      if (normalized.price !== undefined) normalized.price = Number(normalized.price);
+      if (normalized.price !== undefined)
+        normalized.price = Number(normalized.price);
       return normalized;
     };
 
@@ -97,8 +102,11 @@ export function StockModal({
     return normalizedOriginal.some((original, i) => {
       const current = normalizedCurrent[i];
       // Compare all keys
-      const allKeys = new Set([...Object.keys(original), ...Object.keys(current)]);
-      return Array.from(allKeys).some(key => original[key] !== current[key]);
+      const allKeys = new Set([
+        ...Object.keys(original),
+        ...Object.keys(current),
+      ]);
+      return Array.from(allKeys).some((key) => original[key] !== current[key]);
     });
   };
 
@@ -108,7 +116,7 @@ export function StockModal({
       return;
     }
     let tempArr = [...stockData];
-    rows.forEach(row => {
+    rows.forEach((row) => {
       tempArr = arrayMove(tempArr, Number(row), Number(row) - 1);
     });
     // const newSelected = rows.reduce((obj, val) => { obj[Number(val) - 1] = true; return obj; }, {});
@@ -121,7 +129,7 @@ export function StockModal({
       return;
     }
     let tempArr = [...stockData];
-    rows.reverse().forEach(row => {
+    rows.reverse().forEach((row) => {
       tempArr = arrayMove(tempArr, Number(row), Number(row) + 1);
     });
     setStockData(tempArr);
@@ -146,8 +154,10 @@ export function StockModal({
 
   const copyStockItems = async () => {
     const rows = Object.keys(selected);
-    const filteredData = stockData.filter((row, index) => rows.includes(index.toString()));
-    const duplicateRows = filteredData.map(row => {
+    const filteredData = stockData.filter((row, index) =>
+      rows.includes(index.toString()),
+    );
+    const duplicateRows = filteredData.map((row) => {
       const newRow = {
         ...row,
         id: shortid.generate(),
@@ -161,10 +171,8 @@ export function StockModal({
   const handleStockSave = async () => {
     let complete = true;
 
-    stockData.forEach(stockItem => {
-      const {
-        name, abv, packSize, price,
-      } = stockItem;
+    stockData.forEach((stockItem) => {
+      const { name, abv, packSize, price } = stockItem;
       if (!name || !abv || !packSize || !price) {
         complete = false;
       }
@@ -216,12 +224,12 @@ export function StockModal({
   return (
     <>
       <Modal
-        size="large"
+        size='large'
         open={modalOpen}
         onClose={handleModalClose}
         closeOnDimmerClick={!hasChanges()}
         closeIcon
-        trigger={(
+        trigger={
           <Button
             primary
             onClick={() => {
@@ -236,7 +244,7 @@ export function StockModal({
           >
             Edit
           </Button>
-        )}
+        }
       >
         <Modal.Header>
           <StockModalMenu
@@ -256,36 +264,43 @@ export function StockModal({
               setStockEditPending={() => {}}
             />
           </Modal.Content>
-          <Message style={{ width: '97%', margin: '1.5%' }} icon error compact hidden={!incompleteStockItem}>
-            <Icon name="warning sign" />
+          <Message
+            style={{ width: '97%', margin: '1.5%' }}
+            icon
+            error
+            compact
+            hidden={!incompleteStockItem}
+          >
+            <Icon name='warning sign' />
             <Message.Content>
-              <Message.Header>A stock item is missing required fields.</Message.Header>
+              <Message.Header>
+                A stock item is missing required fields.
+              </Message.Header>
               <p>Please complete them or delete the item.</p>
             </Message.Content>
           </Message>
         </StockModalStyle>
         <Modal.Actions>
-
-          <Button onClick={handleModalClose} content="Close" />
+          <Button onClick={handleModalClose} content='Close' />
           <Button
             loading={updatingStock}
-            className="stock-save"
+            className='stock-save'
             onClick={handleStockSave}
             primary={!dataLoaded}
             positive={dataLoaded}
           >
-            {loadingData && <Loader active inline="centered" size="mini" />}
-            {dataLoaded && <Icon name="check" />}
+            {loadingData && <Loader active inline='centered' size='mini' />}
+            {dataLoaded && <Icon name='check' />}
             {!dataLoaded && !loadingData && 'Save'}
           </Button>
         </Modal.Actions>
       </Modal>
       <Confirm
-        size="tiny"
+        size='tiny'
         open={confirmOpen}
         onCancel={handleCloseCancel}
         onConfirm={handleCloseConfirm}
-        content="Close stock manager without saving?"
+        content='Close stock manager without saving?'
       />
     </>
   );

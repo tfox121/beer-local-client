@@ -8,9 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 // import { FormattedMessage } from 'react-intl';
-import {
-  Modal, Button, Dropdown, Input, Divider,
-} from 'semantic-ui-react';
+import { Modal, Button, Dropdown, Input, Divider } from 'semantic-ui-react';
 
 import NumberFormat from 'react-number-format';
 import promotionCopySelection from '../../utils/promotionCopy';
@@ -22,7 +20,8 @@ import PromotionModalStyle from './PromotionModalStyle';
 
 const PromotionModal = ({ onPromotionAdded }) => {
   const { data: userProfile } = useUserQuery();
-  const { mutateAsync: promotionAdd, isLoading: addingPromotion } = useAddPromotionMutation();
+  const { mutateAsync: promotionAdd, isLoading: addingPromotion } =
+    useAddPromotionMutation();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [promotionSelectedValues, setPromotionSelectedValues] = useState({});
@@ -34,16 +33,24 @@ const PromotionModal = ({ onPromotionAdded }) => {
 
   useEffect(() => {
     if (userProfile && userProfile.stock) {
-      setAvailableStock(userProfile.stock
-        .filter(stockItem => stockItem.display === 'Show')
-        .map(stockItem => ({
-          key: stockItem.id, value: stockItem.id, text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]} - ${stockItem.availability}`,
-        })));
-      setAvailablePackageTypes(userProfile.stock
-        .filter(stockItem => stockItem.display === 'Show')
-        .map(stockItem => ({
-          key: stockItem.packSize, value: stockItem.packSize, text: PACK_SIZES[stockItem.packSize],
-        })));
+      setAvailableStock(
+        userProfile.stock
+          .filter((stockItem) => stockItem.display === 'Show')
+          .map((stockItem) => ({
+            key: stockItem.id,
+            value: stockItem.id,
+            text: `${stockItem.name} - ${PACK_SIZES[stockItem.packSize]} - ${stockItem.availability}`,
+          })),
+      );
+      setAvailablePackageTypes(
+        userProfile.stock
+          .filter((stockItem) => stockItem.display === 'Show')
+          .map((stockItem) => ({
+            key: stockItem.packSize,
+            value: stockItem.packSize,
+            text: PACK_SIZES[stockItem.packSize],
+          })),
+      );
     }
   }, [userProfile]);
 
@@ -115,56 +122,66 @@ const PromotionModal = ({ onPromotionAdded }) => {
   return (
     <Modal
       style={{ left: 0, minWidth: '800px' }}
-      size="large"
+      size='large'
       open={modalOpen}
       onClose={handleModalClose}
       closeIcon
-      trigger={<Button primary onClick={() => setModalOpen(true)}>Add</Button>}
+      trigger={
+        <Button primary onClick={() => setModalOpen(true)}>
+          Add
+        </Button>
+      }
     >
-      <Modal.Header>
-        Add New Promotion
-      </Modal.Header>
+      <Modal.Header>Add New Promotion</Modal.Header>
       <Modal.Content>
         {!promotionSaved ? (
           <PromotionModalStyle>
             <Dropdown
-              placeholder="Condition"
-              name="condition"
+              placeholder='Condition'
+              name='condition'
               selection
               options={promotionOptions}
               onChange={handleChange}
               value={promotionSelectedValues.condition || undefined}
               fluid
-              className="condition-dropdown"
+              className='condition-dropdown'
             />
             <div>
-
               {promotionSelectedValues.condition === 'minSpend' && (
                 <>
-                  If you spend
-                  {' '}
+                  If you spend{' '}
                   <NumberFormat
                     thousandSeparator
                     decimalScale={2}
                     fixedDecimalScale
-                    placeholder="£ ####"
-                    prefix="£"
-                    onValueChange={values => { handleChange(null, { name: 'minSpend', value: values.floatValue }); setConditionsComplete(true); }}
+                    placeholder='£ ####'
+                    prefix='£'
+                    onValueChange={(values) => {
+                      handleChange(null, {
+                        name: 'minSpend',
+                        value: values.floatValue,
+                      });
+                      setConditionsComplete(true);
+                    }}
                     allowNegative={false}
                     value={promotionSelectedValues.minSpend || undefined}
-                    className="spend-input"
+                    className='spend-input'
                   />
                 </>
               )}
               {promotionSelectedValues.condition === 'multibuy' && (
                 <>
-                  If you buy
-                  {' '}
-                  <Input name="multibuyQuantity" className="multibuy-quantity" placeholder="Quantity" onChange={handleChange} value={promotionSelectedValues.multibuyQuantity || ''} />
-                  {' '}
+                  If you buy{' '}
+                  <Input
+                    name='multibuyQuantity'
+                    className='multibuy-quantity'
+                    placeholder='Quantity'
+                    onChange={handleChange}
+                    value={promotionSelectedValues.multibuyQuantity || ''}
+                  />{' '}
                   <Dropdown
-                    placeholder="Type"
-                    name="multibuyType"
+                    placeholder='Type'
+                    name='multibuyType'
                     selection
                     inline
                     options={typeOptions}
@@ -173,22 +190,32 @@ const PromotionModal = ({ onPromotionAdded }) => {
                   />
                   {promotionSelectedValues.multibuyType === 'product' && (
                     <Dropdown
-                      placeholder="Product"
-                      name="multibuyProduct"
+                      placeholder='Product'
+                      name='multibuyProduct'
                       selection
                       options={availableStock}
-                      onChange={(e, { name, value }) => { handleChange(e, { name, value }); setConditionsComplete(true); }}
-                      value={promotionSelectedValues.multibuyProduct || undefined}
+                      onChange={(e, { name, value }) => {
+                        handleChange(e, { name, value });
+                        setConditionsComplete(true);
+                      }}
+                      value={
+                        promotionSelectedValues.multibuyProduct || undefined
+                      }
                     />
                   )}
                   {promotionSelectedValues.multibuyType === 'packageType' && (
                     <Dropdown
-                      placeholder="Package type"
-                      name="multibuyPackageType"
+                      placeholder='Package type'
+                      name='multibuyPackageType'
                       selection
                       options={availablePackageTypes}
-                      onChange={(e, { name, value }) => { handleChange(e, { name, value }); setConditionsComplete(true); }}
-                      value={promotionSelectedValues.multibuyPackageType || undefined}
+                      onChange={(e, { name, value }) => {
+                        handleChange(e, { name, value });
+                        setConditionsComplete(true);
+                      }}
+                      value={
+                        promotionSelectedValues.multibuyPackageType || undefined
+                      }
                     />
                   )}
                 </>
@@ -196,94 +223,120 @@ const PromotionModal = ({ onPromotionAdded }) => {
             </div>
             <Divider />
             <Dropdown
-              placeholder="Discount type"
-              name="discountType"
+              placeholder='Discount type'
+              name='discountType'
               selection
               options={discountTypeOptions}
               onChange={handleChange}
               value={promotionSelectedValues.discountType || undefined}
               fluid
-              className="discount-dropdown"
+              className='discount-dropdown'
             />
             <Divider />
 
             {promotionSelectedValues.discountType === 'moneyOff' && (
               <>
-                You will get
-                {' '}
+                You will get{' '}
                 <NumberFormat
                   thousandSeparator
                   decimalScale={2}
                   fixedDecimalScale
-                  placeholder="£ ####"
-                  prefix="£"
-                  onValueChange={values => { handleChange(null, { name: 'moneyOff', value: values.floatValue }); setDiscountsComplete(true); }}
+                  placeholder='£ ####'
+                  prefix='£'
+                  onValueChange={(values) => {
+                    handleChange(null, {
+                      name: 'moneyOff',
+                      value: values.floatValue,
+                    });
+                    setDiscountsComplete(true);
+                  }}
                   allowNegative={false}
                   value={promotionSelectedValues.moneyOff || undefined}
-                  className="discount-value-input"
-                />
-                {' '}
+                  className='discount-value-input'
+                />{' '}
                 off the total order.
               </>
             )}
             {promotionSelectedValues.discountType === 'percentageOff' && (
               <>
-                You will get
-                {' '}
+                You will get{' '}
                 <NumberFormat
                   decimalScale={1}
                   fixedDecimalScale
-                  placeholder="%"
-                  suffix="%"
-                  onValueChange={values => { handleChange(null, { name: 'percentageOff', value: values.floatValue }); setDiscountsComplete(true); }}
+                  placeholder='%'
+                  suffix='%'
+                  onValueChange={(values) => {
+                    handleChange(null, {
+                      name: 'percentageOff',
+                      value: values.floatValue,
+                    });
+                    setDiscountsComplete(true);
+                  }}
                   allowNegative={false}
                   value={promotionSelectedValues.percentageOff || undefined}
-                  className="discount-percentage-input"
-                />
-                {' '}
+                  className='discount-percentage-input'
+                />{' '}
                 off the total order.
               </>
             )}
             {promotionSelectedValues.discountType === 'freeItems' && (
               <>
-                You will get
-                {' '}
-                <Input className="free-item-quantity" name="freeItemQuantity" placeholder="Quantity" onChange={handleChange} value={promotionSelectedValues.freeItemQuantity || ''} />
-                {' '}
-                free
-                {' '}
+                You will get{' '}
+                <Input
+                  className='free-item-quantity'
+                  name='freeItemQuantity'
+                  placeholder='Quantity'
+                  onChange={handleChange}
+                  value={promotionSelectedValues.freeItemQuantity || ''}
+                />{' '}
+                free{' '}
                 {promotionSelectedValues.freeItemQuantity && (
                   <Dropdown
-                    placeholder="Product"
-                    name="freeItemProduct"
+                    placeholder='Product'
+                    name='freeItemProduct'
                     selection
                     options={availableStock}
-                    onChange={(e, { name, value }) => { handleChange(e, { name, value }); setDiscountsComplete(true); }}
+                    onChange={(e, { name, value }) => {
+                      handleChange(e, { name, value });
+                      setDiscountsComplete(true);
+                    }}
                     value={promotionSelectedValues.freeItemProduct || undefined}
                   />
                 )}
               </>
             )}
             {conditionsComplete && discountsComplete && !promotionSaved && (
-              <Button primary floated="right" icon="check" basic size="tiny" onClick={() => setPromotionSaved(true)} />
+              <Button
+                primary
+                floated='right'
+                icon='check'
+                basic
+                size='tiny'
+                onClick={() => setPromotionSaved(true)}
+              />
             )}
-
           </PromotionModalStyle>
         ) : (
           <>
             {promotionCopySelection(promotionSelectedValues, availableStock)}
             {promotionSaved && (
-              <Button primary floated="right" icon="edit" basic size="tiny" onClick={() => setPromotionSaved(false)} />
+              <Button
+                primary
+                floated='right'
+                icon='edit'
+                basic
+                size='tiny'
+                onClick={() => setPromotionSaved(false)}
+              />
             )}
           </>
         )}
-
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={handleModalClose} content="Close" />
+        <Button onClick={handleModalClose} content='Close' />
         <Button
           primary
-          className="stock-save"
+          className='stock-save'
           loading={addingPromotion}
           onClick={handleSave}
         >
@@ -296,6 +349,5 @@ const PromotionModal = ({ onPromotionAdded }) => {
 
 PromotionModal.propTypes = {
   onPromotionAdded: PropTypes.func,
-
 };
 export default PromotionModal;

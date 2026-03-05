@@ -35,14 +35,14 @@ import { translationMessages } from './i18n';
 
 const MOUNT_NODE = document.getElementById('app');
 
-const render = messages => {
+const render = (messages) => {
   ReactDOM.render(
     <Auth0Provider
       domain={process.env.REACT_APP_AUTH0_DOMAIN}
       clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
       redirectUri={window.location.origin}
       audience={process.env.REACT_APP_AUTH0_AUDIENCE}
-      cacheLocation="localstorage"
+      cacheLocation='localstorage'
       // scope="read:current_user update:current_user_metadata"
     >
       <QueryClientProvider client={queryClient}>
@@ -69,12 +69,12 @@ if (module.hot) {
 
 // Chunked polyfill for browsers without Intl support
 if (!window.Intl) {
-  new Promise(resolve => {
+  new Promise((resolve) => {
     resolve(import('intl'));
   })
     .then(() => Promise.all([import('intl/locale-data/jsonp/en')]))
     .then(() => render(translationMessages))
-    .catch(err => {
+    .catch((err) => {
       throw err;
     });
 } else {

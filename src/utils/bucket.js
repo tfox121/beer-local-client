@@ -12,15 +12,11 @@ export const getPresignedRoute = async (type, productId) => {
 export const imageToBucket = async (presignedRoute, imageDataURI) => {
   const formData = new FormData();
 
-  Object.keys(presignedRoute.fields).forEach(formKey => {
+  Object.keys(presignedRoute.fields).forEach((formKey) => {
     formData.set(formKey, presignedRoute.fields[formKey]);
   });
   formData.set('file', dataURItoBlob(imageDataURI));
-  return axios.post(
-    presignedRoute.url,
-    formData,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    },
-  );
+  return axios.post(presignedRoute.url, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 };

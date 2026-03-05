@@ -32,7 +32,6 @@ const EditProfileStyle = styled.div`
     width: 100%;
     object-fit: cover;
     filter: brightness(0.4);
-
   }
 
   img.profile-image.ui.centered.image {

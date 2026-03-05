@@ -11,10 +11,18 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { divIcon } from 'leaflet';
 import { Icon } from 'semantic-ui-react';
 
-const blueMarkerIconMarkup = renderToStaticMarkup(<Icon size="big" color="blue" name="map marker alternate" />);
-const redMarkerIconMarkup = renderToStaticMarkup(<Icon size="big" color="red" name="map marker alternate" />);
-const manIconMarkup = renderToStaticMarkup(<Icon size="big" name="street view" />);
-const dotIconMarkup = renderToStaticMarkup(<Icon name="dot circle outline" color="blue" />);
+const blueMarkerIconMarkup = renderToStaticMarkup(
+  <Icon size='big' color='blue' name='map marker alternate' />,
+);
+const redMarkerIconMarkup = renderToStaticMarkup(
+  <Icon size='big' color='red' name='map marker alternate' />,
+);
+const manIconMarkup = renderToStaticMarkup(
+  <Icon size='big' name='street view' />,
+);
+const dotIconMarkup = renderToStaticMarkup(
+  <Icon name='dot circle outline' color='blue' />,
+);
 
 const blueMarkerIcon = divIcon({
   html: blueMarkerIconMarkup,
@@ -42,7 +50,7 @@ const dotIcon = divIcon({
 
 function MapMarker({ location, type, name }) {
   switch (type) {
-    case ('customer'):
+    case 'customer':
       return (
         <Marker position={location} icon={blueMarkerIcon}>
           <Popup>
@@ -50,7 +58,7 @@ function MapMarker({ location, type, name }) {
           </Popup>
         </Marker>
       );
-    case ('not-customer'):
+    case 'not-customer':
       return (
         <Marker position={location} icon={redMarkerIcon}>
           <Popup>
@@ -58,7 +66,7 @@ function MapMarker({ location, type, name }) {
           </Popup>
         </Marker>
       );
-    case ('user'):
+    case 'user':
       return (
         <Marker position={location} icon={manIcon}>
           <Popup>

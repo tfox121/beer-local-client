@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import {
-  Dropdown, Menu, Image, Icon,
-} from 'semantic-ui-react';
+import { Dropdown, Menu, Image, Icon } from 'semantic-ui-react';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import styled from 'styled-components';
@@ -41,10 +39,12 @@ const StyledDropdownMenu = styled(Dropdown.Menu)`
   }
 `;
 
-export default function UserMenuItems({ avatarSource, notifications, businessName }) {
-  const {
-    user, isAuthenticated, loginWithRedirect, logout,
-  } = useAuth0();
+export default function UserMenuItems({
+  avatarSource,
+  notifications,
+  businessName,
+}) {
+  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const [notificationsArr, setNotificationsArr] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
@@ -56,9 +56,9 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
 
   useEffect(() => {
     if (notificationsArr) {
-      const unreadNotificationCount = notificationsArr.filter(notification => (
-        notification.read === false
-      )).length;
+      const unreadNotificationCount = notificationsArr.filter(
+        (notification) => notification.read === false,
+      ).length;
       setUnreadNotifications(unreadNotificationCount);
     }
   }, [notificationsArr]);
@@ -78,48 +78,47 @@ export default function UserMenuItems({ avatarSource, notifications, businessNam
         <Dropdown
           onClose={handleClose}
           item
-          icon={(
+          icon={
             <>
               <Icon
                 fitted
-                size="large"
+                size='large'
                 name={unreadNotifications ? 'bell' : 'bell outline'}
                 color={unreadNotifications ? 'blue' : 'black'}
               />
               {!!unreadNotifications && (
-                <NotificationCircle>
-                  {unreadNotifications}
-                </NotificationCircle>
+                <NotificationCircle>{unreadNotifications}</NotificationCircle>
               )}
             </>
-          )}
+          }
           scrolling
         >
-          <StyledDropdownMenu onClick={handleClose} direction="left">
-            {notificationsArr.length ? notificationsArr.map(notification => (
-              <React.Fragment key={notification._id}>
-                <Notification notification={notification} />
-              </React.Fragment>
-            ))
-              : (
-                <Dropdown.Item disabled>
-                  No notifications.
-                </Dropdown.Item>
-              )}
+          <StyledDropdownMenu onClick={handleClose} direction='left'>
+            {notificationsArr.length ? (
+              notificationsArr.map((notification) => (
+                <React.Fragment key={notification._id}>
+                  <Notification notification={notification} />
+                </React.Fragment>
+              ))
+            ) : (
+              <Dropdown.Item disabled>No notifications.</Dropdown.Item>
+            )}
           </StyledDropdownMenu>
         </Dropdown>
         <Dropdown
           item
-          trigger={(
+          trigger={
             <div>
-              <Image src={avatarSource || '/images/avatars/blank-avatar.webp'} avatar />
+              <Image
+                src={avatarSource || '/images/avatars/blank-avatar.webp'}
+                avatar
+              />
             </div>
-          )}
+          }
         >
           <Dropdown.Menu>
             <Dropdown.Header>
-              <FormattedMessage {...messages.signedInAs} />
-              {' '}
+              <FormattedMessage {...messages.signedInAs} />{' '}
               {businessName || user.name}
             </Dropdown.Header>
             {/* <Dropdown.Item>

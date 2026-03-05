@@ -3,7 +3,9 @@ const getImageUrl = (sub, type, productId) => {
 
   if (!cloudfrontUrl) {
     console.error('REACT_APP_CLOUDFRONT_URL environment variable is not set');
-    throw new Error('REACT_APP_CLOUDFRONT_URL environment variable is required');
+    throw new Error(
+      'REACT_APP_CLOUDFRONT_URL environment variable is required',
+    );
   }
 
   if (!sub) {
@@ -12,7 +14,9 @@ const getImageUrl = (sub, type, productId) => {
   }
 
   // Ensure cloudfrontUrl ends with / and sub doesn't start with /
-  const baseUrl = cloudfrontUrl.endsWith('/') ? cloudfrontUrl : `${cloudfrontUrl}/`;
+  const baseUrl = cloudfrontUrl.endsWith('/')
+    ? cloudfrontUrl
+    : `${cloudfrontUrl}/`;
   const userSub = sub.startsWith('/') ? sub.slice(1) : sub;
 
   return type === 'product'

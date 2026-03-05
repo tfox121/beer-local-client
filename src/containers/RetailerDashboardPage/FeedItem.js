@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Feed, Segment, Image, Button, Header, Divider,
+  Feed,
+  Segment,
+  Image,
+  Button,
+  Header,
+  Divider,
 } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { stateToHTML } from 'draft-js-export-html';
@@ -11,10 +16,9 @@ import numToWords from '../../utils/numToWords';
 import { PACK_SIZES } from '../../utils/constants';
 import { useFollowProducerMutation } from '../../queries/user';
 
-const FeedItem = ({
-  producerItem, userProfile,
-}) => {
-  const { mutate: producerFollow, isLoading: producerFollowing } = useFollowProducerMutation();
+const FeedItem = ({ producerItem, userProfile }) => {
+  const { mutate: producerFollow, isLoading: producerFollowing } =
+    useFollowProducerMutation();
   const [followButtonClicked, setFollowButtonClicked] = useState(false);
 
   useEffect(() => {
@@ -28,38 +32,61 @@ const FeedItem = ({
     setFollowButtonClicked(true);
   };
 
-  const multiNewItemRender = itemGroup => {
+  const multiNewItemRender = (itemGroup) => {
     const vowelRegex = '^[aieouAIEOU].*';
     if (itemGroup.producerItems.length === 1) {
       return (
-        <Feed.Event key={`${itemGroup.createdAt}${itemGroup.producerItems[0].producerId}`}>
+        <Feed.Event
+          key={`${itemGroup.createdAt}${itemGroup.producerItems[0].producerId}`}
+        >
           <Feed.Label>
-            <img src={itemGroup.producerItems[0].avatarSource || '/images/avatars/blank-avatar.webp'} alt="producer avatar" />
+            <img
+              src={
+                itemGroup.producerItems[0].avatarSource ||
+                '/images/avatars/blank-avatar.webp'
+              }
+              alt='producer avatar'
+            />
           </Feed.Label>
           <Feed.Content>
             <Feed.Summary>
-              <Feed.User as="p"><Link to={`/brewery/${itemGroup.producerItems[0].producerId}`}>{itemGroup.producerItems[0].producer}</Link></Feed.User>
-              {' '}
+              <Feed.User as='p'>
+                <Link to={`/brewery/${itemGroup.producerItems[0].producerId}`}>
+                  {itemGroup.producerItems[0].producer}
+                </Link>
+              </Feed.User>{' '}
               added a new beer
-              <Feed.Date>{timeAgo.format(Date.parse(itemGroup.producerItems[0].createdAt))}</Feed.Date>
+              <Feed.Date>
+                {timeAgo.format(
+                  Date.parse(itemGroup.producerItems[0].createdAt),
+                )}
+              </Feed.Date>
             </Feed.Summary>
             <Segment>
               <Feed.Extra text>
                 {itemGroup.producerItems[0].name}
                 {' - '}
-                {numToWords(Math.floor(itemGroup.producerItems[0].abv)).match(vowelRegex) ? ' an ' : ' a '}
+                {numToWords(Math.floor(itemGroup.producerItems[0].abv)).match(
+                  vowelRegex,
+                )
+                  ? ' an '
+                  : ' a '}
                 {itemGroup.producerItems[0].abv}
                 {'% '}
-                {itemGroup.producerItems[0].style}
-                {' '}
-                in
-                {' '}
-                {PACK_SIZES[itemGroup.producerItems[0].packSize]}
-                .
+                {itemGroup.producerItems[0].style} in{' '}
+                {PACK_SIZES[itemGroup.producerItems[0].packSize]}.
               </Feed.Extra>
               {itemGroup.producerItems[0].imageSource && (
                 <Feed.Extra images>
-                  <Image className="product-image" size="tiny" bordered centered circular src={itemGroup.producerItems[0].imageSource} alt="product" />
+                  <Image
+                    className='product-image'
+                    size='tiny'
+                    bordered
+                    centered
+                    circular
+                    src={itemGroup.producerItems[0].imageSource}
+                    alt='product'
+                  />
                   <p>{itemGroup.producerItems[0].description}</p>
                 </Feed.Extra>
               )}
@@ -69,20 +96,29 @@ const FeedItem = ({
       );
     }
     return (
-      <Feed.Event key={`${itemGroup.createdAt}${itemGroup.producerItems[0].producerId}`}>
+      <Feed.Event
+        key={`${itemGroup.createdAt}${itemGroup.producerItems[0].producerId}`}
+      >
         <Feed.Label>
-          <img src={itemGroup.producerItems[0].avatarSource || '/images/avatars/blank-avatar.webp'} alt="producer avatar" />
+          <img
+            src={
+              itemGroup.producerItems[0].avatarSource ||
+              '/images/avatars/blank-avatar.webp'
+            }
+            alt='producer avatar'
+          />
         </Feed.Label>
         <Feed.Content>
           <Feed.Summary>
-            <Feed.User as="p"><Link to={`/brewery/${itemGroup.producerItems[0].producerId}`}>{itemGroup.producerItems[0].producer}</Link></Feed.User>
-            {' '}
-            added
-            {' '}
-            {itemGroup.producerItems.length}
-            {' '}
-            new beers
-            <Feed.Date>{timeAgo.format(Date.parse(itemGroup.producerItems[0].createdAt))}</Feed.Date>
+            <Feed.User as='p'>
+              <Link to={`/brewery/${itemGroup.producerItems[0].producerId}`}>
+                {itemGroup.producerItems[0].producer}
+              </Link>
+            </Feed.User>{' '}
+            added {itemGroup.producerItems.length} new beers
+            <Feed.Date>
+              {timeAgo.format(Date.parse(itemGroup.producerItems[0].createdAt))}
+            </Feed.Date>
           </Feed.Summary>
           <Segment>
             {itemGroup.producerItems.map((producerSubItem, index) => (
@@ -90,27 +126,29 @@ const FeedItem = ({
                 <Feed.Extra text>
                   {producerSubItem.name}
                   {' - '}
-                  {numToWords(Math.floor(producerSubItem.abv)).match(vowelRegex) ? ' an ' : ' a '}
+                  {numToWords(Math.floor(producerSubItem.abv)).match(vowelRegex)
+                    ? ' an '
+                    : ' a '}
                   {producerSubItem.abv}
                   {'% '}
-                  {producerSubItem.style}
-                  {' '}
-                  in
-                  {' '}
-                  {PACK_SIZES[producerSubItem.packSize]}
-                  .
+                  {producerSubItem.style} in{' '}
+                  {PACK_SIZES[producerSubItem.packSize]}.
                 </Feed.Extra>
-                {
-                  producerSubItem.imageSource && (
-                    <Feed.Extra images>
-                      <Image className="product-image" size="tiny" bordered centered circular src={producerSubItem.imageSource} alt="product" />
-                      <p>{producerSubItem.description}</p>
-                    </Feed.Extra>
-                  )
-                }
-                {index !== itemGroup.producerItems.length - 1 && (
-                  <Divider />
+                {producerSubItem.imageSource && (
+                  <Feed.Extra images>
+                    <Image
+                      className='product-image'
+                      size='tiny'
+                      bordered
+                      centered
+                      circular
+                      src={producerSubItem.imageSource}
+                      alt='product'
+                    />
+                    <p>{producerSubItem.description}</p>
+                  </Feed.Extra>
                 )}
+                {index !== itemGroup.producerItems.length - 1 && <Divider />}
               </React.Fragment>
             ))}
           </Segment>
@@ -119,22 +157,37 @@ const FeedItem = ({
     );
   };
 
-  const newBlogRender = item => (
+  const newBlogRender = (item) => (
     <Feed.Event key={item._id}>
       <Feed.Label>
-        <img src={item.avatarSource || '/images/avatars/blank-avatar.webp'} alt="producer avatar" />
+        <img
+          src={item.avatarSource || '/images/avatars/blank-avatar.webp'}
+          alt='producer avatar'
+        />
       </Feed.Label>
       <Feed.Content>
         <Feed.Summary>
-          <Feed.User as="p"><Link to={`/brewery/${item.producerId}`}>{item.producer}</Link></Feed.User>
-          {' '}
+          <Feed.User as='p'>
+            <Link to={`/brewery/${item.producerId}`}>{item.producer}</Link>
+          </Feed.User>{' '}
           posted some news
           <Feed.Date>{timeAgo.format(Date.parse(item.createdAt))}</Feed.Date>
         </Feed.Summary>
         <Feed.Extra text>
           <Segment>
-            <Header><i>{item.title}</i></Header>
-            <div className="blog-text" dangerouslySetInnerHTML={{ __html: stateToHTML(EditorState.createWithContent(convertFromRaw(JSON.parse(item.blogData))).getCurrentContent()) }} />
+            <Header>
+              <i>{item.title}</i>
+            </Header>
+            <div
+              className='blog-text'
+              dangerouslySetInnerHTML={{
+                __html: stateToHTML(
+                  EditorState.createWithContent(
+                    convertFromRaw(JSON.parse(item.blogData)),
+                  ).getCurrentContent(),
+                ),
+              }}
+            />
           </Segment>
         </Feed.Extra>
         {/* <Feed.Meta>
@@ -146,19 +199,18 @@ const FeedItem = ({
     </Feed.Event>
   );
 
-  const newProducerRender = producer => (
+  const newProducerRender = (producer) => (
     <Feed.Event key={producer.businessId}>
       <Feed.Label>
-        <img src="/images/site-logo.png" alt="producer avatar" />
+        <img src='/images/site-logo.png' alt='producer avatar' />
       </Feed.Label>
       <Feed.Content>
         <Feed.Summary>
-          <Feed.User as="div">
+          <Feed.User as='div'>
             <Link to={`/brewery/${producer.businessId}`}>
               {producer.businessName}
             </Link>
-          </Feed.User>
-          {' '}
+          </Feed.User>{' '}
           has joined BeerLocal, and they deliver to your area!
           <Feed.Date>
             {timeAgo.format(Date.parse(producer.createdAt))}
@@ -166,35 +218,35 @@ const FeedItem = ({
         </Feed.Summary>
         <Segment>
           <Feed.Extra images style={{ flexDirection: 'column' }}>
-            <div className="follow-container" style={{ display: 'flex' }}>
+            <div className='follow-container' style={{ display: 'flex' }}>
               <Image
-                size="small"
+                size='small'
                 centered
                 src={
                   producer.avatarSource || '/images/avatars/blank-avatar.webp'
                 }
-                alt="product"
+                alt='product'
               />
               <p style={{ marginBottom: '0', paddingTop: '0' }}>
                 {producer.intro}
               </p>
               <Button
-                className="follow-button"
-                size="mini"
+                className='follow-button'
+                size='mini'
                 loading={followButtonClicked}
                 positive={userProfile.followedProducers
-                  .map(followedProducer => followedProducer.sub)
+                  .map((followedProducer) => followedProducer.sub)
                   .includes(producer.sub)}
                 icon={
                   userProfile.followedProducers
-                    .map(followedProducer => followedProducer.sub)
+                    .map((followedProducer) => followedProducer.sub)
                     .includes(producer.sub)
                     ? 'check'
                     : 'plus'
                 }
                 content={
                   userProfile.followedProducers
-                    .map(followedProducer => followedProducer.sub)
+                    .map((followedProducer) => followedProducer.sub)
                     .includes(producer.sub)
                     ? 'Following'
                     : 'Follow'

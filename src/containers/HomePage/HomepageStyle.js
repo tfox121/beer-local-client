@@ -14,7 +14,7 @@ const HomepageStyle = styled.div`
   div.ui.header.primary {
     color: #fdfdf0;
     font-size: 5em;
-    font-family: "Yantramanav", sans-serif;
+    font-family: 'Yantramanav', sans-serif;
     font-weight: 700;
     margin: 0;
     letter-spacing: 1px;
@@ -24,7 +24,7 @@ const HomepageStyle = styled.div`
   div.ui.header.secondary {
     color: #fdfdf0;
     font-size: 4em;
-    font-family: "Yantramanav", sans-serif;
+    font-family: 'Yantramanav', sans-serif;
     font-weight: 700;
     margin: 0;
     letter-spacing: 1px;
@@ -34,7 +34,7 @@ const HomepageStyle = styled.div`
   h5.ui.header.sub-header {
     color: #fdfdf0;
     font-size: 1.5em;
-    font-family: "Yantramanav", sans-serif;
+    font-family: 'Yantramanav', sans-serif;
     font-weight: 400;
     margin: 0 0 1em 0;
     letter-spacing: 0.5px;
@@ -46,7 +46,7 @@ const HomepageStyle = styled.div`
 
   .full-page::after {
     background-color: rgba(0, 0, 0, 0.75);
-    content: " ";
+    content: ' ';
     display: block;
     position: absolute;
     left: 0;
@@ -60,8 +60,8 @@ const HomepageStyle = styled.div`
   }
 
   .full-page::before {
-    background-image: url("./images/homepage-background-1.jpg");
-    content: " ";
+    background-image: url('./images/homepage-background-1.jpg');
+    content: ' ';
     display: block;
     position: absolute;
     left: 0;
@@ -91,7 +91,7 @@ const HomepageStyle = styled.div`
       }
 
       .default.text {
-        font-family: "Lato";
+        font-family: 'Lato';
       }
 
       @media only screen and (max-width: 424px) {

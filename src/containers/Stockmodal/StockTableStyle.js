@@ -13,7 +13,8 @@ const StockTableStyle = styled.div`
     align-items: center;
   }
 
-  .table-input, .filter-input {
+  .table-input,
+  .filter-input {
     font-size: 1rem !important;
     margin: 0 !important;
     width: 100%;
@@ -31,7 +32,8 @@ const StockTableStyle = styled.div`
     border: 0;
   }
 
-  .table-input:focus, .filter-input:focus {
+  .table-input:focus,
+  .filter-input:focus {
     outline: none !important;
     border: 1px solid rgb(38, 132, 255);
     border-radius: 4.5px;
@@ -120,21 +122,20 @@ const StockTableStyle = styled.div`
     justify-content: center;
     align-items: center;
     margin: auto;
-    width: fit-content
+    width: fit-content;
   }
 
-  .filter-container > input[type=range] {
+  .filter-container > input[type='range'] {
     margin-right: 0.5em;
   }
 
   th:nth-child(2) {
     text-align: left !important;
     .column-header {
-      margin-left: 0
+      margin-left: 0;
     }
     .filter-container {
-      margin-left: 0
-        .filter-input {
+      margin-left: 0 .filter-input {
         text-align: left !important;
         padding-left: 10px;
       }

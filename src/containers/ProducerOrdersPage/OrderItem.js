@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Table, Button, Popup, Image,
-} from 'semantic-ui-react';
+import { Table, Button, Popup, Image } from 'semantic-ui-react';
 import moment from 'moment';
 import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
@@ -12,10 +10,9 @@ import OrderModalContent from '../../components/OrderModalContent';
 import Can from '../../components/Can';
 import { useEditProducerOrderMutation } from '../../queries/orders';
 
-const OrderItem = ({
-  userProfile, ordersInfo, order, index,
-}) => {
-  const { mutate: orderEdit, isLoading: orderEditing } = useEditProducerOrderMutation();
+const OrderItem = ({ userProfile, ordersInfo, order, index }) => {
+  const { mutate: orderEdit, isLoading: orderEditing } =
+    useEditProducerOrderMutation();
   const [orderData, setOrderData] = useState({ ...order });
 
   const { role } = userProfile;
@@ -26,7 +23,10 @@ const OrderItem = ({
 
   const handleConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
-    const confirmedOrder = { _id: orderData._id, status: orderData.status === 'Confirmed' ? 'Pending' : 'Confirmed' };
+    const confirmedOrder = {
+      _id: orderData._id,
+      status: orderData.status === 'Confirmed' ? 'Pending' : 'Confirmed',
+    };
     orderEdit(confirmedOrder);
     // try {
     //   const response = await privateRoute.patch(`/orders/${order._id}`, confirmedOrder);
@@ -41,9 +41,13 @@ const OrderItem = ({
   const handleChangesConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
     const itemsApproved = order.items
-      .filter(orderItem => orderItem.orderChange !== 'delete')
-      .map(orderItem => ({ ...orderItem, orderChange: '' }));
-    const pendingOrder = { _id: orderData._id, status: 'Pending', items: itemsApproved };
+      .filter((orderItem) => orderItem.orderChange !== 'delete')
+      .map((orderItem) => ({ ...orderItem, orderChange: '' }));
+    const pendingOrder = {
+      _id: orderData._id,
+      status: 'Pending',
+      items: itemsApproved,
+    };
 
     orderEdit(pendingOrder);
 
@@ -59,7 +63,10 @@ const OrderItem = ({
 
   const handleReject = async () => {
     // const privateRoute = await getPrivateRoute();
-    const rejectedOrder = { _id: orderData._id, status: orderData.status === 'Rejected' ? 'Pending' : 'Rejected' };
+    const rejectedOrder = {
+      _id: orderData._id,
+      status: orderData.status === 'Rejected' ? 'Pending' : 'Rejected',
+    };
 
     orderEdit(rejectedOrder);
     // try {
@@ -91,37 +98,63 @@ const OrderItem = ({
   return (
     <Popup
       mouseEnterDelay={500}
-      trigger={(
-        <Table.Row warning={userProfile.role === 'producer' ? orderData.producerNotification : orderData.retailerNotification} style={{ color: (order.status === 'Rejected' || order.status === 'Cancelled') && 'lightgray' }}>
+      trigger={
+        <Table.Row
+          warning={
+            userProfile.role === 'producer'
+              ? orderData.producerNotification
+              : orderData.retailerNotification
+          }
+          style={{
+            color:
+              (order.status === 'Rejected' || order.status === 'Cancelled') &&
+              'lightgray',
+          }}
+        >
           <Table.Cell>{`SO-${order.orderNumber.toString().padStart(6, '0')}`}</Table.Cell>
-          <Table.Cell>{moment(order.createdAt).format('DD/MM/YYYY')}</Table.Cell>
+          <Table.Cell>
+            {moment(order.createdAt).format('DD/MM/YYYY')}
+          </Table.Cell>
           <Table.Cell>
             <Image
               style={{ marginLeft: '0.5em' }}
-              src={ordersInfo.businesses[index]?.avatarSource || '/images/avatars/blank-avatar.webp'}
+              src={
+                ordersInfo.businesses[index]?.avatarSource ||
+                '/images/avatars/blank-avatar.webp'
+              }
               alt={`${ordersInfo.businesses[index]?.businessName || 'Business'} avatar`}
               avatar
-              onError={e => {
+              onError={(e) => {
                 e.target.src = '/images/avatars/blank-avatar.webp';
               }}
             />
-            {userProfile.role === 'retailer'
-              ? <Link to={`/brewery/${ordersInfo.businesses[index].businessId}`}>{ordersInfo.businesses[index].businessName}</Link>
-              : <>{ordersInfo.businesses[index].businessName}</>}
+            {userProfile.role === 'retailer' ? (
+              <Link to={`/brewery/${ordersInfo.businesses[index].businessId}`}>
+                {ordersInfo.businesses[index].businessName}
+              </Link>
+            ) : (
+              <>{ordersInfo.businesses[index].businessName}</>
+            )}
           </Table.Cell>
           <Table.Cell>
             <NumberFormat
-              displayType="text"
+              displayType='text'
               thousandSeparator
               decimalScale={2}
               fixedDecimalScale
-              prefix="£"
+              prefix='£'
               // eslint-disable-next-line no-param-reassign
               value={calcOrderTotal(order.items)}
             />
           </Table.Cell>
-          <Table.Cell style={{ fontWeight: order.status === 'Confirmed' && 'bold' }}>{order.status}</Table.Cell>
-          <Table.Cell textAlign="center" width={2}><Link to={`/order/${order._id}`}>View Details</Link></Table.Cell>
+          <Table.Cell
+            style={{ fontWeight: order.status === 'Confirmed' && 'bold' }}
+          >
+            {order.status}
+          </Table.Cell>
+          <Table.Cell textAlign='center' width={2}>
+            <Link to={`/order/${order._id}`}>View Details</Link>
+          </Table.Cell>
           {/* <Modal
         trigger={<Table.Cell textAlign="center" width={2}>View Details</Table.Cell>}
         dimmer="inverted"
@@ -175,47 +208,86 @@ const OrderItem = ({
             )}
         </Modal.Actions>
       </Modal> */}
-          <Table.Cell textAlign="center">
+          <Table.Cell textAlign='center'>
             <Can
               role={role}
-              perform="orders:confirm"
-              yes={() => (orderData.status === 'Pending' || orderData.status === 'Confirmed') && (
-                <Button loading={orderEditing} onClick={handleConfirm} basic={orderData.status !== 'Confirmed'} color="green" icon="check" title="Confirm order" />
-              )}
+              perform='orders:confirm'
+              yes={() =>
+                (orderData.status === 'Pending' ||
+                  orderData.status === 'Confirmed') && (
+                  <Button
+                    loading={orderEditing}
+                    onClick={handleConfirm}
+                    basic={orderData.status !== 'Confirmed'}
+                    color='green'
+                    icon='check'
+                    title='Confirm order'
+                  />
+                )
+              }
             />
             <Can
               role={role}
-              perform="orders:changes-confirm"
-              yes={() => (orderData.status === 'Changes pending') && (
-                <Button loading={orderEditing} onClick={handleChangesConfirm} color="green" icon="check" title="Approve changes" />
-              )}
+              perform='orders:changes-confirm'
+              yes={() =>
+                orderData.status === 'Changes pending' && (
+                  <Button
+                    loading={orderEditing}
+                    onClick={handleChangesConfirm}
+                    color='green'
+                    icon='check'
+                    title='Approve changes'
+                  />
+                )
+              }
             />
             <Can
               role={role}
-              perform="orders:reject"
-              yes={() => (orderData.status === 'Changes pending' || orderData.status === 'Pending' || orderData.status === 'Rejected') && (
-                <Button loading={orderEditing} onClick={handleReject} basic={orderData.status !== 'Rejected'} color="red" icon="ban" title="Reject order" />
-              )}
+              perform='orders:reject'
+              yes={() =>
+                (orderData.status === 'Changes pending' ||
+                  orderData.status === 'Pending' ||
+                  orderData.status === 'Rejected') && (
+                  <Button
+                    loading={orderEditing}
+                    onClick={handleReject}
+                    basic={orderData.status !== 'Rejected'}
+                    color='red'
+                    icon='ban'
+                    title='Reject order'
+                  />
+                )
+              }
             />
             <Can
               role={role}
-              perform="orders:cancel"
-              yes={() => (orderData.status === 'Changes pending' || orderData.status === 'Pending') && (
-                <Button loading={orderEditing} onClick={handleCancel} basic={orderData.status !== 'Cancelled'} color="red" icon="close" title="Cancel order" />
-              )}
+              perform='orders:cancel'
+              yes={() =>
+                (orderData.status === 'Changes pending' ||
+                  orderData.status === 'Pending') && (
+                  <Button
+                    loading={orderEditing}
+                    onClick={handleCancel}
+                    basic={orderData.status !== 'Cancelled'}
+                    color='red'
+                    icon='close'
+                    title='Cancel order'
+                  />
+                )
+              }
             />
           </Table.Cell>
         </Table.Row>
-      )}
-      content={(
+      }
+      content={
         <OrderModalContent
           orderItems={order.items}
           businessName={ordersInfo.businesses[index].businessName}
-          type="orderInfo"
+          type='orderInfo'
         />
-      )}
+      }
       basic
-      wide="very"
+      wide='very'
     />
   );
 };

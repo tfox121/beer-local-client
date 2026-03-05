@@ -18,7 +18,7 @@ describe('<LanguageProvider />', () => {
   it('should render its children', () => {
     const children = <h1>Test</h1>;
     const { container } = render(
-      <LanguageProvider messages={messages} locale="en">
+      <LanguageProvider messages={messages} locale='en'>
         {children}
       </LanguageProvider>,
     );

@@ -3,11 +3,13 @@ import styled from 'styled-components';
 const AvailabilityMobileStyle = styled.div`
   /* min-width: 700px; */
 
-  .ui.table td, .ui.table th {
+  .ui.table td,
+  .ui.table th {
     text-align: center;
   }
 
-  .ui.table th.data-header-0, .ui.table td.data-cell-0 {
+  .ui.table th.data-header-0,
+  .ui.table td.data-cell-0 {
     text-align: left;
   }
 
@@ -54,11 +56,11 @@ const AvailabilityMobileStyle = styled.div`
     will-change: transform;
 
     * {
-    overflow: hidden;
-    line-height: 0;
-    max-height: 0;
-    transition: all 0.5s ease;
-    will-change: transform;
+      overflow: hidden;
+      line-height: 0;
+      max-height: 0;
+      transition: all 0.5s ease;
+      will-change: transform;
     }
   }
 `;

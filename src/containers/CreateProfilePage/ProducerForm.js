@@ -1,8 +1,6 @@
 import { TileLayer, Map } from 'react-leaflet';
 import { Grid, Form } from 'semantic-ui-react';
-import React, {
-  useEffect, useState, useRef,
-} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import AddressAutocomplete from '../../components/AddressAutocomplete';
 import ayt from '../../utils/phoneNumberValidation';
@@ -11,7 +9,10 @@ import MapMarker from '../../components/MapMarker';
 import SuggestBlockStyle from './SuggestBlockStyle';
 import MarkerMapStyle from './MarkerMapStyle';
 import ImageSelect from './ImageSelect';
-import { INTRO_CHARACTER_LIMIT, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
+import {
+  INTRO_CHARACTER_LIMIT,
+  MAP_TILE_PROVIDER_URL,
+} from '../../utils/constants';
 
 const ProducerForm = ({
   formValues,
@@ -71,7 +72,7 @@ const ProducerForm = ({
     setFormValues({ ...formValues, terms: !formValues.terms });
   };
 
-  const handleSuggestSelect = suggestion => {
+  const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
@@ -81,7 +82,11 @@ const ProducerForm = ({
       const newErrors = { ...formErrors };
       delete newErrors.location;
       setFormErrors({ ...newErrors });
-      setFormValues({ ...formValues, location: locationObj, address: gmaps.formatted_address });
+      setFormValues({
+        ...formValues,
+        location: locationObj,
+        address: gmaps.formatted_address,
+      });
     }
   };
 
@@ -92,8 +97,8 @@ const ProducerForm = ({
           <Grid.Column width={10}>
             <Form>
               <Form.Input
-                label="Brewery name"
-                name="businessName"
+                label='Brewery name'
+                name='businessName'
                 value={formValues.businessName || ''}
                 required
                 onChange={handleChange}
@@ -105,8 +110,8 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
-                label="Sales contact name"
-                name="primaryContactName"
+                label='Sales contact name'
+                name='primaryContactName'
                 value={formValues.primaryContactName || ''}
                 required
                 onChange={handleChange}
@@ -118,9 +123,9 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
-                label="Sales email address"
-                name="salesEmail"
-                type="email"
+                label='Sales email address'
+                name='salesEmail'
+                type='email'
                 value={formValues.salesEmail || ''}
                 required
                 onChange={handleChange}
@@ -132,11 +137,11 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
-                label="Sales contact number"
-                name="salesContactNumber"
-                type="tel"
+                label='Sales contact number'
+                name='salesContactNumber'
+                type='tel'
                 value={formValues.salesContactNumber || ''}
-                onChange={e => setUnformattedTel(e.target.value)}
+                onChange={(e) => setUnformattedTel(e.target.value)}
                 error={
                   formErrors.salesContactNumber && {
                     content: formErrors.salesContactNumber,
@@ -145,9 +150,9 @@ const ProducerForm = ({
                 }
               />
               <Form.Input
-                label="Website"
-                name="website"
-                type="url"
+                label='Website'
+                name='website'
+                type='url'
                 value={formValues.website || ''}
                 onChange={handleChange}
               />
@@ -157,12 +162,12 @@ const ProducerForm = ({
                 <SuggestBlockStyle>
                   <AddressAutocomplete
                     ref={geosuggestEl}
-                    label="Location"
-                    id="breweryLocation"
+                    label='Location'
+                    id='breweryLocation'
                     location={mapCentre}
                     radius={1500}
                     minlength={3}
-                    country="gb"
+                    country='gb'
                     onSuggestSelect={handleSuggestSelect}
                     onBlur={() => geosuggestEl.current?.selectSuggest()}
                     autoActivateFirstSuggest
@@ -171,9 +176,9 @@ const ProducerForm = ({
                 </SuggestBlockStyle>
                 {formErrors.location && (
                   <div
-                    className="ui pointing above prompt label"
-                    role="alert"
-                    aria-atomic="true"
+                    className='ui pointing above prompt label'
+                    role='alert'
+                    aria-atomic='true'
                   >
                     This field is required
                   </div>
@@ -181,23 +186,21 @@ const ProducerForm = ({
               </div>
               <br />
               <Form.TextArea
-                label="Intro"
-                placeholder="Tell us more about the brewery..."
+                label='Intro'
+                placeholder='Tell us more about the brewery...'
                 value={formValues.intro || ''}
-                name="intro"
+                name='intro'
                 onChange={handleChange}
                 maxLength={INTRO_CHARACTER_LIMIT}
               />
               {formValues.intro && !!formValues.intro.length && (
                 <p style={{ textAlign: 'right', fontSize: '10px' }}>
-                  {formValues.intro.length}
-                  /
-                  {INTRO_CHARACTER_LIMIT}
+                  {formValues.intro.length}/{INTRO_CHARACTER_LIMIT}
                 </p>
               )}
               <Form.Checkbox
-                label="I agree to the Terms and Conditions"
-                name="terms"
+                label='I agree to the Terms and Conditions'
+                name='terms'
                 // value={formValues.terms}
                 checked={formValues.terms}
                 required
@@ -212,13 +215,14 @@ const ProducerForm = ({
             </Form>
           </Grid.Column>
           <Grid.Column width={6}>
-            <ImageSelect avatarSaved={avatarSaved} setAvatarSaved={setAvatarSaved} />
+            <ImageSelect
+              avatarSaved={avatarSaved}
+              setAvatarSaved={setAvatarSaved}
+            />
             {formValues.location && formValues.location.lat && (
               <MarkerMapStyle>
                 <Map center={mapCentre} zoom={zoomLevel} zoomControl={false}>
-                  <TileLayer
-                    url={MAP_TILE_PROVIDER_URL}
-                  />
+                  <TileLayer url={MAP_TILE_PROVIDER_URL} />
                   <MapMarker location={formValues.location} />
                 </Map>
               </MarkerMapStyle>

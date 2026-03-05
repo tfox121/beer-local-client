@@ -6,9 +6,7 @@
 
 import React, { useEffect, useState } from 'react';
 // import { FormattedMessage } from 'react-intl';
-import {
-  Segment, Header, Dimmer, Loader,
-} from 'semantic-ui-react';
+import { Segment, Header, Dimmer, Loader } from 'semantic-ui-react';
 import PhoneNumber from 'awesome-phonenumber';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useHistory } from 'react-router-dom';
@@ -30,7 +28,8 @@ import { useSaveUserMutation } from '../../queries/user';
 export function CreateProfilePage() {
   const { user } = useAuth0();
   const history = useHistory();
-  const { mutateAsync: saveUser, isLoading: savingUser } = useSaveUserMutation();
+  const { mutateAsync: saveUser, isLoading: savingUser } =
+    useSaveUserMutation();
 
   const formTemplate = {
     type: '',
@@ -68,7 +67,10 @@ export function CreateProfilePage() {
   const [mapCentre, setMapCentre] = useState([54.00366, -2.547855]);
 
   useEffect(() => {
-    if (profileStage === 0 && Object.keys(formValues).length !== Object.keys(formTemplate).length) {
+    if (
+      profileStage === 0 &&
+      Object.keys(formValues).length !== Object.keys(formTemplate).length
+    ) {
       setFormValues(formTemplate);
       setFormErrors({});
     }
@@ -76,14 +78,14 @@ export function CreateProfilePage() {
 
   useEffect(() => {
     if (
-      formValues.type === 'producer'
-      && Object.keys(formValues).length === Object.keys(formTemplate).length
+      formValues.type === 'producer' &&
+      Object.keys(formValues).length === Object.keys(formTemplate).length
     ) {
       setFormValues({ ...formValues, ...producerFormTemplate });
     }
     if (
-      formValues.type === 'retailer'
-      && Object.keys(formValues).length === Object.keys(formTemplate).length
+      formValues.type === 'retailer' &&
+      Object.keys(formValues).length === Object.keys(formTemplate).length
     ) {
       setFormValues({ ...formValues, ...retailerFormTemplate });
     }
@@ -103,10 +105,16 @@ export function CreateProfilePage() {
 
   useEffect(() => {
     if (localStorage.businessName) {
-      setFormValues(prevFormValues => ({ ...prevFormValues, businessName: localStorage.businessName }));
+      setFormValues((prevFormValues) => ({
+        ...prevFormValues,
+        businessName: localStorage.businessName,
+      }));
     }
     if (localStorage.businessType) {
-      setFormValues(prevFormValues => ({ ...prevFormValues, type: localStorage.businessType }));
+      setFormValues((prevFormValues) => ({
+        ...prevFormValues,
+        type: localStorage.businessType,
+      }));
       setProfileStage(1);
     }
   }, [localStorage]);
@@ -130,7 +138,10 @@ export function CreateProfilePage() {
     const errors = {};
 
     if (formValues.type === 'retailer') {
-      const puchasingNumber = new PhoneNumber(formValues.purchasingContactNumber, 'GB');
+      const puchasingNumber = new PhoneNumber(
+        formValues.purchasingContactNumber,
+        'GB',
+      );
       if (!puchasingNumber.isValid()) {
         errors.purchasingContactNumber = 'This is not a valid phone number';
       }
@@ -173,8 +184,13 @@ export function CreateProfilePage() {
     const errors = {};
 
     if (formValues.type === 'producer') {
-      if (formValues.distributionAreas && (!formValues.distributionAreas.features || !formValues.distributionAreas.features.length)) {
-        errors.distributionAreas = 'You need to save at least one distribution area. If you have already drawn a shape, make sure you click \'Finish\' in order to proceed';
+      if (
+        formValues.distributionAreas &&
+        (!formValues.distributionAreas.features ||
+          !formValues.distributionAreas.features.length)
+      ) {
+        errors.distributionAreas =
+          "You need to save at least one distribution area. If you have already drawn a shape, make sure you click 'Finish' in order to proceed";
       }
     }
 
@@ -203,11 +219,11 @@ export function CreateProfilePage() {
     <>
       <Helmet>
         <title>BeerLocal - Create your profile</title>
-        <meta name="description" content="Profile creation form" />
+        <meta name='description' content='Profile creation form' />
       </Helmet>
       <PageWrapper>
-        <Segment basic textAlign="center" className="primary wrapper">
-          <Header as="h1">Complete your profile</Header>
+        <Segment basic textAlign='center' className='primary wrapper'>
+          <Header as='h1'>Complete your profile</Header>
           <BusinessTypeSelection
             profileStage={profileStage}
             setProfileStage={setProfileStage}

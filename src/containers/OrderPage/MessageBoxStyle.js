@@ -10,7 +10,7 @@ const MessageBoxStyle = styled.div`
     resize: none;
     padding: 1em;
     border-radius: 4.5px 0 0 4.5px;
-    border: 1px solid rgba(34,36,38,.15);
+    border: 1px solid rgba(34, 36, 38, 0.15);
     border-right: 0;
   }
 

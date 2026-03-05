@@ -12,9 +12,7 @@ import { Switch, Route, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
-import {
-  Dimmer, Loader, Button, Segment, Header,
-} from 'semantic-ui-react';
+import { Dimmer, Loader, Button, Segment, Header } from 'semantic-ui-react';
 
 import checkUserStatus from '../../utils/checkUserStatus';
 import HomePage from '../HomePage/Loadable';
@@ -31,7 +29,7 @@ import { useUserQuery, userQueryKey } from '../../queries/user';
 import GlobalStyle from '../../global-styles';
 
 const AppWrapper = styled.div`
-  background-color: #FDFDF0;
+  background-color: #fdfdf0;
   min-width: 100%;
   // max-width: calc(768px + 16px * 2);
   margin: 49px auto 0;
@@ -54,8 +52,14 @@ const App = () => {
   } = useUserQuery({ enabled: isAuthenticated });
   const lastPathnameRef = useRef(location.pathname);
 
-  const userStatus = checkUserStatus(isLoading, error, isAuthenticated, fetchingUser, userFetchError, userProfile);
-
+  const userStatus = checkUserStatus(
+    isLoading,
+    error,
+    isAuthenticated,
+    fetchingUser,
+    userFetchError,
+    userProfile,
+  );
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -69,8 +73,21 @@ const App = () => {
       lastPathnameRef.current = location.pathname;
     }
 
-    const checkStatus = checkUserStatus(isLoading, error, isAuthenticated, userRefetching, userFetchError, userProfile);
-    if (pathnameChanged && checkStatus.authenticated && checkStatus.registered && !checkStatus.connectionError && !userRefetching) {
+    const checkStatus = checkUserStatus(
+      isLoading,
+      error,
+      isAuthenticated,
+      userRefetching,
+      userFetchError,
+      userProfile,
+    );
+    if (
+      pathnameChanged &&
+      checkStatus.authenticated &&
+      checkStatus.registered &&
+      !checkStatus.connectionError &&
+      !userRefetching
+    ) {
       userRefetch();
     }
   }, [
@@ -88,9 +105,11 @@ const App = () => {
     const isConnectionError = userStatus.connectionError;
     return (
       <Dimmer active page>
-        <Segment padded="very">
-          <Header as="h2">
-            {isConnectionError ? 'Unable to connect to server' : 'There has been an error.'}
+        <Segment padded='very'>
+          <Header as='h2'>
+            {isConnectionError
+              ? 'Unable to connect to server'
+              : 'There has been an error.'}
           </Header>
           <p>
             {isConnectionError
@@ -122,17 +141,36 @@ const App = () => {
     );
   }
 
-
   return (
     <AppWrapper>
       <NavBar />
       <Switch>
-        <Route exact path="/" component={HomePage} />
-        <ProtectedRoute exact path="/create" isEnabled={userStatus.authenticated && !userStatus.registered} component={CreateProfilePage} />
-        <Route exact path="/brewery/:id" component={ProducerProfilePage} />
-        <ProtectedRoute exact path="/sales/orders" isEnabled={userStatus.registered} component={ProducerOrdersPage} />
-        <ProtectedRoute exact path="/breweries" isEnabled={userStatus.registered} component={ProducerListPage} />
-        <ProtectedRoute exact path="/order/:id" isEnabled={userStatus.registered} component={OrderPage} />
+        <Route exact path='/' component={HomePage} />
+        <ProtectedRoute
+          exact
+          path='/create'
+          isEnabled={userStatus.authenticated && !userStatus.registered}
+          component={CreateProfilePage}
+        />
+        <Route exact path='/brewery/:id' component={ProducerProfilePage} />
+        <ProtectedRoute
+          exact
+          path='/sales/orders'
+          isEnabled={userStatus.registered}
+          component={ProducerOrdersPage}
+        />
+        <ProtectedRoute
+          exact
+          path='/breweries'
+          isEnabled={userStatus.registered}
+          component={ProducerListPage}
+        />
+        <ProtectedRoute
+          exact
+          path='/order/:id'
+          isEnabled={userStatus.registered}
+          component={OrderPage}
+        />
         <Route component={NotFoundPage} />
       </Switch>
       <GlobalStyle />

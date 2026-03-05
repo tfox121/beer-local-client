@@ -20,11 +20,7 @@ export function LanguageProvider({
 
   return (
     <LanguageContext.Provider value={contextValue}>
-      <IntlProvider
-        locale={locale}
-        key={locale}
-        messages={messages[locale]}
-      >
+      <IntlProvider locale={locale} key={locale} messages={messages[locale]}>
         {React.Children.only(children)}
       </IntlProvider>
     </LanguageContext.Provider>

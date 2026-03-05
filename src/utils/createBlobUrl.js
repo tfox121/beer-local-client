@@ -1,6 +1,6 @@
 const urls = new WeakMap();
 
-const createBlobUrl = blob => {
+const createBlobUrl = (blob) => {
   if (urls.has(blob)) {
     return urls.get(blob);
   }

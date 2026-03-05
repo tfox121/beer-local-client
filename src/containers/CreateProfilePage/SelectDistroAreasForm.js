@@ -29,7 +29,7 @@ const SelectDistroAreasForm = ({
 
   let editableFG = null;
 
-  const onFeatureGroupReady = reactFGref => {
+  const onFeatureGroupReady = (reactFGref) => {
     if (reactFGref) {
       editableFG = reactFGref;
     }
@@ -51,7 +51,7 @@ const SelectDistroAreasForm = ({
     onChange();
   };
 
-  const onCreated = e => {
+  const onCreated = (e) => {
     const type = e.layerType;
 
     onChange();
@@ -62,7 +62,7 @@ const SelectDistroAreasForm = ({
   };
 
   return (
-    <Transition.Group animation="fade" duration={{ hide: 500, show: 2000 }}>
+    <Transition.Group animation='fade' duration={{ hide: 500, show: 2000 }}>
       {visible && (
         <>
           <p>
@@ -76,17 +76,15 @@ const SelectDistroAreasForm = ({
           </p>
           <DistroMapStyle>
             <Map center={mapCentre} zoom={10} zoomControl={false}>
-              <TileLayer
-                url={MAP_TILE_PROVIDER_URL}
-              />
+              <TileLayer url={MAP_TILE_PROVIDER_URL} />
               <MapMarker location={formValues.location} />
               <FeatureGroup
-                ref={reactFGref => {
+                ref={(reactFGref) => {
                   onFeatureGroupReady(reactFGref);
                 }}
               >
                 <EditControl
-                  position="topright"
+                  position='topright'
                   onEdited={onEdited}
                   onCreated={onCreated}
                   onDeleted={onDeleted}

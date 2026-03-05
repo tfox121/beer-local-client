@@ -35,23 +35,23 @@ const BusinessTypeSelection = ({
         <Grid columns={2} divided centered>
           <Grid.Row>
             <Grid.Column
-              className="typeSelector producer"
-              as="button"
+              className='typeSelector producer'
+              as='button'
               width={7}
-              textAlign="center"
+              textAlign='center'
               onClick={handleProducerClick}
             >
-              <Header as="h1">Producer</Header>
+              <Header as='h1'>Producer</Header>
             </Grid.Column>
             <Grid.Column width={1} />
             <Grid.Column
-              className="typeSelector retailer"
-              as="button"
+              className='typeSelector retailer'
+              as='button'
               width={7}
-              textAlign="center"
+              textAlign='center'
               onClick={handleRetailerClick}
             >
-              <Header as="h1">Retailer</Header>
+              <Header as='h1'>Retailer</Header>
             </Grid.Column>
           </Grid.Row>
         </Grid>

@@ -14,7 +14,14 @@ export const fetchProducerDashboard = async () => {
 
   const mergedOrders = merge(
     orderResponse.data.orders,
-    orderResponse.data.businesses.map(business => pick(business, ['businessName', 'businessId', 'avatarSource', 'location'])),
+    orderResponse.data.businesses.map((business) =>
+      pick(business, [
+        'businessName',
+        'businessId',
+        'avatarSource',
+        'location',
+      ]),
+    ),
   );
 
   return {
@@ -23,8 +30,9 @@ export const fetchProducerDashboard = async () => {
   };
 };
 
-export const useProducerDashboardQuery = (options = {}) => useQuery({
-  queryKey: producerDashboardQueryKey,
-  queryFn: fetchProducerDashboard,
-  ...options,
-});
+export const useProducerDashboardQuery = (options = {}) =>
+  useQuery({
+    queryKey: producerDashboardQueryKey,
+    queryFn: fetchProducerDashboard,
+    ...options,
+  });

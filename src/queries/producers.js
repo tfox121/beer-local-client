@@ -5,12 +5,13 @@ export const producersQueryKey = ['producers'];
 
 export const fetchProducers = async () => {
   const response = await publicRoute.get('/producers');
-  return response.data.map(producer => ({
+  return response.data.map((producer) => ({
     ...producer,
   }));
 };
 
-export const useProducersQuery = () => useQuery({
-  queryKey: producersQueryKey,
-  queryFn: fetchProducers,
-});
+export const useProducersQuery = () =>
+  useQuery({
+    queryKey: producersQueryKey,
+    queryFn: fetchProducers,
+  });

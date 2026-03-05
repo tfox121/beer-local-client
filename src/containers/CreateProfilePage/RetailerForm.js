@@ -10,7 +10,10 @@ import MapMarker from '../../components/MapMarker';
 import MarkerMapStyle from './MarkerMapStyle';
 import SuggestBlockStyle from './SuggestBlockStyle';
 import ImageSelect from './ImageSelect';
-import { DELIVERY_INSTRUCTION_CHARACTER_LIMIT, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
+import {
+  DELIVERY_INSTRUCTION_CHARACTER_LIMIT,
+  MAP_TILE_PROVIDER_URL,
+} from '../../utils/constants';
 
 const RetailerForm = ({
   formValues,
@@ -52,7 +55,10 @@ const RetailerForm = ({
       handleChange(null, { name: 'purchasingContactNumber', value: '' });
     } else {
       ayt.reset(unformattedTel);
-      handleChange(null, { name: 'purchasingContactNumber', value: ayt.number() });
+      handleChange(null, {
+        name: 'purchasingContactNumber',
+        value: ayt.number(),
+      });
     }
   }, [unformattedTel]);
 
@@ -70,7 +76,7 @@ const RetailerForm = ({
     setFormValues({ ...formValues, terms: !formValues.terms });
   };
 
-  const handleSuggestSelect = suggestion => {
+  const handleSuggestSelect = (suggestion) => {
     if (suggestion) {
       const { location: locationArray, gmaps } = suggestion;
       // Convert array [lat, lon] to object {lat, lng} format
@@ -80,7 +86,11 @@ const RetailerForm = ({
       const newErrors = { ...formErrors };
       delete newErrors.location;
       setFormErrors({ ...newErrors });
-      setFormValues({ ...formValues, location: locationObj, address: gmaps.formatted_address });
+      setFormValues({
+        ...formValues,
+        location: locationObj,
+        address: gmaps.formatted_address,
+      });
     }
   };
 
@@ -91,8 +101,8 @@ const RetailerForm = ({
           <Grid.Column width={10}>
             <Form>
               <Form.Input
-                label="Premises name"
-                name="businessName"
+                label='Premises name'
+                name='businessName'
                 value={formValues.businessName || ''}
                 required
                 onChange={handleChange}
@@ -104,8 +114,8 @@ const RetailerForm = ({
                 }
               />
               <Form.Input
-                label="Primary contact name"
-                name="primaryContactName"
+                label='Primary contact name'
+                name='primaryContactName'
                 value={formValues.primaryContactName || ''}
                 required
                 onChange={handleChange}
@@ -117,9 +127,9 @@ const RetailerForm = ({
                 }
               />
               <Form.Input
-                label="Purchasing email address"
-                name="purchasingEmail"
-                type="email"
+                label='Purchasing email address'
+                name='purchasingEmail'
+                type='email'
                 value={formValues.purchasingEmail || ''}
                 required
                 onChange={handleChange}
@@ -131,11 +141,11 @@ const RetailerForm = ({
                 }
               />
               <Form.Input
-                label="Purchasing contact number"
-                name="purchasingContactNumber"
-                type="tel"
+                label='Purchasing contact number'
+                name='purchasingContactNumber'
+                type='tel'
                 value={formValues.purchasingContactNumber || ''}
-                onChange={e => setUnformattedTel(e.target.value)}
+                onChange={(e) => setUnformattedTel(e.target.value)}
                 error={
                   formErrors.purchasingContactNumber && {
                     content: formErrors.purchasingContactNumber,
@@ -149,12 +159,12 @@ const RetailerForm = ({
                 <SuggestBlockStyle>
                   <AddressAutocomplete
                     ref={geosuggestEl}
-                    label="Location"
-                    id="Location"
+                    label='Location'
+                    id='Location'
                     location={mapCentre}
                     radius={1500}
                     minlength={3}
-                    country="gb"
+                    country='gb'
                     onSuggestSelect={handleSuggestSelect}
                     onBlur={() => geosuggestEl.current?.selectSuggest()}
                     autoActivateFirstSuggest
@@ -163,9 +173,9 @@ const RetailerForm = ({
                 </SuggestBlockStyle>
                 {formErrors.location && (
                   <div
-                    className="ui pointing above prompt label"
-                    role="alert"
-                    aria-atomic="true"
+                    className='ui pointing above prompt label'
+                    role='alert'
+                    aria-atomic='true'
                   >
                     This field is required
                   </div>
@@ -173,23 +183,23 @@ const RetailerForm = ({
               </div>
               <br />
               <Form.TextArea
-                label="Delivery Instruction"
-                placeholder="Any delivery restrictions or instructions..."
+                label='Delivery Instruction'
+                placeholder='Any delivery restrictions or instructions...'
                 value={formValues.deliveryInstruction || ''}
-                name="deliveryInstruction"
+                name='deliveryInstruction'
                 onChange={handleChange}
                 maxLength={DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
               />
-              {formValues.deliveryInstruction && !!formValues.deliveryInstruction.length && (
-                <p style={{ textAlign: 'right', fontSize: '10px' }}>
-                  {formValues.deliveryInstruction.length}
-                  /
-                  {DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
-                </p>
-              )}
+              {formValues.deliveryInstruction &&
+                !!formValues.deliveryInstruction.length && (
+                  <p style={{ textAlign: 'right', fontSize: '10px' }}>
+                    {formValues.deliveryInstruction.length}/
+                    {DELIVERY_INSTRUCTION_CHARACTER_LIMIT}
+                  </p>
+                )}
               <Form.Checkbox
-                label="I agree to the Terms and Conditions"
-                name="terms"
+                label='I agree to the Terms and Conditions'
+                name='terms'
                 // value={formValues.terms}
                 checked={formValues.terms}
                 required
@@ -204,13 +214,14 @@ const RetailerForm = ({
             </Form>
           </Grid.Column>
           <Grid.Column width={6}>
-            <ImageSelect avatarSaved={avatarSaved} setAvatarSaved={setAvatarSaved} />
+            <ImageSelect
+              avatarSaved={avatarSaved}
+              setAvatarSaved={setAvatarSaved}
+            />
             {formValues.location && formValues.location.lat && (
               <MarkerMapStyle>
                 <Map center={mapCentre} zoom={zoomLevel} zoomControl={false}>
-                  <TileLayer
-                    url={MAP_TILE_PROVIDER_URL}
-                  />
+                  <TileLayer url={MAP_TILE_PROVIDER_URL} />
                   <MapMarker location={formValues.location} />
                 </Map>
               </MarkerMapStyle>

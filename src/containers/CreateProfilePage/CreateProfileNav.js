@@ -13,22 +13,22 @@ const CreateProfileNav = ({
   handleSubmit,
 }) => {
   const backButton = () => (
-    <Grid.Column width="2" as="button" onClick={backClickHandler}>
-      <Icon name="angle left" size="big" />
+    <Grid.Column width='2' as='button' onClick={backClickHandler}>
+      <Icon name='angle left' size='big' />
       Back
     </Grid.Column>
   );
 
   const forwardButton = () => (
-    <Grid.Column width="2" as="button" onClick={forwardClickHandler}>
-      <Icon name="angle right" size="big" />
+    <Grid.Column width='2' as='button' onClick={forwardClickHandler}>
+      <Icon name='angle right' size='big' />
       Continue
     </Grid.Column>
   );
 
   const tickButton = () => (
-    <Grid.Column width="2" as="button" onClick={handleSubmit}>
-      <Icon name="check" size="large" />
+    <Grid.Column width='2' as='button' onClick={handleSubmit}>
+      <Icon name='check' size='large' />
       Complete
     </Grid.Column>
   );
@@ -39,10 +39,10 @@ const CreateProfileNav = ({
     case PROFILE_CREATION_STAGES:
       return (
         <CreateProfileNavStyle>
-          <Grid textAlign="center">
+          <Grid textAlign='center'>
             <Grid.Row>
               {backButton()}
-              <Grid.Column width="12" />
+              <Grid.Column width='12' />
               {tickButton()}
             </Grid.Row>
           </Grid>
@@ -51,10 +51,10 @@ const CreateProfileNav = ({
     default:
       return (
         <CreateProfileNavStyle>
-          <Grid textAlign="center">
+          <Grid textAlign='center'>
             <Grid.Row>
               {backButton()}
-              <Grid.Column width="12" />
+              <Grid.Column width='12' />
               {forwardButton()}
             </Grid.Row>
           </Grid>

@@ -18,8 +18,12 @@ const SuggestBlockStyle = styled.div`
     border: 2px solid transparent;
     box-shadow: 0 0 1px #3d464d;
     padding: 0.5em 1em;
-    -webkit-transition: border 0.2s, box-shadow 0.2s;
-    transition: border 0.2s, box-shadow 0.2s;
+    -webkit-transition:
+      border 0.2s,
+      box-shadow 0.2s;
+    transition:
+      border 0.2s,
+      box-shadow 0.2s;
   }
   .geosuggest__input:focus {
     border-color: #267dc0;
@@ -40,8 +44,12 @@ const SuggestBlockStyle = styled.div`
     overflow-y: auto;
     list-style: none;
     z-index: 5;
-    -webkit-transition: max-height 0.2s, border 0.2s;
-    transition: max-height 0.2s, border 0.2s;
+    -webkit-transition:
+      max-height 0.2s,
+      border 0.2s;
+    transition:
+      max-height 0.2s,
+      border 0.2s;
   }
   .geosuggest__suggests--hidden {
     max-height: 0;

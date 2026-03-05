@@ -22,9 +22,7 @@ import {
   useRowSelect,
 } from 'react-table';
 import matchSorter from 'match-sorter';
-import {
-  Table, Button, Icon,
-} from 'semantic-ui-react';
+import { Table, Button, Icon } from 'semantic-ui-react';
 // import PropTypes from 'prop-types';
 
 // import { FormattedMessage } from 'react-intl';
@@ -44,7 +42,7 @@ const EditableCell = ({
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
 
-  const onChange = e => {
+  const onChange = (e) => {
     setValue(e.target.value);
   };
 
@@ -54,11 +52,11 @@ const EditableCell = ({
     updateMyData(index, id, value === 'Show' ? 'Hide' : 'Show' || 0);
   };
 
-  const onValueChange = values => {
+  const onValueChange = (values) => {
     setValue(values.floatValue || 0);
   };
 
-  const onSelectChange = selectedOption => {
+  const onSelectChange = (selectedOption) => {
     setValue(selectedOption);
     updateMyData(index, id, selectedOption.value || 0);
   };
@@ -79,7 +77,7 @@ const EditableCell = ({
 
   let element = (
     <input
-      className="table-input"
+      className='table-input'
       value={value}
       onChange={onChange}
       onBlur={onBlur}
@@ -89,11 +87,11 @@ const EditableCell = ({
   if (id === 'price') {
     element = (
       <NumberFormat
-        className="table-input"
+        className='table-input'
         thousandSeparator
         decimalScale={2}
         fixedDecimalScale
-        prefix="£"
+        prefix='£'
         value={value}
         onValueChange={onValueChange}
         onBlur={onBlur}
@@ -105,10 +103,10 @@ const EditableCell = ({
   if (id === 'abv') {
     element = (
       <NumberFormat
-        className="table-input"
+        className='table-input'
         decimalScale={1}
         fixedDecimalScale
-        suffix="%"
+        suffix='%'
         value={value}
         onValueChange={onValueChange}
         onBlur={onBlur}
@@ -119,22 +117,25 @@ const EditableCell = ({
 
   if (id === 'packSize') {
     const customStyles = {
-      menuPortal: base => ({ ...base, zIndex: 9999 }),
-      dropdownIndicator: base => ({ ...base, padding: '4px' }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
       indicatorSeparator: () => ({ display: 'none' }),
-      container: base => ({ ...base, border: 'none' }),
-      control: base => ({ ...base, minHeight: 'unset', border: 'none' }),
-      valueContainer: base => ({ ...base, justifyContent: 'center' }),
-      singleValue: base => ({ ...base, padding: '3px' }),
+      container: (base) => ({ ...base, border: 'none' }),
+      control: (base) => ({ ...base, minHeight: 'unset', border: 'none' }),
+      valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
+      singleValue: (base) => ({ ...base, padding: '3px' }),
     };
 
-    const packSizeArr = Object.keys(PACK_SIZES).map(key => ({ value: key, label: PACK_SIZES[key] }));
+    const packSizeArr = Object.keys(PACK_SIZES).map((key) => ({
+      value: key,
+      label: PACK_SIZES[key],
+    }));
     element = (
       <Select
         options={packSizeArr}
         onChange={onSelectChange}
-        value={packSizeArr.filter(option => option.value === value)[0] || ''}
-        placeholder="Select size"
+        value={packSizeArr.filter((option) => option.value === value)[0] || ''}
+        placeholder='Select size'
         menuPortalTarget={document.body}
         styles={customStyles}
       />
@@ -144,13 +145,13 @@ const EditableCell = ({
   if (id === 'display') {
     element = (
       <input
-        type="checkbox"
-        id="display"
-        name="display"
-        value="Show"
+        type='checkbox'
+        id='display'
+        name='display'
+        value='Show'
         checked={value === 'Show'}
         onClick={onCheckboxChange}
-        onChange={() => { }}
+        onChange={() => {}}
       />
     );
   }
@@ -166,10 +167,10 @@ function DefaultColumnFilter({
 
   return (
     <input
-      className="filter-input"
+      className='filter-input'
       style={{ maxWidth: '160px' }}
       value={filterValue || ''}
-      onChange={e => {
+      onChange={(e) => {
         setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
       }}
       placeholder={`Search ${count} records...`}
@@ -180,42 +181,46 @@ function DefaultColumnFilter({
 // This is a custom filter UI for selecting
 // a unique option from a list
 function SelectColumnFilter({
-  column: {
-    filterValue, setFilter, preFilteredRows, id,
-  },
+  column: { filterValue, setFilter, preFilteredRows, id },
 }) {
   // Calculate the options for filtering
   // using the preFilteredRows
   const options = React.useMemo(() => {
     const filterOptions = new Set();
-    preFilteredRows.forEach(row => {
+    preFilteredRows.forEach((row) => {
       filterOptions.add(row.values[id]);
     });
-    const filteredArr = [...filterOptions.values()].map(value => ({ value, label: value }));
+    const filteredArr = [...filterOptions.values()].map((value) => ({
+      value,
+      label: value,
+    }));
     filteredArr.unshift({ label: 'All', value: '' });
 
     return filteredArr;
   }, [id, preFilteredRows]);
 
   const customStyles = {
-    dropdownIndicator: base => ({ ...base, padding: '4px' }),
+    dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
     indicatorSeparator: () => ({ display: 'none' }),
-    container: base => ({
-      ...base, border: 'none', width: '100%', minWidth: '100px',
+    container: (base) => ({
+      ...base,
+      border: 'none',
+      width: '100%',
+      minWidth: '100px',
     }),
-    control: base => ({ ...base, minHeight: 'unset' }),
-    valueContainer: base => ({ ...base, justifyContent: 'center' }),
-    singleValue: base => ({ ...base, padding: '3px' }),
+    control: (base) => ({ ...base, minHeight: 'unset' }),
+    valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
+    singleValue: (base) => ({ ...base, padding: '3px' }),
   };
   // Render a multi-select box
   return (
     <Select
-      className="select-filter"
+      className='select-filter'
       options={options}
       defaultValue={options[0]}
       styles={customStyles}
-      value={options.filter(option => option.value === filterValue)[0]}
-      onChange={e => {
+      value={options.filter((option) => option.value === filterValue)[0]}
+      onChange={(e) => {
         setFilter(e.value || undefined);
       }}
     />
@@ -226,9 +231,7 @@ function SelectColumnFilter({
 // slider to set the filter value between a column's
 // min and max values
 function SliderColumnFilter({
-  column: {
-    filterValue, setFilter, preFilteredRows, id,
-  },
+  column: { filterValue, setFilter, preFilteredRows, id },
 }) {
   // Calculate the min and max
   // using the preFilteredRows
@@ -236,7 +239,7 @@ function SliderColumnFilter({
   const [min, max] = React.useMemo(() => {
     let filterMin = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
     let filterMax = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
-    preFilteredRows.forEach(row => {
+    preFilteredRows.forEach((row) => {
       filterMin = Math.min(row.values[id], filterMin);
       filterMax = Math.max(row.values[id], filterMax);
     });
@@ -246,47 +249,46 @@ function SliderColumnFilter({
   return (
     <>
       <input
-        type="range"
+        type='range'
         min={min}
         max={Math.ceil(max)}
         value={filterValue || Math.ceil(max)}
-        onChange={e => {
+        onChange={(e) => {
           setFilter(parseFloat(e.target.value));
         }}
       />
       {/* <Button size="mini" type="button" onClick={() => setFilter(undefined)}>
         Off
       </Button> */}
-      <Icon name="cancel" onClick={() => setFilter(undefined)} />
+      <Icon name='cancel' onClick={() => setFilter(undefined)} />
     </>
   );
 }
 
 function fuzzyTextFilterFn(rows, id, filterValue) {
-  return matchSorter(rows, filterValue, { keys: [row => row.values[id]] });
+  return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
 }
 
 // Let the table remove the filter if the string is empty
-fuzzyTextFilterFn.autoRemove = val => !val;
+fuzzyTextFilterFn.autoRemove = (val) => !val;
 
 // Be sure to pass our updateMyData and the skipReset option
-const MyTable = ({
-  columns, data, updateMyData, skipReset, setSelected,
-}) => {
+const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
   const filterTypes = React.useMemo(
     () => ({
       // Add a new fuzzyTextFilterFn filter type.
       fuzzyText: fuzzyTextFilterFn,
       // Or, override the default text filter to use
       // "startWith"
-      text: (rows, id, filterValue) => rows.filter(row => {
-        const rowValue = row.values[id];
-        return rowValue !== undefined
-          ? String(rowValue)
-            .toLowerCase()
-            .startsWith(String(filterValue).toLowerCase())
-          : true;
-      }),
+      text: (rows, id, filterValue) =>
+        rows.filter((row) => {
+          const rowValue = row.values[id];
+          return rowValue !== undefined
+            ? String(rowValue)
+                .toLowerCase()
+                .startsWith(String(filterValue).toLowerCase())
+            : true;
+        }),
     }),
     [],
   );
@@ -345,8 +347,8 @@ const MyTable = ({
     usePagination,
     useRowSelect,
     // Here we will use a plugin to add our selection column
-    hooks => {
-      hooks.visibleColumns.push(tableColumns => [
+    (hooks) => {
+      hooks.visibleColumns.push((tableColumns) => [
         {
           id: 'selection',
           // Make this column a groupByBoundary. This ensures that groupBy columns
@@ -355,7 +357,7 @@ const MyTable = ({
           // The header can use the table's getToggleAllRowsSelectedProps method
           // to render a checkbox
           Header: ({ getToggleAllRowsSelectedProps }) => (
-            <div className="checkbox">
+            <div className='checkbox'>
               <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
             </div>
           ),
@@ -373,14 +375,16 @@ const MyTable = ({
   );
 
   const customStyles = {
-    dropdownIndicator: base => ({ ...base, padding: '4px' }),
+    dropdownIndicator: (base) => ({ ...base, padding: '4px' }),
     indicatorSeparator: () => ({ display: 'none' }),
-    container: base => ({
-      ...base, border: 'none', width: '100px',
+    container: (base) => ({
+      ...base,
+      border: 'none',
+      width: '100px',
     }),
-    control: base => ({ ...base, minHeight: 'unset' }),
-    valueContainer: base => ({ ...base, justifyContent: 'center' }),
-    singleValue: base => ({ ...base, padding: '3px' }),
+    control: (base) => ({ ...base, minHeight: 'unset' }),
+    valueContainer: (base) => ({ ...base, justifyContent: 'center' }),
+    singleValue: (base) => ({ ...base, padding: '3px' }),
   };
 
   // track selected rows
@@ -392,18 +396,18 @@ const MyTable = ({
   return (
     <>
       <StockTableStyle>
-        <Table {...getTableProps()} className="stock-table" compact unstackable>
-          <Table.Header className="table-header">
+        <Table {...getTableProps()} className='stock-table' compact unstackable>
+          <Table.Header className='table-header'>
             {headerGroups.map((headerGroup, index) => (
               <Table.Row key={index} {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column, i) => (
                   <th
                     key={i}
-                    className="header-cell"
+                    className='header-cell'
                     width={column.width}
                     {...column.getHeaderProps()}
                   >
-                    <div className="column-header">
+                    <div className='column-header'>
                       <span {...column.getSortByToggleProps()}>
                         {column.render('Header')}
                         {/* Add a sort direction indicator */}
@@ -415,7 +419,7 @@ const MyTable = ({
                       </span>
                     </div>
                     {/* Render the columns filter UI */}
-                    <div className="filter-container">
+                    <div className='filter-container'>
                       {column.canFilter ? column.render('Filter') : null}
                     </div>
                   </th>
@@ -423,7 +427,7 @@ const MyTable = ({
               </Table.Row>
             ))}
           </Table.Header>
-          <Table.Body className="table-body" {...getTableBodyProps()}>
+          <Table.Body className='table-body' {...getTableBodyProps()}>
             {page.map((row, index) => {
               prepareRow(row);
               return (
@@ -431,7 +435,7 @@ const MyTable = ({
                   {row.cells.map((cell, i) => (
                     <Table.Cell
                       key={i}
-                      className="table-cell"
+                      className='table-cell'
                       {...cell.getCellProps()}
                     >
                       {cell.isGrouped ? (
@@ -439,20 +443,18 @@ const MyTable = ({
                         <>
                           <span {...row.getToggleRowExpandedProps()}>
                             {row.isExpanded ? 'ðŸ‘‡' : 'ðŸ‘‰'}
-                          </span>
-                          {' '}
-                          {cell.render('Cell', { editable: false })}
-                          {' '}
-                          (
-                          {row.subRows.length}
-                          )
+                          </span>{' '}
+                          {cell.render('Cell', { editable: false })} (
+                          {row.subRows.length})
                         </>
-                      ) : cell.isPlaceholder ? null : ( // For cells with repeated values, render null
-                        // Otherwise, just render the regular cell
-                        cell.column.id === 'metadata' ? (
-                          <MetadataModal cell={cell} updateMyData={updateMyData} />
-                        )
-                          : cell.render('Cell', { editable: true })
+                      ) : cell.isPlaceholder ? null : // Otherwise, just render the regular cell // For cells with repeated values, render null
+                      cell.column.id === 'metadata' ? (
+                        <MetadataModal
+                          cell={cell}
+                          updateMyData={updateMyData}
+                        />
+                      ) : (
+                        cell.render('Cell', { editable: true })
                       )}
                     </Table.Cell>
                   ))}
@@ -467,64 +469,52 @@ const MyTable = ({
       */}
       </StockTableStyle>
 
-      <div className="pagination">
+      <div className='pagination'>
         <Button
-          type="button"
-          size="mini"
+          type='button'
+          size='mini'
           onClick={() => gotoPage(0)}
           disabled={!canPreviousPage}
         >
-          <Icon name="angle double left" />
-        </Button>
-        {' '}
+          <Icon name='angle double left' />
+        </Button>{' '}
         <Button
-          type="button"
-          size="mini"
+          type='button'
+          size='mini'
           onClick={() => previousPage()}
           disabled={!canPreviousPage}
         >
-          <Icon name="angle left" />
-          {' '}
-        </Button>
-        {' '}
+          <Icon name='angle left' />{' '}
+        </Button>{' '}
         <Button
-          type="button"
-          size="mini"
+          type='button'
+          size='mini'
           onClick={() => nextPage()}
           disabled={!canNextPage}
         >
-          <Icon name="angle right" />
-        </Button>
-        {' '}
+          <Icon name='angle right' />
+        </Button>{' '}
         <Button
-          type="button"
-          size="mini"
+          type='button'
+          size='mini'
           onClick={() => gotoPage(pageCount - 1)}
           disabled={!canNextPage}
         >
-          <Icon name="angle double right" />
-        </Button>
-        {' '}
+          <Icon name='angle double right' />
+        </Button>{' '}
         <span>
-          Page
-          {' '}
+          Page{' '}
           <strong>
-            {pageIndex + 1}
-            {' '}
-            of
-            {' '}
-            {pageOptions.length}
-          </strong>
-          {' '}
+            {pageIndex + 1} of {pageOptions.length}
+          </strong>{' '}
         </span>
         <span>
-          &nbsp;| Go to page:
-          {' '}
+          &nbsp;| Go to page:{' '}
           <input
-            className="pagination-input"
-            type="number"
+            className='pagination-input'
+            type='number'
             defaultValue={pageIndex + 1}
-            onChange={e => {
+            onChange={(e) => {
               const toPage = e.target.value ? Number(e.target.value) - 1 : 0;
               gotoPage(toPage);
             }}
@@ -535,10 +525,13 @@ const MyTable = ({
           defaultValue={{ value: 10, label: 'Show 10' }}
           value={{ value: pageSize, label: `Show ${pageSize}` }}
           styles={customStyles}
-          onChange={e => {
+          onChange={(e) => {
             setPageSize(Number(e.value));
           }}
-          options={[10, 20, 30, 40, 50].map(value => ({ value, label: `Show ${value}` }))}
+          options={[10, 20, 30, 40, 50].map((value) => ({
+            value,
+            label: `Show ${value}`,
+          }))}
         />
         {/* {[10, 20, 30, 40, 50].map((pageSizeVal) => (
             <option key={pageSizeVal} value={pageSizeVal}>
@@ -555,14 +548,14 @@ const MyTable = ({
 
 // Define a custom filter filter function!
 function filterGreaterThan(rows, id, filterValue) {
-  return rows.filter(row => {
+  return rows.filter((row) => {
     const rowValue = row.values[id];
     return rowValue >= filterValue;
   });
 }
 
 function filterLesserThan(rows, id, filterValue) {
-  return rows.filter(row => {
+  return rows.filter((row) => {
     const rowValue = row.values[id];
     return rowValue <= filterValue;
   });
@@ -572,7 +565,7 @@ function filterLesserThan(rows, id, filterValue) {
 // when given the new filter value and returns true, the filter
 // will be automatically removed. Normally this is just an undefined
 // check, but here, we want to remove the filter if it's not a number
-filterGreaterThan.autoRemove = val => typeof val !== 'number';
+filterGreaterThan.autoRemove = (val) => typeof val !== 'number';
 
 const IndeterminateCheckbox = React.forwardRef(
   ({ indeterminate, ...rest }, ref) => {
@@ -583,15 +576,11 @@ const IndeterminateCheckbox = React.forwardRef(
       resolvedRef.current.indeterminate = indeterminate;
     }, [resolvedRef, indeterminate]);
 
-    return (
-      <input type="checkbox" ref={resolvedRef} {...rest} />
-    );
+    return <input type='checkbox' ref={resolvedRef} {...rest} />;
   },
 );
 
-const StockManager = ({
-  data, setData, setSelected, setStockEditPending,
-}) => {
+const StockManager = ({ data, setData, setSelected, setStockEditPending }) => {
   const columns = React.useMemo(
     () => [
       {
@@ -659,16 +648,18 @@ const StockManager = ({
     // We also turn on the flag to not reset the page
     skipResetRef.current = true;
     setStockEditPending(true);
-    setData(old => old.map((row, index) => {
-      if (index === rowIndex) {
-        const newRow = {
-          ...row,
-          [columnId]: value,
-        };
-        return newRow;
-      }
-      return row;
-    }));
+    setData((old) =>
+      old.map((row, index) => {
+        if (index === rowIndex) {
+          const newRow = {
+            ...row,
+            [columnId]: value,
+          };
+          return newRow;
+        }
+        return row;
+      }),
+    );
   };
 
   // After data changes, we turn the flag back off

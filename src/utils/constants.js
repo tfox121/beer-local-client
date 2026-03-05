@@ -37,8 +37,30 @@ export const NOTIFICATION_TYPES = {
 };
 
 export const BLOG_EDITOR_TOOLBAR = {
-  options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'colorPicker', 'link', 'emoji', 'image', 'remove', 'history'],
-  inline: { options: ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript'] },
+  options: [
+    'inline',
+    'blockType',
+    'fontSize',
+    'fontFamily',
+    'list',
+    'textAlign',
+    'colorPicker',
+    'link',
+    'emoji',
+    'image',
+    'remove',
+    'history',
+  ],
+  inline: {
+    options: [
+      'bold',
+      'italic',
+      'underline',
+      'strikethrough',
+      'superscript',
+      'subscript',
+    ],
+  },
   list: { inDropdown: true },
   textAlign: { inDropdown: true },
   link: { inDropdown: true },
@@ -51,4 +73,5 @@ export const PRODUCER_CHART_TIME_PERIODS = {
   week: 'day',
 };
 
-export const MAP_TILE_PROVIDER_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+export const MAP_TILE_PROVIDER_URL =
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';

@@ -1,6 +1,18 @@
-const checkUserStatus = (authLoading, authError, authenticated, userLoading, userLoadingError, userData) => {
+const checkUserStatus = (
+  authLoading,
+  authError,
+  authenticated,
+  userLoading,
+  userLoadingError,
+  userData,
+) => {
   const userStatusObj = {
-    authenticated: false, registered: false, loading: false, error: false, notFound: false, connectionError: false,
+    authenticated: false,
+    registered: false,
+    loading: false,
+    error: false,
+    notFound: false,
+    connectionError: false,
   };
   if (authLoading) {
     userStatusObj.loading = true;
@@ -12,11 +24,12 @@ const checkUserStatus = (authLoading, authError, authenticated, userLoading, use
   }
   if (userLoadingError) {
     // Check for connection errors (backend unavailable)
-    const isConnectionError = !userLoadingError.response
-      && (userLoadingError.code === 'ECONNREFUSED'
-        || userLoadingError.message?.includes('ERR_CONNECTION_REFUSED')
-        || userLoadingError.message?.includes('Network Error')
-        || userLoadingError.request);
+    const isConnectionError =
+      !userLoadingError.response &&
+      (userLoadingError.code === 'ECONNREFUSED' ||
+        userLoadingError.message?.includes('ERR_CONNECTION_REFUSED') ||
+        userLoadingError.message?.includes('Network Error') ||
+        userLoadingError.request);
 
     if (isConnectionError) {
       userStatusObj.loading = false;

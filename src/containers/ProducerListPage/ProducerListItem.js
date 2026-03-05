@@ -9,11 +9,10 @@ import MapMarker from '../../components/MapMarker';
 import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 import { useFollowProducerMutation } from '../../queries/user';
 
-const ProducerListItem = ({
-  producer, user,
-}) => {
+const ProducerListItem = ({ producer, user }) => {
   const history = useHistory();
-  const { mutate: followProducer, isLoading: producerFollowing } = useFollowProducerMutation();
+  const { mutate: followProducer, isLoading: producerFollowing } =
+    useFollowProducerMutation();
   const [followButtonClicked, setFollowButtonClicked] = useState(false);
 
   useEffect(() => {
@@ -27,31 +26,53 @@ const ProducerListItem = ({
     setFollowButtonClicked(true);
   };
 
-  const handleClick = businessId => {
+  const handleClick = (businessId) => {
     history.push(`/brewery/${businessId}`);
   };
 
-  const followedProducerSubs = (user.followedProducers || []).map(followedProducer => followedProducer.sub);
+  const followedProducerSubs = (user.followedProducers || []).map(
+    (followedProducer) => followedProducer.sub,
+  );
   const isFollowed = followedProducerSubs.includes(producer.sub);
 
   return (
     <Table.Row key={producer._id}>
-      <Table.Cell width={5}><Image className="image-link" onClick={() => handleClick(producer.businessId)} src={producer.avatarSource || '/images/avatars/blank-avatar.webp'} size="small" bordered centered circular /></Table.Cell>
+      <Table.Cell width={5}>
+        <Image
+          className='image-link'
+          onClick={() => handleClick(producer.businessId)}
+          src={producer.avatarSource || '/images/avatars/blank-avatar.webp'}
+          size='small'
+          bordered
+          centered
+          circular
+        />
+      </Table.Cell>
       <Table.Cell width={6}>
         <div style={{ display: 'flex' }}>
-          <Link to={`/brewery/${producer.businessId}`}><h2>{producer.businessName}</h2></Link>
-          <Button size="mini" style={{ maxWidth: '100px', maxHeight: '30px', marginLeft: '1em' }} title={`${isFollowed ? 'Unfollow ' : 'Follow '}${producer.businessName}`} loading={followButtonClicked} positive={isFollowed} icon={isFollowed ? 'check' : 'plus'} onClick={handleFollowClick} />
+          <Link to={`/brewery/${producer.businessId}`}>
+            <h2>{producer.businessName}</h2>
+          </Link>
+          <Button
+            size='mini'
+            style={{ maxWidth: '100px', maxHeight: '30px', marginLeft: '1em' }}
+            title={`${isFollowed ? 'Unfollow ' : 'Follow '}${producer.businessName}`}
+            loading={followButtonClicked}
+            positive={isFollowed}
+            icon={isFollowed ? 'check' : 'plus'}
+            onClick={handleFollowClick}
+          />
         </div>
         <p>{producer.intro}</p>
       </Table.Cell>
       <Table.Cell width={5}>
         <Map center={producer.location} zoom={6} zoomControl={false}>
-          <TileLayer
-            url={MAP_TILE_PROVIDER_URL}
+          <TileLayer url={MAP_TILE_PROVIDER_URL} />
+          <DistributionAreaDisplay
+            distributionAreas={producer.distributionAreas}
           />
-          <DistributionAreaDisplay distributionAreas={producer.distributionAreas} />
           <MapMarker location={producer.location} />
-          <MapMarker type="user" location={user.location} />
+          <MapMarker type='user' location={user.location} />
         </Map>
       </Table.Cell>
     </Table.Row>

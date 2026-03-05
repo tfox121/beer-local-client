@@ -3,7 +3,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTable, useSortBy } from 'react-table';
 import {
-  Table, Input, Menu, Modal, Header, Button, Icon, Image, Grid, Dimmer, Loader,
+  Table,
+  Input,
+  Menu,
+  Modal,
+  Header,
+  Button,
+  Icon,
+  Image,
+  Grid,
+  Dimmer,
+  Loader,
 } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
@@ -19,10 +29,21 @@ import calcOrderTotal from '../../utils/calcOrderTotal';
 import { useSendOrderMutation } from '../../queries/producerProfile';
 
 const TableRows = ({
-  data, rows, prepareRow, storedCategory, index, categories, handleCategoryChange, handleRemoveCategory, producerProfile, user, activeIndex, handleRowClick,
+  data,
+  rows,
+  prepareRow,
+  storedCategory,
+  index,
+  categories,
+  handleCategoryChange,
+  handleRemoveCategory,
+  producerProfile,
+  user,
+  activeIndex,
+  handleRowClick,
 }) => {
   const [category, setCategory] = useState(storedCategory);
-  const onSelectChange = selectedOption => {
+  const onSelectChange = (selectedOption) => {
     setCategory(selectedOption.value);
     handleCategoryChange(index, selectedOption.value);
   };
@@ -34,93 +55,139 @@ const TableRows = ({
   return (
     <>
       <Table.Row>
-        {(user && user.businessId === producerProfile.businessId)
-          ? (
-            <>
-              <Table.Cell>
-                <Select
-                  options={[...categories, { value: '', label: 'All' }]}
-                  onChange={onSelectChange}
-                  value={category ? { value: category, label: category } : { value: '', label: 'All' }}
-                  placeholder="All"
-                  menuPortalTarget={document.body}
-                />
-
-              </Table.Cell>
-              <Table.Cell textAlign="right">
-                <Button icon="minus" attached basic onClick={() => handleRemoveCategory(index)} />
-              </Table.Cell>
-            </>
-          )
-          : (
-            <Table.Cell colSpan={user.role === 'producer' ? 2 : 3} textAlign="left">
-              <Header textAlign="left">{category || 'All'}</Header>
+        {user && user.businessId === producerProfile.businessId ? (
+          <>
+            <Table.Cell>
+              <Select
+                options={[...categories, { value: '', label: 'All' }]}
+                onChange={onSelectChange}
+                value={
+                  category
+                    ? { value: category, label: category }
+                    : { value: '', label: 'All' }
+                }
+                placeholder='All'
+                menuPortalTarget={document.body}
+              />
             </Table.Cell>
-          )}
+            <Table.Cell textAlign='right'>
+              <Button
+                icon='minus'
+                attached
+                basic
+                onClick={() => handleRemoveCategory(index)}
+              />
+            </Table.Cell>
+          </>
+        ) : (
+          <Table.Cell
+            colSpan={user.role === 'producer' ? 2 : 3}
+            textAlign='left'
+          >
+            <Header textAlign='left'>{category || 'All'}</Header>
+          </Table.Cell>
+        )}
       </Table.Row>
-      {rows.map(
-        (row, rowIndex) => {
-          if (row.original.display === 'Show' && (row.original.category === category || category === '')) {
-            prepareRow(row);
-            return (
-              <>
-                <Table.Row {...row.getRowProps()} onClick={() => handleRowClick(rowIndex)}>
-                  {row.cells.map((cell, i) => {
-                    if (cell.column.id === 'orderQuant' && ((user && user.role !== 'retailer') || !user)) {
-                      return null;
-                    }
-                    return (
-                      <Table.Cell className={`data-cell-${i}`} {...cell.getCellProps()}>
-                        {cell.column.id === 'orderQuant'
-                          ? cell.render('Cell', { editable: true })
-                          : cell.column.id === 'name'
-                            ? (
-                              <Grid stackable={false}>
-                                <Grid.Row>
-                                  <Grid.Column width={1} verticalAlign="middle">
-                                    <Icon name="caret right" rotated={activeIndex === rowIndex ? 'clockwise' : undefined} />
-                                  </Grid.Column>
-                                  <Grid.Column width={15} className="name-cell">
-                                    {cell.render('Cell')}
-                                    <p style={{ fontSize: '0.8em' }}>{PACK_SIZES[data[index].packSize] || data[index].packSize}</p>
-                                  </Grid.Column>
-                                </Grid.Row>
-                              </Grid>
-                            )
-                            : cell.render('Cell')}
-                      </Table.Cell>
-                    );
-                  })}
-                </Table.Row>
-                <Table.Row className="product-info">
-                  <Table.Cell colSpan={user.role === 'producer' ? 2 : 3} className={activeIndex === rowIndex ? 'row-accordion' : 'row-accordion-hidden'}>
-                    <Grid columns={2}>
-                      <Grid.Row>
-                        <Grid.Column width={4}>
-                          <Image src={data[rowIndex].imageSource || '/images/products/blank-product.png'} bordered centered circular />
-                        </Grid.Column>
-                        <Grid.Column width={12} textAlign="left">
-                          {data[rowIndex].description && (
-                            <p>{data[rowIndex].description}</p>
-                          )}
-                          <Grid columns={3} textAlign="left">
-                            <Grid.Row>
-                              <Grid.Column>{`${data[rowIndex].abv.toFixed(1)}%`}</Grid.Column>
-                              <Grid.Column>{data[rowIndex].style}</Grid.Column>
-                              <Grid.Column>{data[rowIndex].availability}</Grid.Column>
-                            </Grid.Row>
-                          </Grid>
-                        </Grid.Column>
-                      </Grid.Row>
-                    </Grid>
-                  </Table.Cell>
-                </Table.Row>
-              </>
-            );
-          }
-          return null;
-        },
-      )}
+      {rows.map((row, rowIndex) => {
+        if (
+          row.original.display === 'Show' &&
+          (row.original.category === category || category === '')
+        ) {
+          prepareRow(row);
+          return (
+            <>
+              <Table.Row
+                {...row.getRowProps()}
+                onClick={() => handleRowClick(rowIndex)}
+              >
+                {row.cells.map((cell, i) => {
+                  if (
+                    cell.column.id === 'orderQuant' &&
+                    ((user && user.role !== 'retailer') || !user)
+                  ) {
+                    return null;
+                  }
+                  return (
+                    <Table.Cell
+                      className={`data-cell-${i}`}
+                      {...cell.getCellProps()}
+                    >
+                      {cell.column.id === 'orderQuant' ? (
+                        cell.render('Cell', { editable: true })
+                      ) : cell.column.id === 'name' ? (
+                        <Grid stackable={false}>
+                          <Grid.Row>
+                            <Grid.Column width={1} verticalAlign='middle'>
+                              <Icon
+                                name='caret right'
+                                rotated={
+                                  activeIndex === rowIndex
+                                    ? 'clockwise'
+                                    : undefined
+                                }
+                              />
+                            </Grid.Column>
+                            <Grid.Column width={15} className='name-cell'>
+                              {cell.render('Cell')}
+                              <p style={{ fontSize: '0.8em' }}>
+                                {PACK_SIZES[data[index].packSize] ||
+                                  data[index].packSize}
+                              </p>
+                            </Grid.Column>
+                          </Grid.Row>
+                        </Grid>
+                      ) : (
+                        cell.render('Cell')
+                      )}
+                    </Table.Cell>
+                  );
+                })}
+              </Table.Row>
+              <Table.Row className='product-info'>
+                <Table.Cell
+                  colSpan={user.role === 'producer' ? 2 : 3}
+                  className={
+                    activeIndex === rowIndex
+                      ? 'row-accordion'
+                      : 'row-accordion-hidden'
+                  }
+                >
+                  <Grid columns={2}>
+                    <Grid.Row>
+                      <Grid.Column width={4}>
+                        <Image
+                          src={
+                            data[rowIndex].imageSource ||
+                            '/images/products/blank-product.png'
+                          }
+                          bordered
+                          centered
+                          circular
+                        />
+                      </Grid.Column>
+                      <Grid.Column width={12} textAlign='left'>
+                        {data[rowIndex].description && (
+                          <p>{data[rowIndex].description}</p>
+                        )}
+                        <Grid columns={3} textAlign='left'>
+                          <Grid.Row>
+                            <Grid.Column>{`${data[rowIndex].abv.toFixed(1)}%`}</Grid.Column>
+                            <Grid.Column>{data[rowIndex].style}</Grid.Column>
+                            <Grid.Column>
+                              {data[rowIndex].availability}
+                            </Grid.Column>
+                          </Grid.Row>
+                        </Grid>
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
+                </Table.Cell>
+              </Table.Row>
+            </>
+          );
+        }
+        return null;
+      })}
     </>
   );
 };
@@ -148,7 +215,7 @@ const EditableCell = ({
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
 
-  const onChange = e => {
+  const onChange = (e) => {
     setValue(e.target.value);
   };
 
@@ -168,13 +235,13 @@ const EditableCell = ({
 
   return (
     <Input
-      className="table-input"
+      className='table-input'
       value={value || ''}
       onChange={onChange}
       onBlur={onBlur}
-      type="number"
-      min="0"
-      size="small"
+      type='number'
+      min='0'
+      size='small'
       fluid
     />
   );
@@ -189,7 +256,15 @@ EditableCell.propTypes = {
 };
 
 const AvailibilityTable = ({
-  columns, data, updateMyData, skipReset, handleSubmit, producerProfile, user, profileOptionsUpdate, orderSending,
+  columns,
+  data,
+  updateMyData,
+  skipReset,
+  handleSubmit,
+  producerProfile,
+  user,
+  profileOptionsUpdate,
+  orderSending,
 }) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -199,33 +274,30 @@ const AvailibilityTable = ({
     [],
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-      defaultColumn,
-      updateMyData,
-      autoResetPage: !skipReset,
-      autoResetSelectedRows: !skipReset,
-    },
-    useSortBy,
-  );
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable(
+      {
+        columns,
+        data,
+        defaultColumn,
+        updateMyData,
+        autoResetPage: !skipReset,
+        autoResetSelectedRows: !skipReset,
+      },
+      useSortBy,
+    );
 
   const [modalOpen, setModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [stockCategories, setStockCategories] = useState(producerProfile && producerProfile.profileOptions.stockCategories);
+  const [stockCategories, setStockCategories] = useState(
+    producerProfile && producerProfile.profileOptions.stockCategories,
+  );
   const isInitialMount = useRef(true);
   const lastPatchedCategories = useRef(stockCategories);
   const [activeIndex, setActiveIndex] = useState(null);
-  const hasOrderItems = data.some(item => Number(item.orderQuant) > 0);
+  const hasOrderItems = data.some((item) => Number(item.orderQuant) > 0);
 
-  const handleRowClick = rowIndex => {
+  const handleRowClick = (rowIndex) => {
     if (rowIndex === activeIndex) {
       setActiveIndex(null);
       return;
@@ -234,12 +306,15 @@ const AvailibilityTable = ({
   };
 
   const handleAddCategory = () => {
-    if (stockCategories.length < [...new Set(data.map(stockItem => stockItem.category))].length) {
+    if (
+      stockCategories.length <
+      [...new Set(data.map((stockItem) => stockItem.category))].length
+    ) {
       setStockCategories([...stockCategories, '']);
     }
   };
 
-  const handleRemoveCategory = index => {
+  const handleRemoveCategory = (index) => {
     const newCats = [...stockCategories];
     newCats.splice(index, 1);
     setStockCategories([...newCats]);
@@ -262,12 +337,19 @@ const AvailibilityTable = ({
         return;
       }
       lastPatchedCategories.current = stockCategories;
-      profileOptionsUpdate({ name: 'stockCategories', payload: stockCategories });
+      profileOptionsUpdate({
+        name: 'stockCategories',
+        payload: stockCategories,
+      });
     }
   }, [stockCategories]);
 
   useEffect(() => {
-    setCategories([...new Set(data.map(stockItem => stockItem.category))].filter(category => !!category && !stockCategories.includes(category)).map(category => ({ value: category, label: category })));
+    setCategories(
+      [...new Set(data.map((stockItem) => stockItem.category))]
+        .filter((category) => !!category && !stockCategories.includes(category))
+        .map((category) => ({ value: category, label: category })),
+    );
   }, [data, stockCategories]);
 
   const handleModalOpen = () => {
@@ -284,31 +366,41 @@ const AvailibilityTable = ({
 
   return (
     <>
-      { orderSending && (
+      {orderSending && (
         <Dimmer inverted active page>
           <Loader inverted />
         </Dimmer>
       )}
       <Table {...getTableProps()} unstackable>
         <Table.Header>
-          {headerGroups.map(headerGroup => (
+          {headerGroups.map((headerGroup) => (
             <Table.Row {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column, index) => {
-                if (column.Header === 'Order #' && ((user && user.role !== 'retailer') || !user)) {
+                if (
+                  column.Header === 'Order #' &&
+                  ((user && user.role !== 'retailer') || !user)
+                ) {
                   return null;
                 }
                 return (
-                // Add the sorting props to control sorting. For this example
-                // we can add them into the header props
-                  <Table.HeaderCell className={`data-header-${index}`} {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  // Add the sorting props to control sorting. For this example
+                  // we can add them into the header props
+                  <Table.HeaderCell
+                    className={`data-header-${index}`}
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                  >
                     {column.render('Header')}
                     {/* Add a sort direction indicator */}
                     <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? <Icon name="triangle down" />
-                          : <Icon name="triangle up" />
-                        : ''}
+                      {column.isSorted ? (
+                        column.isSortedDesc ? (
+                          <Icon name='triangle down' />
+                        ) : (
+                          <Icon name='triangle up' />
+                        )
+                      ) : (
+                        ''
+                      )}
                     </span>
                   </Table.HeaderCell>
                 );
@@ -318,52 +410,95 @@ const AvailibilityTable = ({
         </Table.Header>
         <Table.Body {...getTableBodyProps()}>
           {stockCategories.map((storedCategory, index) => (
-          // eslint-disable-next-line react/no-array-index-key
+            // eslint-disable-next-line react/no-array-index-key
             <React.Fragment key={index}>
-              <TableRows data={data} rows={rows} prepareRow={prepareRow} producerProfile={producerProfile} user={user} storedCategory={storedCategory} index={index} categories={categories} handleCategoryChange={handleCategoryChange} handleRemoveCategory={handleRemoveCategory} activeIndex={activeIndex} handleRowClick={handleRowClick} />
+              <TableRows
+                data={data}
+                rows={rows}
+                prepareRow={prepareRow}
+                producerProfile={producerProfile}
+                user={user}
+                storedCategory={storedCategory}
+                index={index}
+                categories={categories}
+                handleCategoryChange={handleCategoryChange}
+                handleRemoveCategory={handleRemoveCategory}
+                activeIndex={activeIndex}
+                handleRowClick={handleRowClick}
+              />
             </React.Fragment>
           ))}
         </Table.Body>
         <Table.Footer>
           {user && user.businessId === producerProfile.businessId && (
             <Table.Row>
-              <Table.HeaderCell colSpan="16">
-                <Button attached basic icon="plus" content="Add category section" onClick={handleAddCategory} />
+              <Table.HeaderCell colSpan='16'>
+                <Button
+                  attached
+                  basic
+                  icon='plus'
+                  content='Add category section'
+                  onClick={handleAddCategory}
+                />
               </Table.HeaderCell>
             </Table.Row>
           )}
           {user && user.role === 'retailer' && (
             <Table.Row>
-              <Table.HeaderCell colSpan="16">
-                <Menu floated="right">
-                  {geoJsonContainsCoords(producerProfile.distributionAreas, user.location) || producerProfile.profileOptions.distantPurchasing ? (
+              <Table.HeaderCell colSpan='16'>
+                <Menu floated='right'>
+                  {geoJsonContainsCoords(
+                    producerProfile.distributionAreas,
+                    user.location,
+                  ) || producerProfile.profileOptions.distantPurchasing ? (
                     <>
-                      <Menu.Item name="Place Order" onClick={handleModalOpen} />
+                      <Menu.Item name='Place Order' onClick={handleModalOpen} />
                       <Modal
                         open={modalOpen}
                         onClose={() => setModalOpen(false)}
-                        size="large"
+                        size='large'
                       >
                         <Modal.Header>Confirm Order</Modal.Header>
                         <OrderModalContent
                           orderItems={data}
                           businessName={producerProfile.businessName}
-                          type="draftOrder"
-                          distancePurchase={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)}
-                          distantPurchasingConditions={producerProfile.profileOptions.distantPurchasingConditions}
-                          distantPurchasingMinimumMet={calcOrderTotal(data) >= producerProfile.profileOptions.distantPurchasingConditions.minSpend}
+                          type='draftOrder'
+                          distancePurchase={
+                            !geoJsonContainsCoords(
+                              producerProfile.distributionAreas,
+                              user.location,
+                            )
+                          }
+                          distantPurchasingConditions={
+                            producerProfile.profileOptions
+                              .distantPurchasingConditions
+                          }
+                          distantPurchasingMinimumMet={
+                            calcOrderTotal(data) >=
+                            producerProfile.profileOptions
+                              .distantPurchasingConditions.minSpend
+                          }
                           deliveryInstruction={user.deliveryInstruction}
                         />
                         <Modal.Actions>
-                          <Button content="Cancel" onClick={() => setModalOpen(false)} />
+                          <Button
+                            content='Cancel'
+                            onClick={() => setModalOpen(false)}
+                          />
                           <Button
                             primary
-                            content="Confirm"
+                            content='Confirm'
                             disabled={
-                              !hasOrderItems
-                            || (!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)
-                              && producerProfile.profileOptions.distantPurchasingConditions
-                              && calcOrderTotal(data) < producerProfile.profileOptions.distantPurchasingConditions.minSpend)
+                              !hasOrderItems ||
+                              (!geoJsonContainsCoords(
+                                producerProfile.distributionAreas,
+                                user.location,
+                              ) &&
+                                producerProfile.profileOptions
+                                  .distantPurchasingConditions &&
+                                calcOrderTotal(data) <
+                                  producerProfile.profileOptions
+                                    .distantPurchasingConditions.minSpend)
                             }
                             onClick={handleSendOrder}
                           />
@@ -371,7 +506,7 @@ const AvailibilityTable = ({
                       </Modal>
                     </>
                   ) : (
-                    <Menu.Item disabled name="Not available in your area" />
+                    <Menu.Item disabled name='Not available in your area' />
                   )}
                 </Menu>
               </Table.HeaderCell>
@@ -397,27 +532,37 @@ AvailibilityTable.propTypes = {
 };
 
 const AvailabilityMobile = ({
-  data, producerProfile, profileOptionsUpdate, user,
+  data,
+  producerProfile,
+  profileOptionsUpdate,
+  user,
 }) => {
   const history = useHistory();
-  const { mutateAsync: orderSend, isLoading: orderSending } = useSendOrderMutation();
-  const [orderItems, setOrderItems] = useState([...data].map(stockItem => ({ ...stockItem, orderQuant: 0 })));
+  const { mutateAsync: orderSend, isLoading: orderSending } =
+    useSendOrderMutation();
+  const [orderItems, setOrderItems] = useState(
+    [...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })),
+  );
 
   const handleSubmit = async () => {
-    const order = orderItems.filter(stockItem => stockItem.orderQuant);
-    const response = await orderSend({ orderItems: order, producerSub: producerProfile.sub });
+    const order = orderItems.filter((stockItem) => stockItem.orderQuant);
+    const response = await orderSend({
+      orderItems: order,
+      producerSub: producerProfile.sub,
+    });
     if (response && response.order && response.order._id) {
       history.push(`/order/${response.order._id}`);
     }
   };
 
   useEffect(() => {
-    setOrderItems([...data].map(stockItem => ({ ...stockItem, orderQuant: 0 })));
+    setOrderItems(
+      [...data].map((stockItem) => ({ ...stockItem, orderQuant: 0 })),
+    );
   }, [data]);
 
   const columns = React.useMemo(
     () => [
-
       {
         Header: '↕ Name',
         accessor: 'name',
@@ -425,13 +570,13 @@ const AvailabilityMobile = ({
       {
         Header: 'List Price',
         accessor: 'price',
-        Cell: properties => (
+        Cell: (properties) => (
           <NumberFormat
-            displayType="text"
+            displayType='text'
             thousandSeparator
             decimalScale={2}
             fixedDecimalScale
-            prefix="£"
+            prefix='£'
             value={properties.value}
           />
         ),
@@ -440,7 +585,6 @@ const AvailabilityMobile = ({
         Header: 'Order #',
         accessor: 'orderQuant',
       },
-
     ],
     [],
   );
@@ -450,16 +594,18 @@ const AvailabilityMobile = ({
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
     skipResetRef.current = true;
-    setOrderItems(old => old.map((row, index) => {
-      if (index === rowIndex) {
-        const newRow = {
-          ...row,
-          [columnId]: value,
-        };
-        return newRow;
-      }
-      return row;
-    }));
+    setOrderItems((old) =>
+      old.map((row, index) => {
+        if (index === rowIndex) {
+          const newRow = {
+            ...row,
+            [columnId]: value,
+          };
+          return newRow;
+        }
+        return row;
+      }),
+    );
   };
 
   React.useEffect(() => {

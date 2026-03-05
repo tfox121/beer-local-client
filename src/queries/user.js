@@ -18,15 +18,18 @@ export const fetchCurrentUser = async () => {
   };
 };
 
-export const useUserQuery = (options = {}) => useQuery({
-  queryKey: userQueryKey,
-  queryFn: fetchCurrentUser,
-  ...options,
-});
+export const useUserQuery = (options = {}) =>
+  useQuery({
+    queryKey: userQueryKey,
+    queryFn: fetchCurrentUser,
+    ...options,
+  });
 
-export const followProducer = async producerSub => {
+export const followProducer = async (producerSub) => {
   const privateRoute = await getPrivateRoute();
-  const response = await privateRoute.patch('/user/follow', { follow: producerSub });
+  const response = await privateRoute.patch('/user/follow', {
+    follow: producerSub,
+  });
   return response.data;
 };
 
@@ -35,9 +38,9 @@ export const useFollowProducerMutation = () => {
 
   return useMutation({
     mutationFn: followProducer,
-    onSuccess: data => {
+    onSuccess: (data) => {
       if (data && data.followedProducers) {
-        queryClient.setQueryData(userQueryKey, previous => {
+        queryClient.setQueryData(userQueryKey, (previous) => {
           if (!previous) {
             return previous;
           }
@@ -54,7 +57,7 @@ export const useFollowProducerMutation = () => {
   });
 };
 
-export const updateCurrentUser = async updateObj => {
+export const updateCurrentUser = async (updateObj) => {
   const privateRoute = await getPrivateRoute();
   const response = await privateRoute.patch('/user', updateObj);
   return response.data;
@@ -65,7 +68,7 @@ export const useUpdateUserMutation = () => {
 
   return useMutation({
     mutationFn: updateCurrentUser,
-    onSuccess: data => {
+    onSuccess: (data) => {
       if (data && data.user && data.business) {
         queryClient.setQueryData(userQueryKey, {
           ...data.business,
@@ -78,7 +81,7 @@ export const useUpdateUserMutation = () => {
   });
 };
 
-export const saveCurrentUser = async profileData => {
+export const saveCurrentUser = async (profileData) => {
   const privateRoute = await getPrivateRoute();
   const response = await privateRoute.post('/user', profileData);
   return response.data;
@@ -89,7 +92,7 @@ export const useSaveUserMutation = () => {
 
   return useMutation({
     mutationFn: saveCurrentUser,
-    onSuccess: data => {
+    onSuccess: (data) => {
       if (data && data.user && data.business) {
         queryClient.setQueryData(userQueryKey, {
           ...data.business,

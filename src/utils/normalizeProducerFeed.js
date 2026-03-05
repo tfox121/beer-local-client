@@ -10,16 +10,20 @@ export default function normalizeProducerFeed(producerFeed) {
   }
 
   const { followedProducers = [], nearbyProducers = [] } = producerFeed;
-  const producerInfo = followedProducers.map(producer => [...producer.stock, ...producer.blog]);
+  const producerInfo = followedProducers.map((producer) => [
+    ...producer.stock,
+    ...producer.blog,
+  ]);
 
   const withProducerProps = producerInfo
-    .map((producerItems, index) => producerItems
-      .map(producerItem => ({
+    .map((producerItems, index) =>
+      producerItems.map((producerItem) => ({
         producer: followedProducers[index].businessName,
         producerId: followedProducers[index].businessId,
         avatarSource: followedProducers[index].avatarSource,
         ...producerItem,
-      })))
+      })),
+    )
     .flat()
     .sort((a, b) => {
       if (a.createdAt > b.createdAt) return -1;
@@ -39,7 +43,7 @@ export default function normalizeProducerFeed(producerFeed) {
     return groupsObj;
   }, {});
 
-  const groupedBeersArray = Object.keys(groupedBeers).map(dateKey => {
+  const groupedBeersArray = Object.keys(groupedBeers).map((dateKey) => {
     const groupItems = groupedBeers[dateKey];
     const mostRecentDate = groupItems.reduce((latest, item) => {
       const itemDate = item.createdAt || item.firstDisplayed || item.updatedAt;
@@ -52,13 +56,17 @@ export default function normalizeProducerFeed(producerFeed) {
     };
   });
 
-  const nearbyProducersWithDate = nearbyProducers.map(producer => ({
+  const nearbyProducersWithDate = nearbyProducers.map((producer) => ({
     ...producer,
-    createdAt: producer.createdAt || producer.updatedAt || producer.firstDisplayed || new Date(0).toISOString(),
+    createdAt:
+      producer.createdAt ||
+      producer.updatedAt ||
+      producer.firstDisplayed ||
+      new Date(0).toISOString(),
   }));
 
   return [
-    ...withProducerProps.filter(producerItem => !producerItem.price),
+    ...withProducerProps.filter((producerItem) => !producerItem.price),
     ...groupedBeersArray,
     ...nearbyProducersWithDate,
   ].sort(sortByCreatedAtDesc);

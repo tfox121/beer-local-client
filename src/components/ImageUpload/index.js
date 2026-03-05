@@ -18,7 +18,7 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
 
   const fileInputRef = createRef();
 
-  const fileChange = e => {
+  const fileChange = (e) => {
     setFormValues({
       ...formValues,
       pictureFile: e.target.files[0],
@@ -31,11 +31,11 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
     <ImageUploadStyle>
       <Form>
         <Form.Field>
-          <label htmlFor="fileUpload">
+          <label htmlFor='fileUpload'>
             Profile picture
             <br />
             <Button
-              type="button"
+              type='button'
               content={
                 pictureFile ? (
                   <div>{pictureFile.name}</div>
@@ -44,23 +44,23 @@ function ImageUpload({ formValues, setFormValues, formErrors }) {
                 )
               }
               color={pictureFile ? 'grey' : 'blue'}
-              labelPosition="left"
-              icon="file image"
+              labelPosition='left'
+              icon='file image'
               onClick={() => fileInputRef.current.click()}
             />
             <input
-              id="fileUpload"
+              id='fileUpload'
               ref={fileInputRef}
-              type="file"
-              accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
+              type='file'
+              accept='.png,.jpg,.jpeg,.svg,.webp,.gif'
               hidden
               onChange={fileChange}
             />
             {formErrors.pictureFile && (
               <div
-                className="ui below pointing prompt label"
-                role="alert"
-                aria-atomic="true"
+                className='ui below pointing prompt label'
+                role='alert'
+                aria-atomic='true'
               >
                 Invalid file type.
               </div>

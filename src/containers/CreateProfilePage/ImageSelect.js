@@ -1,8 +1,6 @@
 import React, { useState, createRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Image, Button, Modal, Header, Label,
-} from 'semantic-ui-react';
+import { Image, Button, Modal, Header, Label } from 'semantic-ui-react';
 import { Slider } from 'react-semantic-ui-range';
 import AvatarEditor from 'react-avatar-editor';
 import ImageSelectStyle from './ImageSelectStyle';
@@ -28,7 +26,7 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
     min: 0.5,
     max: 3,
     step: 0.05,
-    onChange: value => {
+    onChange: (value) => {
       setZoom(value);
     },
   };
@@ -53,23 +51,50 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
     <>
       <strong>Profile Picture</strong>
       <ImageSelectStyle>
-        <Image className="profile-image" src={avatarSaved || '/images/avatars/blank-avatar.webp'} size="small" bordered centered circular />
-        <Button inverted circular basic className="image-button" icon="camera" onClick={() => avatarRef.current.click()} />
+        <Image
+          className='profile-image'
+          src={avatarSaved || '/images/avatars/blank-avatar.webp'}
+          size='small'
+          bordered
+          centered
+          circular
+        />
+        <Button
+          inverted
+          circular
+          basic
+          className='image-button'
+          icon='camera'
+          onClick={() => avatarRef.current.click()}
+        />
         <input
-          id="avatarUpload"
+          id='avatarUpload'
           ref={avatarRef}
-          type="file"
-          accept=".png,.jpg,.jpeg,.svg,.webp,.gif"
+          type='file'
+          accept='.png,.jpg,.jpeg,.svg,.webp,.gif'
           hidden
-          onChange={e => setAvatar(e.target.files[0])}
+          onChange={(e) => setAvatar(e.target.files[0])}
         />
       </ImageSelectStyle>
-      <Modal className="image-resizer" open={imageResizeModalOpen} onClose={handleModalClose}>
+      <Modal
+        className='image-resizer'
+        open={imageResizeModalOpen}
+        onClose={handleModalClose}
+      >
         <Modal.Header>
-          <Button floated="left" basic icon="left arrow" onClick={() => setImageResizeModalOpen(false)} />
-          Edit picture
-          {' '}
-          <Button primary floated="right" content="Apply" onClick={handleApply} />
+          <Button
+            floated='left'
+            basic
+            icon='left arrow'
+            onClick={() => setImageResizeModalOpen(false)}
+          />
+          Edit picture{' '}
+          <Button
+            primary
+            floated='right'
+            content='Apply'
+            onClick={handleApply}
+          />
         </Modal.Header>
         <AvatarEditor
           ref={editorRef}
@@ -81,7 +106,7 @@ const ImageSelect = ({ avatarSaved, setAvatarSaved }) => {
           color={[255, 255, 255, 0.6]}
         />
         <Modal.Content>
-          <Slider value={zoom} color="blue" settings={sliderSettings} />
+          <Slider value={zoom} color='blue' settings={sliderSettings} />
         </Modal.Content>
       </Modal>
     </>

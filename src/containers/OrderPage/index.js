@@ -4,7 +4,12 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Map, TileLayer } from 'react-leaflet';
 
 import {
-  Header, Segment, Button, Grid, Message, TextArea,
+  Header,
+  Segment,
+  Button,
+  Grid,
+  Message,
+  TextArea,
 } from 'semantic-ui-react';
 import { Helmet } from 'react-helmet';
 import { Link, useLocation } from 'react-router-dom';
@@ -17,8 +22,15 @@ import Can from '../../components/Can';
 import MapStyle from './MapStyle';
 import MapMarker from '../../components/MapMarker';
 import MessageBoxStyle from './MessageBoxStyle';
-import { ORDER_MESSAGE_CHARACTER_LIMIT, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
-import { useOrderQuery, useEditOrderMutation, useSendOrderMessageMutation } from '../../queries/orders';
+import {
+  ORDER_MESSAGE_CHARACTER_LIMIT,
+  MAP_TILE_PROVIDER_URL,
+} from '../../utils/constants';
+import {
+  useOrderQuery,
+  useEditOrderMutation,
+  useSendOrderMessageMutation,
+} from '../../queries/orders';
 import { useUserQuery } from '../../queries/user';
 
 const OrderPage = () => {
@@ -26,15 +38,22 @@ const OrderPage = () => {
   const location = useLocation();
   const orderId = location.pathname.split('/')[2];
   const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
-  const { data: orderInfo } = useOrderQuery(orderId, { enabled: isAuthenticated && !!orderId });
-  const { mutate: orderEdit, isLoading: orderEditing } = useEditOrderMutation(orderId);
-  const { mutate: messageSend, isLoading: messageSending } = useSendOrderMessageMutation(orderId);
+  const { data: orderInfo } = useOrderQuery(orderId, {
+    enabled: isAuthenticated && !!orderId,
+  });
+  const { mutate: orderEdit, isLoading: orderEditing } =
+    useEditOrderMutation(orderId);
+  const { mutate: messageSend, isLoading: messageSending } =
+    useSendOrderMessageMutation(orderId);
   const notificationClearedRef = useRef(false);
 
-  useEffect(() => () => {
-    notificationClearedRef.current = false;
-    orderIdRef.current = null;
-  }, [isAuthenticated, location.pathname]);
+  useEffect(
+    () => () => {
+      notificationClearedRef.current = false;
+      orderIdRef.current = null;
+    },
+    [isAuthenticated, location.pathname],
+  );
 
   const { role } = userProfile || {};
 
@@ -63,10 +82,13 @@ const OrderPage = () => {
     }
 
     // Same order ID but fresh server data (for example, new messages): keep local order metadata in sync.
-    setOrderData(prevOrderData => {
+    setOrderData((prevOrderData) => {
       const prevMessageCount = prevOrderData?.messages?.length || 0;
       const nextMessageCount = order?.messages?.length || 0;
-      if (prevMessageCount === nextMessageCount && prevOrderData?.status === order?.status) {
+      if (
+        prevMessageCount === nextMessageCount &&
+        prevOrderData?.status === order?.status
+      ) {
         return prevOrderData;
       }
       return { ...order };
@@ -75,25 +97,42 @@ const OrderPage = () => {
 
   useEffect(() => {
     if (userProfile && userProfile.stock && orderItems.length) {
-      const orderIds = orderItems.map(orderItem => orderItem.id);
-      setAvailableStock(userProfile.stock
-        .filter(stockItem => stockItem.display === 'Show' && !orderIds.includes(stockItem.id))
-        .map(stockItem => ({ ...stockItem, value: stockItem.id, label: `${stockItem.name} ${stockItem.packSize} ${stockItem.availability}` })));
+      const orderIds = orderItems.map((orderItem) => orderItem.id);
+      setAvailableStock(
+        userProfile.stock
+          .filter(
+            (stockItem) =>
+              stockItem.display === 'Show' && !orderIds.includes(stockItem.id),
+          )
+          .map((stockItem) => ({
+            ...stockItem,
+            value: stockItem.id,
+            label: `${stockItem.name} ${stockItem.packSize} ${stockItem.availability}`,
+          })),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile?.stock, orderItems.length]);
 
   useEffect(() => {
     // Only clear notification once when order is first loaded
-    if (orderData?._id && !notificationClearedRef.current && orderIdRef.current === orderData._id) {
+    if (
+      orderData?._id &&
+      !notificationClearedRef.current &&
+      orderIdRef.current === orderData._id
+    ) {
       const clearNotification = async () => {
         try {
           const privateRoute = await getPrivateRoute();
           if (role === 'producer' && orderData.producerNotification) {
-            await privateRoute.patch(`/orders/${orderData._id}`, { producerNotification: false });
+            await privateRoute.patch(`/orders/${orderData._id}`, {
+              producerNotification: false,
+            });
             notificationClearedRef.current = true;
           } else if (role === 'retailer' && orderData.retailerNotification) {
-            await privateRoute.patch(`/orders/${orderData._id}`, { retailerNotification: false });
+            await privateRoute.patch(`/orders/${orderData._id}`, {
+              retailerNotification: false,
+            });
             notificationClearedRef.current = true;
           } else {
             // No notification to clear, mark as done
@@ -120,7 +159,10 @@ const OrderPage = () => {
 
   const handleConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
-    const confirmedOrder = { _id: orderData._id, status: orderData.status === 'Confirmed' ? 'Pending' : 'Confirmed' };
+    const confirmedOrder = {
+      _id: orderData._id,
+      status: orderData.status === 'Confirmed' ? 'Pending' : 'Confirmed',
+    };
     // try {
     // const response = await privateRoute.patch(`/orders/${orderData._id}`, confirmedOrder);
     orderEdit(confirmedOrder);
@@ -135,9 +177,13 @@ const OrderPage = () => {
   const handleChangesConfirm = async () => {
     // const privateRoute = await getPrivateRoute();
     const itemsApproved = orderItems
-      .filter(orderItem => orderItem.orderChange !== 'delete')
-      .map(orderItem => ({ ...orderItem, orderChange: '' }));
-    const pendingOrder = { _id: orderData._id, status: 'Pending', items: itemsApproved };
+      .filter((orderItem) => orderItem.orderChange !== 'delete')
+      .map((orderItem) => ({ ...orderItem, orderChange: '' }));
+    const pendingOrder = {
+      _id: orderData._id,
+      status: 'Pending',
+      items: itemsApproved,
+    };
     orderEdit(pendingOrder);
 
     // try {
@@ -152,7 +198,10 @@ const OrderPage = () => {
 
   const handleReject = async () => {
     // const privateRoute = await getPrivateRoute();
-    const rejectedOrder = { _id: orderData._id, status: orderData.status === 'Rejected' ? 'Pending' : 'Rejected' };
+    const rejectedOrder = {
+      _id: orderData._id,
+      status: orderData.status === 'Rejected' ? 'Pending' : 'Rejected',
+    };
 
     orderEdit(rejectedOrder);
 
@@ -182,20 +231,22 @@ const OrderPage = () => {
     // }
   };
 
-  const handleDeleteItem = id => {
+  const handleDeleteItem = (id) => {
     // setOrderEditPending(true);
-    setOrderItems(orderItems.map(orderItem => {
-      if (orderItem.id === id && orderItem.orderChange === 'delete') {
-        return { ...orderItem, orderChange: '' };
-      }
-      if (orderItem.id === id) {
-        return { ...orderItem, orderChange: 'delete' };
-      }
-      return orderItem;
-    }));
+    setOrderItems(
+      orderItems.map((orderItem) => {
+        if (orderItem.id === id && orderItem.orderChange === 'delete') {
+          return { ...orderItem, orderChange: '' };
+        }
+        if (orderItem.id === id) {
+          return { ...orderItem, orderChange: 'delete' };
+        }
+        return orderItem;
+      }),
+    );
   };
 
-  const handleAddItem = newItem => {
+  const handleAddItem = (newItem) => {
     // setOrderEditPending(true);
     const item = newItem;
     delete item.label;
@@ -205,14 +256,22 @@ const OrderPage = () => {
     setOrderItems([...orderItems, item]);
   };
 
-  const handleDecreaseQuant = id => {
+  const handleDecreaseQuant = (id) => {
     // setOrderEditPending(true);
-    const orderItemsEdit = orderItems.map(orderItem => {
+    const orderItemsEdit = orderItems.map((orderItem) => {
       if (orderItem.id === id && orderItem.orderQuant > 1) {
-        const decreasedItem = { ...orderItem, orderQuant: orderItem.orderQuant - 1 };
-        const originalItem = orderData.items.filter(origOrderItem => origOrderItem.id === id)[0];
+        const decreasedItem = {
+          ...orderItem,
+          orderQuant: orderItem.orderQuant - 1,
+        };
+        const originalItem = orderData.items.filter(
+          (origOrderItem) => origOrderItem.id === id,
+        )[0];
         if (orderItem.orderChange !== 'add') {
-          if (originalItem && decreasedItem.orderQuant < originalItem.orderQuant) {
+          if (
+            originalItem &&
+            decreasedItem.orderQuant < originalItem.orderQuant
+          ) {
             decreasedItem.orderChange = 'decrease';
           } else {
             delete decreasedItem.orderChange;
@@ -225,14 +284,22 @@ const OrderPage = () => {
     setOrderItems(orderItemsEdit);
   };
 
-  const handleIncreaseQuant = id => {
+  const handleIncreaseQuant = (id) => {
     // setOrderEditPending(true);
-    const orderItemsEdit = orderItems.map(orderItem => {
+    const orderItemsEdit = orderItems.map((orderItem) => {
       if (orderItem.id === id) {
-        const increasedItem = { ...orderItem, orderQuant: orderItem.orderQuant + 1 };
-        const originalItem = orderData.items.filter(origOrderItem => origOrderItem.id === id)[0];
+        const increasedItem = {
+          ...orderItem,
+          orderQuant: orderItem.orderQuant + 1,
+        };
+        const originalItem = orderData.items.filter(
+          (origOrderItem) => origOrderItem.id === id,
+        )[0];
         if (orderItem.orderChange !== 'add') {
-          if (originalItem && increasedItem.orderQuant > originalItem.orderQuant) {
+          if (
+            originalItem &&
+            increasedItem.orderQuant > originalItem.orderQuant
+          ) {
             increasedItem.orderChange = 'increase';
           } else {
             delete increasedItem.orderChange;
@@ -247,7 +314,11 @@ const OrderPage = () => {
 
   const handleSave = async () => {
     // const privateRoute = await getPrivateRoute();
-    const editedOrder = { _id: orderData._id, status: 'Changes pending', items: [...orderItems] };
+    const editedOrder = {
+      _id: orderData._id,
+      status: 'Changes pending',
+      items: [...orderItems],
+    };
     // const response = await privateRoute.patch(`/orders/${orderData._id}`, editedOrder);
     orderEdit(editedOrder);
 
@@ -274,7 +345,12 @@ const OrderPage = () => {
   const order = orderInfo?.order || orderInfo;
   const business = orderInfo?.business;
 
-  if (!userProfile || !business || !orderItems || !Object.keys(orderData).length) {
+  if (
+    !userProfile ||
+    !business ||
+    !orderItems ||
+    !Object.keys(orderData).length
+  ) {
     return null;
   }
 
@@ -282,79 +358,136 @@ const OrderPage = () => {
     <>
       <Helmet>
         <title>BeerLocal - Order Info</title>
-        <meta name="description" content="Your order" />
+        <meta name='description' content='Your order' />
       </Helmet>
       <PageWrapper>
-        <Segment basic className="primary wrapper">
-          <Header as="h1">{`Order #SO-${orderData.orderNumber.toString().padStart(6, '0')} from ${business.businessName}`}</Header>
-          {(orderData.status === 'Cancelled' || orderData.status === 'Rejected') && (
+        <Segment basic className='primary wrapper'>
+          <Header as='h1'>{`Order #SO-${orderData.orderNumber.toString().padStart(6, '0')} from ${business.businessName}`}</Header>
+          {(orderData.status === 'Cancelled' ||
+            orderData.status === 'Rejected') && (
             <Message negative>
               <Message.Header>{`This order has been ${orderData.status.toLowerCase()}.`}</Message.Header>
               <p>
-                If this is a mistake, please contact us
-                {' '}
-                <Link to="/">here</Link>
+                If this is a mistake, please contact us <Link to='/'>here</Link>
                 .
               </p>
             </Message>
           )}
-          {(orderData.status === 'Confirmed' && role === 'retailer') && (
+          {orderData.status === 'Confirmed' && role === 'retailer' && (
             <Message info>
               <Message.Header>Your order has been confirmed!</Message.Header>
             </Message>
           )}
-          {(orderData.status === 'Changes pending' && role === 'retailer') && (
+          {orderData.status === 'Changes pending' && role === 'retailer' && (
             <Message warning>
               <Message.Header>Your order has changes pending.</Message.Header>
-              <p>
-                Please approve the changes or cancel the order.
-              </p>
+              <p>Please approve the changes or cancel the order.</p>
             </Message>
           )}
-          {(orderData.status === 'Changes pending' && role === 'producer') && (
+          {orderData.status === 'Changes pending' && role === 'producer' && (
             <Message>
-              <Message.Header>Awaiting approval for order changes from the customer.</Message.Header>
+              <Message.Header>
+                Awaiting approval for order changes from the customer.
+              </Message.Header>
             </Message>
           )}
-          {(orderData.status === 'Pending' && role === 'retailer') && (
+          {orderData.status === 'Pending' && role === 'retailer' && (
             <Message>
-              <Message.Header>Awaiting order confirmation from the brewery.</Message.Header>
+              <Message.Header>
+                Awaiting order confirmation from the brewery.
+              </Message.Header>
             </Message>
           )}
-          {((orderData.status === 'Pending' || orderData.status === 'Confirmed') && role === 'producer' && business.deliveryInstruction) && (
-            <Message warning>
-              <Message.Header>This customer has specific requirements for delivery.</Message.Header>
-              <p>{business.deliveryInstruction}</p>
-            </Message>
-          )}
+          {(orderData.status === 'Pending' ||
+            orderData.status === 'Confirmed') &&
+            role === 'producer' &&
+            business.deliveryInstruction && (
+              <Message warning>
+                <Message.Header>
+                  This customer has specific requirements for delivery.
+                </Message.Header>
+                <p>{business.deliveryInstruction}</p>
+              </Message>
+            )}
           <Button.Group>
             <Can
               role={role}
-              perform="orders:confirm"
-              yes={() => (orderData.status === 'Pending' || orderData.status === 'Confirmed') && (
-                <Button onClick={handleConfirm} loading={orderEditing} basic={orderData.status !== 'Confirmed'} color="green" icon="check" content={orderData.status !== 'Confirmed' ? 'Confirm order' : 'Confirmed - click again to undo'} />
-              )}
+              perform='orders:confirm'
+              yes={() =>
+                (orderData.status === 'Pending' ||
+                  orderData.status === 'Confirmed') && (
+                  <Button
+                    onClick={handleConfirm}
+                    loading={orderEditing}
+                    basic={orderData.status !== 'Confirmed'}
+                    color='green'
+                    icon='check'
+                    content={
+                      orderData.status !== 'Confirmed'
+                        ? 'Confirm order'
+                        : 'Confirmed - click again to undo'
+                    }
+                  />
+                )
+              }
             />
             <Can
               role={role}
-              perform="orders:changes-confirm"
-              yes={() => (orderData.status === 'Changes pending') && (
-                <Button onClick={handleChangesConfirm} loading={orderEditing} color="green" icon="check" content="Approve changes" />
-              )}
+              perform='orders:changes-confirm'
+              yes={() =>
+                orderData.status === 'Changes pending' && (
+                  <Button
+                    onClick={handleChangesConfirm}
+                    loading={orderEditing}
+                    color='green'
+                    icon='check'
+                    content='Approve changes'
+                  />
+                )
+              }
             />
             <Can
               role={role}
-              perform="orders:reject"
-              yes={() => (orderData.status === 'Changes pending' || orderData.status === 'Pending' || orderData.status === 'Rejected') && (
-                <Button onClick={handleReject} loading={orderEditing} basic={orderData.status !== 'Rejected'} color="red" icon="ban" content={orderData.status !== 'Rejected' ? 'Reject order' : 'Rejected - click again to undo'} />
-              )}
+              perform='orders:reject'
+              yes={() =>
+                (orderData.status === 'Changes pending' ||
+                  orderData.status === 'Pending' ||
+                  orderData.status === 'Rejected') && (
+                  <Button
+                    onClick={handleReject}
+                    loading={orderEditing}
+                    basic={orderData.status !== 'Rejected'}
+                    color='red'
+                    icon='ban'
+                    content={
+                      orderData.status !== 'Rejected'
+                        ? 'Reject order'
+                        : 'Rejected - click again to undo'
+                    }
+                  />
+                )
+              }
             />
             <Can
               role={role}
-              perform="orders:cancel"
-              yes={() => (orderData.status === 'Changes pending' || orderData.status === 'Pending') && (
-                <Button onClick={handleCancel} loading={orderEditing} basic={orderData.status !== 'Cancelled'} color="red" icon="close" content={orderData.status !== 'Cancelled' ? 'Cancel order' : 'Cancelled - click again to undo'} />
-              )}
+              perform='orders:cancel'
+              yes={() =>
+                (orderData.status === 'Changes pending' ||
+                  orderData.status === 'Pending') && (
+                  <Button
+                    onClick={handleCancel}
+                    loading={orderEditing}
+                    basic={orderData.status !== 'Cancelled'}
+                    color='red'
+                    icon='close'
+                    content={
+                      orderData.status !== 'Cancelled'
+                        ? 'Cancel order'
+                        : 'Cancelled - click again to undo'
+                    }
+                  />
+                )
+              }
             />
           </Button.Group>
           <Segment basic>
@@ -362,22 +495,24 @@ const OrderPage = () => {
               <Grid.Row>
                 <Grid.Column>
                   <p>{business.businessName}</p>
-                  {business.address.split(',').map(addressLine => (
+                  {business.address.split(',').map((addressLine) => (
                     <p key={addressLine}>{addressLine}</p>
                   ))}
                 </Grid.Column>
                 <Grid.Column>
                   <MapStyle>
                     <Map
-                      className="profileViewMap"
+                      className='profileViewMap'
                       center={business.location}
                       zoom={12}
                       zoomControl={false}
                     >
-                      <TileLayer
-                        url={MAP_TILE_PROVIDER_URL}
+                      <TileLayer url={MAP_TILE_PROVIDER_URL} />
+                      <MapMarker
+                        type='customer'
+                        location={business.location}
+                        name={business.businessName}
                       />
-                      <MapMarker type="customer" location={business.location} name={business.businessName} />
                     </Map>
                   </MapStyle>
                 </Grid.Column>
@@ -393,35 +528,55 @@ const OrderPage = () => {
             handleDecreaseQuant={handleDecreaseQuant}
             handleIncreaseQuant={handleIncreaseQuant}
             businessName={business.businessName}
-            type="orderInfo"
+            type='orderInfo'
           />
           <br />
-          {editingOrder
-            ? (
-              <Button.Group>
-                <Button content="Cancel" onClick={handleCancelEdit} />
-                <Button content="Save" primary onClick={handleSave} />
-              </Button.Group>
-            )
-            : (
-              <Can
-                role={role}
-                perform="orders:edit"
-                yes={() => orderData.status !== 'Cancelled' && orderData.status !== 'Rejected' && (
-                  <Button primary content="Edit" size="large" onClick={() => setEditingOrder(true)} />
-                )}
-              />
-            )}
-          <MessageFeed messages={order?.messages || orderData?.messages} user={userProfile} business={business} businessAvatar={orderInfo.image} />
+          {editingOrder ? (
+            <Button.Group>
+              <Button content='Cancel' onClick={handleCancelEdit} />
+              <Button content='Save' primary onClick={handleSave} />
+            </Button.Group>
+          ) : (
+            <Can
+              role={role}
+              perform='orders:edit'
+              yes={() =>
+                orderData.status !== 'Cancelled' &&
+                orderData.status !== 'Rejected' && (
+                  <Button
+                    primary
+                    content='Edit'
+                    size='large'
+                    onClick={() => setEditingOrder(true)}
+                  />
+                )
+              }
+            />
+          )}
+          <MessageFeed
+            messages={order?.messages || orderData?.messages}
+            user={userProfile}
+            business={business}
+            businessAvatar={orderInfo.image}
+          />
           <MessageBoxStyle>
-            <TextArea maxLength={ORDER_MESSAGE_CHARACTER_LIMIT} value={messageContent} onChange={e => setMessageContent(e.target.value)} placeholder={`Write your message to ${business.primaryContactName} at ${business.businessName}...`} />
-            <Button attached="right" primary content="Send" onClick={handleMessageSend} loading={messageSending} />
+            <TextArea
+              maxLength={ORDER_MESSAGE_CHARACTER_LIMIT}
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+              placeholder={`Write your message to ${business.primaryContactName} at ${business.businessName}...`}
+            />
+            <Button
+              attached='right'
+              primary
+              content='Send'
+              onClick={handleMessageSend}
+              loading={messageSending}
+            />
           </MessageBoxStyle>
           {!!messageContent.length && (
             <p style={{ textAlign: 'right', fontSize: '10px' }}>
-              {messageContent.length}
-              /
-              {ORDER_MESSAGE_CHARACTER_LIMIT}
+              {messageContent.length}/{ORDER_MESSAGE_CHARACTER_LIMIT}
             </p>
           )}
           {/* {messageModalOpen
@@ -446,7 +601,6 @@ const OrderPage = () => {
               <Button primary inverted content="Submit" onClick={handleMessageSend} />
             </Modal.Actions>
           </Modal> */}
-
         </Segment>
       </PageWrapper>
     </>

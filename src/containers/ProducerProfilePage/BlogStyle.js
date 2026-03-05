@@ -13,8 +13,8 @@ const BlogStyle = styled.div`
     bottom: 4em;
     height: 4em;
     background-image: linear-gradient(
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 1) 100%
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 1) 100%
     );
   }
 `;

@@ -8,7 +8,7 @@ const StockModalStyle = styled.div`
     justify-content: center;
     align-items: center;
 
-    .ui.icon.message>.icon:not(.close) {
+    .ui.icon.message > .icon:not(.close) {
       vertical-align: unset;
     }
 
@@ -21,7 +21,6 @@ const StockModalStyle = styled.div`
       border-radius: 4.5px;
       border: 1px solid rgb(118, 118, 118);
       opacity: 0.4;
-
     }
 
     span > input:focus {
@@ -37,12 +36,12 @@ const StockModalStyle = styled.div`
 
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+      -webkit-appearance: none;
+      margin: 0;
     }
 
-    input[type=number] {
-        -moz-appearance:textfield; /* Firefox */
+    input[type='number'] {
+      -moz-appearance: textfield; /* Firefox */
     }
   }
 `;

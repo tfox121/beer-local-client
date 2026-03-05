@@ -23,9 +23,7 @@ ChartJS.register(
   Legend,
 );
 
-const LineChart = ({
-  data, period, step, status,
-}) => {
+const LineChart = ({ data, period, step, status }) => {
   const [dates, setDates] = useState([]);
   const [values, setValues] = useState([]);
 
@@ -44,7 +42,10 @@ const LineChart = ({
 
   function* previousDateRange(periodString, stepString) {
     const endDate = moment().subtract(1, periodString).subtract(1, 'day');
-    const startDate = moment().subtract(2, periodString).add(1, stepString).subtract(1, 'day');
+    const startDate = moment()
+      .subtract(2, periodString)
+      .add(1, stepString)
+      .subtract(1, 'day');
 
     while (startDate <= endDate) {
       yield startDate.format();
@@ -52,15 +53,19 @@ const LineChart = ({
     }
   }
 
-  const mapDatesToTotals = (datesArr, orders, statusString, stepString) => datesArr.map(date => {
-    let stepTotal = 0;
-    orders.forEach(orderItem => {
-      if (orderItem.status === statusString && moment(orderItem.createdAt).isSame(date, stepString)) {
-        stepTotal += calcOrderTotal(orderItem.items);
-      }
+  const mapDatesToTotals = (datesArr, orders, statusString, stepString) =>
+    datesArr.map((date) => {
+      let stepTotal = 0;
+      orders.forEach((orderItem) => {
+        if (
+          orderItem.status === statusString &&
+          moment(orderItem.createdAt).isSame(date, stepString)
+        ) {
+          stepTotal += calcOrderTotal(orderItem.items);
+        }
+      });
+      return stepTotal;
     });
-    return stepTotal;
-  });
 
   useEffect(() => {
     if (period && step) {
@@ -82,7 +87,7 @@ const LineChart = ({
     return null;
   }
 
-  const labels = dates.map(date => moment(date).format('YYYY-MM-DD'));
+  const labels = dates.map((date) => moment(date).format('YYYY-MM-DD'));
 
   const dataObj = {
     labels,
@@ -149,7 +154,7 @@ const LineChart = ({
       },
       tooltip: {
         callbacks: {
-          label: context => `£${context.parsed.y}`,
+          label: (context) => `£${context.parsed.y}`,
         },
       },
     },
@@ -161,7 +166,7 @@ const LineChart = ({
           maxTicksLimit: 4,
           padding: 10,
           suggestedMax,
-          callback: value => `£${value}`,
+          callback: (value) => `£${value}`,
         },
         gridLines: {
           drawBorder: false,
@@ -172,7 +177,8 @@ const LineChart = ({
         id: 'x-axis',
         ticks: {
           padding: 5,
-          callback: value => moment(labels[value]).format(toolTipFormat[step] || 'ddd Do'),
+          callback: (value) =>
+            moment(labels[value]).format(toolTipFormat[step] || 'ddd Do'),
         },
         gridLines: {
           zeroLineWidth: 0.5,
@@ -181,9 +187,7 @@ const LineChart = ({
       },
     },
   };
-  return (
-    <Line data={dataObj} height={200} options={options} />
-  );
+  return <Line data={dataObj} height={200} options={options} />;
 };
 
 LineChart.propTypes = {

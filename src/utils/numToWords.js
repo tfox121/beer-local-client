@@ -9,11 +9,42 @@ const th = ['', 'thousand', 'million', 'billion', 'trillion'];
 // uncomment this line for English Number System
 // var th = ['','thousand','million', 'milliard','billion'];
 
-const dg = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-const tn = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-const tw = ['twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+const dg = [
+  'zero',
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six',
+  'seven',
+  'eight',
+  'nine',
+];
+const tn = [
+  'ten',
+  'eleven',
+  'twelve',
+  'thirteen',
+  'fourteen',
+  'fifteen',
+  'sixteen',
+  'seventeen',
+  'eighteen',
+  'nineteen',
+];
+const tw = [
+  'twenty',
+  'thirty',
+  'forty',
+  'fifty',
+  'sixty',
+  'seventy',
+  'eighty',
+  'ninety',
+];
 
-const numToWords = number => {
+const numToWords = (number) => {
   let s = number;
   s = s.toString();
   s = s.replace(/[, ]/g, '');
@@ -48,7 +79,9 @@ const numToWords = number => {
   if (x !== s.length) {
     const y = s.length;
     str += 'point ';
-    for (let i = x + 1; i < y; i += 1) { str += `${dg[n[i]]} `; }
+    for (let i = x + 1; i < y; i += 1) {
+      str += `${dg[n[i]]} `;
+    }
   }
   return str.replace(/\s+/g, ' ');
 };
