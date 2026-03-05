@@ -86,7 +86,7 @@ function Notification({ notification }) {
             {tr(
               'components.navbar.notification.you.have.a.new.order.from',
               'You have a new order from',
-            )}
+            )}{' '}
             {author}!
           </>
         );
@@ -97,8 +97,8 @@ function Notification({ notification }) {
             {tr(
               'components.navbar.notification.the.status.of.your.order.from',
               'The status of your order from',
-            )}
-            {author}
+            )}{' '}
+            {author}{' '}
             {tr('components.navbar.notification.has.changed', 'has changed.')}
           </>
         );
@@ -109,8 +109,8 @@ function Notification({ notification }) {
             {tr(
               'components.navbar.notification.your.order.with',
               'Your order with',
-            )}
-            {author}
+            )}{' '}
+            {author}{' '}
             {tr(
               'components.navbar.notification.has.a.new.message',
               'has a new message.',
