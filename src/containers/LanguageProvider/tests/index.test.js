@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { FormattedMessage, defineMessages } from 'react-intl';
 
 import LanguageProvider from '../index';
@@ -17,22 +17,22 @@ const messages = defineMessages({
 describe('<LanguageProvider />', () => {
   it('should render its children', () => {
     const children = <h1>Test</h1>;
-    const { container } = render(
+    render(
       <LanguageProvider messages={messages} locale='en'>
         {children}
       </LanguageProvider>,
     );
-    expect(container.firstChild).not.toBeNull();
+    expect(screen.getByRole('heading', { name: 'Test' })).not.toBeNull();
   });
 });
 
-describe('<LanguageProvider />', () => {
+describe('<LanguageProvider /> language messages', () => {
   it('should render the default language messages', () => {
-    const { queryByText } = render(
+    render(
       <LanguageProvider messages={translationMessages}>
         <FormattedMessage {...messages.someMessage} />
       </LanguageProvider>,
     );
-    expect(queryByText(messages.someMessage.defaultMessage)).not.toBeNull();
+    expect(screen.getByText(messages.someMessage.defaultMessage)).not.toBeNull();
   });
 });
