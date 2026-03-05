@@ -33,6 +33,8 @@ describe('<LanguageProvider /> language messages', () => {
         <FormattedMessage {...messages.someMessage} />
       </LanguageProvider>,
     );
-    expect(screen.getByText(messages.someMessage.defaultMessage)).not.toBeNull();
+    expect(
+      screen.getByText(messages.someMessage.defaultMessage),
+    ).not.toBeNull();
   });
 });

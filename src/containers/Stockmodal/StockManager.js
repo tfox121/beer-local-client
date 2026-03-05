@@ -447,8 +447,8 @@ const MyTable = ({ columns, data, updateMyData, skipReset, setSelected }) => {
                           {cell.render('Cell', { editable: false })} (
                           {row.subRows.length})
                         </>
-                      ) : cell.isPlaceholder ? null : // Otherwise, just render the regular cell // For cells with repeated values, render null
-                      cell.column.id === 'metadata' ? (
+                      ) : cell.isPlaceholder ? null : cell.column.id === // Otherwise, just render the regular cell // For cells with repeated values, render null
+                        'metadata' ? (
                         <MetadataModal
                           cell={cell}
                           updateMyData={updateMyData}
