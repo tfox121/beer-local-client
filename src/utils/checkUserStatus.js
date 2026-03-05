@@ -36,14 +36,10 @@ const checkUserStatus = (authLoading, authError, authenticated, userLoading, use
   }
   if (authenticated) {
     userStatusObj.authenticated = true;
-    // necessary in order to prevent routes from rendering before user retrieved.
-    // Only set loading if there's no error
-    if (!userLoadingError) {
+    // Only keep the app in loading while the user request is actually in flight.
+    if (userLoading && !userLoadingError) {
       userStatusObj.loading = true;
     }
-  }
-  if (userLoading && !userLoadingError) {
-    userStatusObj.loading = true;
   }
   if (userData) {
     userStatusObj.loading = false;

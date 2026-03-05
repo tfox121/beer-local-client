@@ -10,8 +10,6 @@ import AvatarEditor from 'react-avatar-editor';
 import { Slider } from 'react-semantic-ui-range';
 import PhoneNumber from 'awesome-phonenumber';
 
-// import { useInjectSaga } from '../../utils/injectSaga';
-// import { useInjectReducer } from '../../utils/injectReducer';
 import NumberFormat from 'react-number-format';
 import AddressAutocomplete from '../../components/AddressAutocomplete';
 import L from 'leaflet';
@@ -26,7 +24,6 @@ import SuggestBlockStyle from '../CreateProfilePage/SuggestBlockStyle';
 import DistroMapStyle from '../CreateProfilePage/DistroMapStyle';
 import MapMarker from '../../components/MapMarker';
 import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
-// import { fetchUser } from '../App/actions';
 
 const ProfileEditModal = ({
   producerProfile, user, profileUpdate, profileEditModalOpen, setProfileEditModalOpen,

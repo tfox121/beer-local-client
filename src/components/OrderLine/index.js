@@ -6,7 +6,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Table, Button } from 'semantic-ui-react';
 import NumberFormat from 'react-number-format';
 import { PACK_SIZES } from '../../utils/constants';
@@ -69,9 +68,5 @@ function OrderLine({
     </Table.Row>
   );
 }
-
-OrderLine.propTypes = {
-  orderLine: PropTypes.object,
-};
 
 export default OrderLine;

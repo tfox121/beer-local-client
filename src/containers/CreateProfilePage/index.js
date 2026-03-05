@@ -5,20 +5,16 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl';
-import { createStructuredSelector } from 'reselect';
-import { compose } from 'redux';
 import {
   Segment, Header, Dimmer, Loader,
 } from 'semantic-ui-react';
 import PhoneNumber from 'awesome-phonenumber';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useHistory } from 'react-router-dom';
 
 import { Helmet } from 'react-helmet';
 // import messages from './messages';
-import { saveUser } from '../App/actions';
 
 import CreateProfileNav from './CreateProfileNav';
 import BusinessTypeSelection from './BusinessTypeSelection';
@@ -29,13 +25,12 @@ import CommsOptionsForm from './CommsOptionsForm';
 import PageWrapper from '../../components/PageWrapper';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
-import { makeSelectSavingUser } from '../App/selectors';
+import { useSaveUserMutation } from '../../queries/user';
 
-export function CreateProfilePage({ userSave, savingUser }) {
-  // useInjectReducer({ key: 'createProfilePage', reducer });
-  // useInjectSaga({ key: 'createProfilePage', saga });
-
+export function CreateProfilePage() {
   const { user } = useAuth0();
+  const history = useHistory();
+  const { mutateAsync: saveUser, isLoading: savingUser } = useSaveUserMutation();
 
   const formTemplate = {
     type: '',
@@ -191,7 +186,14 @@ export function CreateProfilePage({ userSave, savingUser }) {
           avatarSource = getImageUrl(user.sub, 'avatar');
         }
       }
-      userSave({ ...formValues, avatarSource });
+      const response = await saveUser({ ...formValues, avatarSource });
+      if (response && response.user) {
+        if (formValues.type === 'producer') {
+          history.push(`/brewery/${response.user.businessId}`);
+        } else {
+          history.push('/');
+        }
+      }
     } else {
       setFormErrors(errors);
     }
@@ -264,24 +266,4 @@ export function CreateProfilePage({ userSave, savingUser }) {
   );
 }
 
-CreateProfilePage.propTypes = {
-  userSave: PropTypes.func,
-  savingUser: PropTypes.bool,
-};
-
-const mapStateToProps = createStructuredSelector({
-  savingUser: makeSelectSavingUser(),
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    userSave: profileData => dispatch(saveUser(profileData)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(withConnect)(CreateProfilePage);
+export default CreateProfilePage;

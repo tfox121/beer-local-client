@@ -23,7 +23,7 @@ import {
 } from 'react-table';
 import matchSorter from 'match-sorter';
 import {
-  Table, Button, Icon, Modal,
+  Table, Button, Icon,
 } from 'semantic-ui-react';
 // import PropTypes from 'prop-types';
 

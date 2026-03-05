@@ -1,23 +1,19 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-
-import { createStructuredSelector } from 'reselect';
+import { useAuth0 } from '@auth0/auth0-react';
 import {
   Header, Segment, Feed, Dimmer, Loader,
 } from 'semantic-ui-react';
 
 import PageWrapper from '../../components/PageWrapper';
-import { makeSelectUser } from '../App/selectors';
 import RetailerDashboardStyle from './RetailerDashboardStyle';
 import FeedItem from './FeedItem';
 import { useRetailerFeedQuery } from '../../queries/retailerFeed';
+import { useUserQuery } from '../../queries/user';
 
-const RetailerDashboardPage = ({
-  userProfile,
-}) => {
+const RetailerDashboardPage = () => {
+  const { isAuthenticated } = useAuth0();
+  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
   const {
     data: producerFeed = [],
     isLoading: producerFeedFetching,
@@ -56,15 +52,4 @@ const RetailerDashboardPage = ({
   );
 };
 
-RetailerDashboardPage.propTypes = {
-  userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-};
-
-const mapStateToProps = createStructuredSelector({
-  userProfile: makeSelectUser(),
-});
-const withConnect = connect(mapStateToProps);
-
-export default compose(
-  withConnect,
-)(RetailerDashboardPage);
+export default RetailerDashboardPage;

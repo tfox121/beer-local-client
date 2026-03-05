@@ -12,22 +12,18 @@ import {
 } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
-import PropTypes from 'prop-types';
-import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
 
 import { Helmet } from 'react-helmet';
 import messages from './messages';
 import PageWrapper from '../../components/PageWrapper';
-import { makeSelectUser } from '../App/selectors';
-import { fetchUser } from '../App/actions';
+import { useUserQuery } from '../../queries/user';
 import RetailerDashboardPage from '../RetailerDashboardPage';
 import ProducerDashboardPage from '../ProducerDashboardPage';
 import HomepageStyle from './HomepageStyle';
 
-const HomePage = ({ userProfile }) => {
+const HomePage = () => {
   const { isAuthenticated, loginWithRedirect } = useAuth0();
+  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
   const [buttonVisible, setButtonVisible] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [businessName, setBusinessName] = useState('');
@@ -201,25 +197,4 @@ const HomePage = ({ userProfile }) => {
   );
 };
 
-HomePage.propTypes = {
-  userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-};
-
-const mapStateToProps = createStructuredSelector({
-  userProfile: makeSelectUser(),
-});
-
-export function mapDispatchToProps(dispatch) {
-  return {
-    userFetch: () => dispatch(fetchUser()),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(
-  withConnect,
-)(HomePage);
+export default HomePage;

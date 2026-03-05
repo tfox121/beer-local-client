@@ -344,30 +344,30 @@ const AvailibilityTable = ({
                         onClose={() => setModalOpen(false)}
                         size="large"
                       >
-                      <Modal.Header>Confirm Order</Modal.Header>
-                      <OrderModalContent
-                        orderItems={data}
-                        businessName={producerProfile.businessName}
-                        type="draftOrder"
-                        distancePurchase={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)}
-                        distantPurchasingConditions={producerProfile.profileOptions.distantPurchasingConditions}
-                        distantPurchasingMinimumMet={calcOrderTotal(data) >= producerProfile.profileOptions.distantPurchasingConditions.minSpend}
-                        deliveryInstruction={user.deliveryInstruction}
-                      />
-                      <Modal.Actions>
-                        <Button content="Cancel" onClick={() => setModalOpen(false)} />
-                        <Button
-                          primary
-                          content="Confirm"
-                          disabled={
-                            !hasOrderItems
+                        <Modal.Header>Confirm Order</Modal.Header>
+                        <OrderModalContent
+                          orderItems={data}
+                          businessName={producerProfile.businessName}
+                          type="draftOrder"
+                          distancePurchase={!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)}
+                          distantPurchasingConditions={producerProfile.profileOptions.distantPurchasingConditions}
+                          distantPurchasingMinimumMet={calcOrderTotal(data) >= producerProfile.profileOptions.distantPurchasingConditions.minSpend}
+                          deliveryInstruction={user.deliveryInstruction}
+                        />
+                        <Modal.Actions>
+                          <Button content="Cancel" onClick={() => setModalOpen(false)} />
+                          <Button
+                            primary
+                            content="Confirm"
+                            disabled={
+                              !hasOrderItems
                             || (!geoJsonContainsCoords(producerProfile.distributionAreas, user.location)
                               && producerProfile.profileOptions.distantPurchasingConditions
                               && calcOrderTotal(data) < producerProfile.profileOptions.distantPurchasingConditions.minSpend)
-                          }
-                          onClick={handleSendOrder}
-                        />
-                      </Modal.Actions>
+                            }
+                            onClick={handleSendOrder}
+                          />
+                        </Modal.Actions>
                       </Modal>
                     </>
                   ) : (

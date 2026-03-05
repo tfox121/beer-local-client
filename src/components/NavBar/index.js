@@ -5,38 +5,38 @@
  */
 
 import React, { useState, memo } from 'react';
-import PropTypes from 'prop-types';
 
 import { Menu, Responsive, Dropdown } from 'semantic-ui-react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
-import { push } from 'connected-react-router';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useHistory } from 'react-router-dom';
 
 import UserMenuItems from './UserMenuItems';
 import Can from '../Can';
 
-import { makeSelectUser } from './selectors';
+import { useUserQuery } from '../../queries/user';
 import NavBarStyle from './NavBarStyle';
 
-function NavBar({ userProfile, pushRoute }) {
+function NavBar() {
   const [activeItem, setActiveItem] = useState('');
+  const { isAuthenticated } = useAuth0();
+  const history = useHistory();
+  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
 
   const handleItemClick = (e, { name }) => {
     setActiveItem(name);
     switch (name) {
       case '/':
         setActiveItem('');
-        pushRoute('/');
+        history.push('/');
         break;
       case '/brewery/profile':
-        pushRoute(`/brewery/${userProfile.businessId}`);
+        history.push(`/brewery/${userProfile.businessId}`);
         break;
       case '/sales/orders':
-        pushRoute('/sales/orders');
+        history.push('/sales/orders');
         break;
       case '/breweries':
-        pushRoute('/breweries');
+        history.push('/breweries');
         break;
       default:
         break;
@@ -122,7 +122,7 @@ function NavBar({ userProfile, pushRoute }) {
         </Responsive>
         <Responsive as={React.Fragment} minWidth={426}>
           <Can
-            role={userProfile.role}
+            role={userProfile?.role}
             perform="producer-menu:visit"
             yes={() => (
               <>
@@ -142,7 +142,7 @@ function NavBar({ userProfile, pushRoute }) {
             )}
           />
           <Can
-            role={userProfile.role}
+            role={userProfile?.role}
             perform="retailer-menu:visit"
             yes={() => (
               <>
@@ -164,39 +164,15 @@ function NavBar({ userProfile, pushRoute }) {
         </Responsive>
         <Menu.Menu position="right">
           <UserMenuItems
-            notifications={userProfile.notifications}
-            avatarSource={userProfile.avatarSource}
-            businessName={userProfile.businessName}
+            notifications={userProfile?.notifications}
+            avatarSource={userProfile?.avatarSource}
+            businessName={userProfile?.businessName}
           />
         </Menu.Menu>
       </Menu>
     </NavBarStyle>
   );
 }
-
-NavBar.propTypes = {
-  userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  pushRoute: PropTypes.func,
-};
-
-const mapStateToProps = createStructuredSelector({
-  userProfile: makeSelectUser(),
-});
-
-export function mapDispatchToProps(dispatch) {
-  return {
-    pushRoute: path => dispatch(push(path)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(
-  withConnect,
-  memo,
-)(NavBar);
+export default memo(NavBar);
 
 // export default NavBar;

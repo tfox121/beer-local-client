@@ -11,15 +11,10 @@ import PropTypes from 'prop-types';
 import {
   Dropdown, Image, Grid,
 } from 'semantic-ui-react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
-import { push } from 'connected-react-router';
 import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 // import messages from './messages';
-import { makeSelectUser } from './selectors';
 import { NOTIFICATION_TYPES } from '../../utils/constants';
 import timeAgo from '../../utils/timeAgo';
 
@@ -179,25 +174,6 @@ function Notification({ notification }) {
 Notification.propTypes = {
   notification: PropTypes.object,
 };
-
-const mapStateToProps = createStructuredSelector({
-  userProfile: makeSelectUser(),
-});
-
-export function mapDispatchToProps(dispatch) {
-  return {
-    pushRoute: path => dispatch(push(path)),
-  };
-}
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-export default compose(
-  withConnect,
-  memo,
-)(Notification);
+export default memo(Notification);
 
 // export default Notification;

@@ -7,13 +7,10 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 // import { FormattedMessage } from 'react-intl';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import { createStructuredSelector } from 'reselect';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import PhoneNumber from 'awesome-phonenumber';
 import {
@@ -31,10 +28,10 @@ import {
   Responsive,
 } from 'semantic-ui-react';
 import { Map, TileLayer } from 'react-leaflet';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useLocation } from 'react-router-dom';
 
 import { BLOG_ITEMS_PER_PAGE, PACK_SIZES, MAP_TILE_PROVIDER_URL } from '../../utils/constants';
-import { makeSelectLocation, makeSelectProducerFollowing, makeSelectUser } from '../App/selectors';
-import { followProducer } from '../App/actions';
 import promotionCopySelection from '../../utils/promotionCopy';
 import {
   useDeletePromotionMutation,
@@ -42,6 +39,7 @@ import {
   useUpdateProfileMutation,
   useUpdateProfileOptionsMutation,
 } from '../../queries/producerProfile';
+import { useFollowProducerMutation, useUserQuery } from '../../queries/user';
 // import messages from './messages';
 
 import PageWrapper from '../../components/PageWrapper';
@@ -61,12 +59,11 @@ import BlogStyle from './BlogStyle';
 import BannerStyle from './BannerStyle';
 import AvailabilityMobile from './AvailabilityMobile';
 
-export function ProducerProfilePage({
-  user,
-  routerLocation,
-  producerFollow,
-  producerFollowing,
-}) {
+export function ProducerProfilePage() {
+  const { isAuthenticated } = useAuth0();
+  const routerLocation = useLocation();
+  const { data: user } = useUserQuery({ enabled: isAuthenticated });
+  const { mutate: producerFollow, isLoading: producerFollowing } = useFollowProducerMutation();
   const producerBusinessId = routerLocation && routerLocation.pathname && routerLocation.pathname.split('/')[2];
   const {
     data: producerProfile,
@@ -87,9 +84,7 @@ export function ProducerProfilePage({
   useEffect(() => {
     if (followedProducers && producerSub) {
       const followedProducerList = followedProducers.map(producer => producer.sub);
-      if (followedProducerList.includes(producerSub)) {
-        setProducerFollowed(true);
-      }
+      setProducerFollowed(followedProducerList.includes(producerSub));
     }
   }, [followedProducers, producerSub]);
 
@@ -366,26 +361,4 @@ export function ProducerProfilePage({
   );
 }
 
-ProducerProfilePage.propTypes = {
-  user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  routerLocation: PropTypes.object,
-  producerFollow: PropTypes.func,
-  producerFollowing: PropTypes.bool,
-};
-
-const mapStateToProps = createStructuredSelector({
-  user: makeSelectUser(),
-  routerLocation: makeSelectLocation(),
-  producerFollowing: makeSelectProducerFollowing(),
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    producerFollow: producerSub => dispatch(followProducer(producerSub)),
-  };
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ProducerProfilePage);
+export default ProducerProfilePage;

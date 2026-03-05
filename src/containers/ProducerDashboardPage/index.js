@@ -1,11 +1,9 @@
 /* eslint-disable no-nested-ternary */
 
 import React, { useEffect, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import moment from 'moment';
 import { values } from 'lodash';
-import { createStructuredSelector } from 'reselect';
+import { useAuth0 } from '@auth0/auth0-react';
 import {
   Header, Segment, Button, Grid, Icon, Image, Dimmer, Loader,
 } from 'semantic-ui-react';
@@ -13,7 +11,6 @@ import { Link } from 'react-router-dom';
 import { TileLayer, Map } from 'react-leaflet';
 
 import PageWrapper from '../../components/PageWrapper';
-import { makeSelectUser } from '../App/selectors';
 import ProducerDashboardStyle from './ProducerDashboardStyle';
 import calcOrderTotal from '../../utils/calcOrderTotal';
 import LineChart from './LineChart';
@@ -21,10 +18,11 @@ import { PACK_SIZES, PRODUCER_CHART_TIME_PERIODS, MAP_TILE_PROVIDER_URL } from '
 import DistributionAreaDisplay from '../../components/DistributionAreaDisplay';
 import MapMarker from '../../components/MapMarker';
 import { useProducerDashboardQuery } from '../../queries/producerDashboard';
+import { useUserQuery } from '../../queries/user';
 
-const ProducerDashboardPage = ({
-  userProfile,
-}) => {
+const ProducerDashboardPage = () => {
+  const { isAuthenticated } = useAuth0();
+  const { data: userProfile } = useUserQuery({ enabled: isAuthenticated });
   const {
     data: dashboardData,
     isLoading: producerDashboardFetching,
@@ -130,7 +128,7 @@ const ProducerDashboardPage = ({
 
   const topItems = useMemo(() => topItemsArr(dashboardOrders, salesPeriod), [dashboardOrders, salesPeriod]);
 
-  if (!Object.keys(dashboardOrders).length || !Object.keys(periodSales).length) {
+  if (!userProfile || !Object.keys(dashboardOrders).length || !Object.keys(periodSales).length) {
     return null;
   }
 
@@ -401,15 +399,4 @@ const ProducerDashboardPage = ({
   );
 };
 
-ProducerDashboardPage.propTypes = {
-  userProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-};
-
-const mapStateToProps = createStructuredSelector({
-  userProfile: makeSelectUser(),
-});
-
-export default connect(
-  mapStateToProps,
-  null,
-)(ProducerDashboardPage);
+export default ProducerDashboardPage;

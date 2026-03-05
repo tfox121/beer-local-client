@@ -19,7 +19,7 @@ module.exports = {
       presets: ['@babel/preset-react'],
     },
   },
-  plugins: ['redux-saga', 'react', 'react-hooks', 'jsx-a11y'],
+  plugins: ['react', 'react-hooks', 'jsx-a11y'],
   rules: {
     'no-underscore-dangle': 0,
     'arrow-body-style': [2, 'as-needed'],
@@ -88,8 +88,6 @@ module.exports = {
     'react/require-extension': 0,
     'react/self-closing-comp': 0,
     'react/sort-comp': 0,
-    'redux-saga/no-yield-in-race': 2,
-    'redux-saga/yield-effects': 2,
     'require-yield': 0,
     'react/jsx-props-no-spreading': 0,
     'react/static-property-placement': 0,

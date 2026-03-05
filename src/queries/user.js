@@ -77,3 +77,27 @@ export const useUpdateUserMutation = () => {
     },
   });
 };
+
+export const saveCurrentUser = async profileData => {
+  const privateRoute = await getPrivateRoute();
+  const response = await privateRoute.post('/user', profileData);
+  return response.data;
+};
+
+export const useSaveUserMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: saveCurrentUser,
+    onSuccess: data => {
+      if (data && data.user && data.business) {
+        queryClient.setQueryData(userQueryKey, {
+          ...data.business,
+          ...data.user,
+        });
+      }
+
+      queryClient.invalidateQueries({ queryKey: userQueryKey });
+    },
+  });
+};

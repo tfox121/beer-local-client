@@ -8,7 +8,6 @@ import rbacRules from '../../utils/rbac-rules';
 
 const check = (rules, role, action, data) => {
   const permissions = rules[role];
-  // console.log('CAN', rules, role, action, data);
 
   if (!permissions) {
     // role is not present in the rules
@@ -39,7 +38,6 @@ const check = (rules, role, action, data) => {
 const Can = ({
   role, perform, data, yes, no,
 }) => (
-  // console.log('NAV', role, perform, data);
   check(rbacRules, role, perform, data) ? yes() : no()
 );
 
