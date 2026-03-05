@@ -1,11 +1,8 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import { Provider } from 'react-redux';
-import { browserHistory } from 'react-router-dom';
 
-import ConnectedLanguageProvider, { LanguageProvider } from '../index';
-import configureStore from '../../../configureStore';
+import LanguageProvider from '../index';
 
 import { translationMessages } from '../../../i18n';
 
@@ -29,20 +26,12 @@ describe('<LanguageProvider />', () => {
   });
 });
 
-describe('<ConnectedLanguageProvider />', () => {
-  let store;
-
-  beforeAll(() => {
-    store = configureStore({}, browserHistory);
-  });
-
+describe('<LanguageProvider />', () => {
   it('should render the default language messages', () => {
     const { queryByText } = render(
-      <Provider store={store}>
-        <ConnectedLanguageProvider messages={translationMessages}>
-          <FormattedMessage {...messages.someMessage} />
-        </ConnectedLanguageProvider>
-      </Provider>,
+      <LanguageProvider messages={translationMessages}>
+        <FormattedMessage {...messages.someMessage} />
+      </LanguageProvider>,
     );
     expect(queryByText(messages.someMessage.defaultMessage)).not.toBeNull();
   });
