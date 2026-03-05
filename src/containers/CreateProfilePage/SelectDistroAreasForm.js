@@ -52,8 +52,6 @@ const SelectDistroAreasForm = ({
   };
 
   const onCreated = (e) => {
-    const type = e.layerType;
-
     onChange();
   };
 
