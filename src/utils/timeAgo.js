@@ -3,4 +3,6 @@ import en from 'javascript-time-ago/locale/en';
 
 TimeAgo.addLocale(en);
 
-export default new TimeAgo('en-UK');
+const timeAgo = new TimeAgo('en-UK');
+
+export default timeAgo;
