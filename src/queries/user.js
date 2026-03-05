@@ -53,3 +53,27 @@ export const useFollowProducerMutation = () => {
     },
   });
 };
+
+export const updateCurrentUser = async updateObj => {
+  const privateRoute = await getPrivateRoute();
+  const response = await privateRoute.patch('/user', updateObj);
+  return response.data;
+};
+
+export const useUpdateUserMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateCurrentUser,
+    onSuccess: data => {
+      if (data && data.user && data.business) {
+        queryClient.setQueryData(userQueryKey, {
+          ...data.business,
+          ...data.user,
+        });
+      }
+
+      queryClient.invalidateQueries({ queryKey: userQueryKey });
+    },
+  });
+};

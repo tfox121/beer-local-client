@@ -8,8 +8,6 @@ import {
 } from 'semantic-ui-react';
 import AvatarEditor from 'react-avatar-editor';
 import { Slider } from 'react-semantic-ui-range';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
 import PhoneNumber from 'awesome-phonenumber';
 
 // import { useInjectSaga } from '../../utils/injectSaga';
@@ -19,10 +17,8 @@ import AddressAutocomplete from '../../components/AddressAutocomplete';
 import L from 'leaflet';
 import { Map, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import { makeSelectUser, makeSelectUpdatingUser } from './selectors';
-// import saga from './saga';
 import ayt from '../../utils/phoneNumberValidation';
-import { updateUser } from '../App/actions';
+import { useUpdateUserMutation } from '../../queries/user';
 import EditProfileStyle from './EditProfileStyle';
 import { getPresignedRoute, imageToBucket } from '../../utils/bucket';
 import getImageUrl from '../../utils/getImageUrl';
@@ -33,10 +29,9 @@ import { MAP_TILE_PROVIDER_URL } from '../../utils/constants';
 // import { fetchUser } from '../App/actions';
 
 const ProfileEditModal = ({
-  producerProfile, user, userUpdate, profileUpdate, userUpdating, profileEditModalOpen, setProfileEditModalOpen,
+  producerProfile, user, profileUpdate, profileEditModalOpen, setProfileEditModalOpen,
 }) => {
-  // useInjectReducer({ key: 'global', reducer });
-  // useInjectSaga({ key: 'profileEditModal', saga });
+  const { mutateAsync: userUpdate, isLoading: userUpdating } = useUpdateUserMutation();
 
   const [userFormValues, setUserFormValues] = useState({});
   const [producerFormValues, setProducerFormValues] = useState({
@@ -611,24 +606,8 @@ const ProfileEditModal = ({
 ProfileEditModal.propTypes = {
   producerProfile: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   user: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  userUpdating: PropTypes.bool,
-  userUpdate: PropTypes.func,
   profileUpdate: PropTypes.func,
   setProfileEditModalOpen: PropTypes.func,
 };
 
-const mapStateToProps = createStructuredSelector({
-  user: makeSelectUser(),
-  userUpdating: makeSelectUpdatingUser(),
-});
-
-function mapDispatchToProps(dispatch, { location }) {
-  return {
-    userUpdate: updateObj => dispatch(updateUser(updateObj, location.pathname)),
-  };
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(ProfileEditModal);
+export default ProfileEditModal;
